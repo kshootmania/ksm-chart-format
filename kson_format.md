@@ -849,9 +849,9 @@ dictionary InvokeList<T> {
 
 # Change Log
 
-Change log before the version `0.1.0` can be referenced here: https://gist.github.com/m4saka/a89594a17dc9422d75e01998bcfd2722
-
-- version `0.1.0` (06/14/2020)
+- `0.2.0` (05/06/2022)
+    - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/3/files
+- `0.1.0` (06/14/2020)
     - No changes from the draft on 01/13/2020
 
 -----------------------------------------------------------------------------------
