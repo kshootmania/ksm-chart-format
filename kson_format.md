@@ -856,4 +856,4 @@ Change log before the version `0.1.0` can be referenced here: https://gist.githu
 -----------------------------------------------------------------------------------
 
 # Acknowledgement
-This specification is initially based on the BMSON format (https://bmson-spec.readthedocs.io/en/master/doc/index.html).
+This specification is initially based on the BMSON format (https://bmson-spec.readthedocs.io/en/master/doc/index.html) and albshin's kshon format (https://gist.github.com/albshin/cf535afc3f94f7d7f7c7e3d1d9ff41cf).
