@@ -5,7 +5,7 @@
 - Support for parameters/options marked "(OPTIONAL)" are optional, but must be ignored if not supported.
 - `xxx` and `...` denote placeholders.
 - The resolution of pulse value (`y`) is 240 per beat (i.e., 960 per measure).
-- The behavior of reading an invalid value is undefined and kson clients do not necessarily have to stop loading the kson file as an error.
+- The behavior for invalid values is undefined, and kson clients do not necessarily need to stop reading the kson file as an error even if there is an invalid value.
 
 -----------------------------------------------------------------------------------
 
