@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.2.0-beta21`)
+# KSON Format Specification (version: `0.2.0`)
 - Encoding: UTF-8 (without BOM), LF
 - If a default values is specified in this document, undefined values are overwritten by the default value.
 - `null` value is not allowed in the entire kson file.
