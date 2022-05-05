@@ -1,6 +1,7 @@
-# KSON Format Specification (version: `0.1.0`)
+# KSON Format Specification (version: `0.2.0-beta15`)
 - Encoding: UTF-8 (without BOM), LF
-- If the default value is specified, omitted value or `null` will be replaced with it.
+- If a default value is specified in this document, the undefined value is replaced by the default value. Note that `null` is not replaced by the default value.
+- Supporting parameters/options marked "(OPTIONAL)" is optional in the kson client.
 
 -----------------------------------------------------------------------------------
 
@@ -15,7 +16,7 @@ dictionary kson {
     AudioInfo?    audio;       // audio-related data
     CameraInfo?   camera;      // camera-related data
     BgInfo?       bg;          // background-related data
-    ClientList?   impl;        // implementation-dependent options for each client
+    ClientList?   impl;        // (OPTIONAL) implementation-dependent options for each client
 }
 ```
 
@@ -25,42 +26,34 @@ dictionary kson {
 ```
 dictionary MetaInfo {
     DOMString       title;                 // self-explanatory
-    DOMString?      title_translit;        // transliterated title
-    DOMString?      subtitle;              // self-explanatory, can be a CD title or a music genre
+    DOMString?      title_img_filename;    // (OPTIONAL) use an image instead of song title text
+    DOMString?      title_translit;        // (OPTIONAL) transliterated title
+    DOMString?      subtitle;              // (OPTIONAL) self-explanatory, can be a CD title or a music genre
     DOMString       artist;                // self-explanatory
-    DOMString?      artist_translit;       // transliterated artist
+    DOMString?      artist_img_filename;   // (OPTIONAL) use an image instead of song artist text
+    DOMString?      artist_translit;       // (OPTIONAL) transliterated artist
     DOMString       chart_author;          // self-explanatory
     DifficultyInfo  difficulty;            // self-explanatory
     unsigned int    level;                 // self-explanatory, 1-20
-    DOMString?      disp_bpm;              // displayed bpm (allowed characters: 0-9, "-", ".")
-                                           // If not specified, the first value of BeatInfo.bpm will be used.
-    double?         std_bpm;               // standard bpm for hi-speed values (should be between minimum bpm and maximum bpm in the chart)
+    DOMString       disp_bpm = "";         // displayed bpm (allowed characters: 0-9, "-", ".")
+    double          std_bpm = 0;           // (OPTIONAL) standard bpm for hi-speed values (should be between minimum bpm and maximum bpm in the chart); automatically set if zero
     DOMString?      jacket_filename;       // self-explanatory (can have a preset image "nowprinting1"/"nowprinting2"/"nowprinting3")
     DOMString?      jacket_author;         // self-explanatory
-    DOMString?      information;           // optional information shown in song selection
-    DOMString?      lang;                  // language (usually "ja" or "ko")
+    DOMString?      information;           // (OPTIONAL) optional information shown in song selection
+    DOMString?      lang;                  // (OPTIONAL) language (usually "ja" or "ko")
                                            // If the system language does not match this value, xxx_translit is used instead of xxx.
                                            // If not specified, the behavior depends on implementation (like xxx_translit is used only for English environment).
-    LegacyMetaInfo? legacy;
-    DOMString?      ksh_version;           // "ver" field of KSH file (specified only if converted from KSH)
+    DOMString?      ksh_version;           // (OPTIONAL) "ver" field of KSH file (specified only if converted from KSH)
 }
 ```
 
 ### `meta.difficulty`
 ```
 dictionary DifficultyInfo {
-    DOMString?     name;        // e.g. "Challenge", "Infinity", "Gravity", "Maximum", "FOUR DIMENSIONS"
-    DOMString?     short_name;  // e.g. "CH", "IN", "GRV", "MXM", "FD"
-                                // (if not specified, it inherits the client defaults based on "index". e.g. 1=>"CH")
+    DOMString?     name;        // (OPTIONAL) e.g. "Challenge", "Infinity", "Gravity", "Maximum", "FOUR DIMENSIONS"
+    DOMString?     short_name;  // (OPTIONAL) e.g. "CH", "IN", "GRV", "MXM", "FD"
+                                // (if not specified, it inherits the client defaults based on "idx". e.g. 1=>"CH")
     unsigned char  idx;         // 0-4  e.g. "CH"=>1, "IN"/"GRV"=>3, "MXM"/"FD"=>4
-}
-```
-
-### `meta.legacy`
-```
-dictionary LegacyMetaInfo {
-    DOMString? title_img_filename;   // use an image instead of song title text
-    DOMString? artist_img_filename;  // use an image instead of song artist text
 }
 ```
 
@@ -101,18 +94,21 @@ dictionary GaugeInfo {
 ## `note`
 ```
 dictionary NoteInfo {
-    Interval[][]? bt;               // BT notes (first index: lane) (l=0: chip note, l>0: long note)
-    Interval[][]? fx;               // FX notes (first index: lane) (l=0: chip note, l>0: long note)
-    LaserSection[][]? laser;        // laser notes (first index: lane (0: left knob, 1: right knob))
+    Interval[][4]? bt;               // BT notes (first index: lane) (l=0: chip note, l>0: long note)
+    Interval[][2]? fx;               // FX notes (first index: lane) (l=0: chip note, l>0: long note)
+    LaserSection[][2]? laser;        // laser notes (first index: lane (0: left knob, 1: right knob))
 }
 ```
+
+- For long BT/FX notes, if the end point of one note and the start point of another note are at the same time (i.e., `y` is the same as `y + l` of the previous note), they are joined as one long note when played. This is mainly used when several audio effects are switched in one long FX note.
+- Two or more notes cannot be overlapped on a single lane.
 
 ### `note.laser[lane][idx]`
 ```
 dictionary LaserSection : ByPulse<GraphSectionPoint[]> {
     unsigned long y;                // pulse number
     GraphSectionPoint[] v;          // laser points (0.0-1.0)
-    unsigned char wide = 1;         // 1-2, sets whether this laser section is 2x-widen or not
+    unsigned char w = 1;            // x-axis scale (1-2), sets whether this laser section is 2x-widen or not
 }
 ```
 
@@ -124,6 +120,7 @@ dictionary AudioInfo {
     BgmInfo? bgm;                               // bgm-related data
     KeySoundInfo? key_sound;                    // key-sound-related data
     AudioEffectInfo? audio_effect;              // audio-effect-related data
+    LegacyAudioInfo? legacy;                    // (OPTIONAL) legacy data
 }
 ```
 
@@ -143,22 +140,38 @@ dictionary BgmInfo {
 ### `audio.key_sound`
 ```
 dictionary KeySoundInfo {
-    DefList<KeySound>? def;                         // key sound definitions
-    InvokeList<ByPulse<KeySound>[]>? pulse_event;   // key sound invocation by pulse
-    InvokeList<ByNotes<KeySound>>? note_event;      // key sound invocation by notes
+    KeySoundFXInfo fx;        // key sound for FX notes
+    KeySoundLaserInfo laser;  // (OPTIONAL) key sound for laser slams
 }
 ```
+- Note: The key of `audio.key_sound.xxx.def` is the filename of a WAVE file (.wav).
 
-#### `audio.key_sound.def`
+### `audio.key_sound.fx`
+```
+dictionary KeySoundFXInfo {
+    DefList<KeySound>? def;                           // key sound definitions
+    InvokeList<ByPulse<KeySound>[][2]>? chip_invoke;  // key sound invocation by chip FX notes
+}
+```
+- Note: `audio.key_sound.laser.chip_invoke` should be the same as `y` of an existing chip FX note on the corresponding lane, otherwise the event is ignored.
+
+### `audio.key_sound.laser` (OPTIONAL)
+```
+dictionary KeySoundLaserInfo {
+    DefList<KeySound>? def;                         // key sound definitions
+    InvokeList<ByPulse<KeySound>[]>? slam_invoke;   // key sound invocation by laser slam notes
+}
+```
+- Note: `audio.key_sound.laser.slam_invoke` should be the same as `y` of an existing laser slam, otherwise the event is ignored.
+- Note: `slam` is predefined in the kson client and is invoked in default.
+- (OPTIONAL) Note: `slam_up` & `slam_down` & `slam_swing` are predefined by kson clients.
+
+#### `audio.key_sound.xxx.def`
 ```
 dictionary Def<KeySound> {
-    // key sound filename (unchangeable in invocation)
-    DOMString filename;
-
-    // parameters (changeable in invocation, the default values are only used in Def)
+    // parameters
     KeySound? v {
-        double vol = 1.0;  // standard volume, this value is multiplied if specified in invocation
-                           //     vol = Def<KeySound>.v.vol * invocation.v.vol
+        double vol = 1.0;
     };
 }
 ```
@@ -166,23 +179,38 @@ dictionary Def<KeySound> {
 ### `audio.audio_effect`
 ```
 dictionary AudioEffectInfo {
-    DefList<AudioEffect>? def;                          // audio effect definitions
-    InvokeList<ByPulse<AudioEffect>[]>? pulse_event;    // audio effect invocation (parameter changes) by pulse
-    InvokeList<ByNotes<AudioEffect>>? note_event;       // audio effect invocation (parameter changes) by notes
+    AudioEffectFXInfo? fx;
+    AudioEffectLaserInfo? laser;
 }
-// Note: In AudioEffectInfo.note_event.laser, the laser points inherit the audio effect type of the previous point.
-//       But this is not applied beyond a section.
-//       Note that the default audio effect (peaking filter) is set to the first point of every section as default.
 ```
 
-#### `audio.audio_effect.def`
+#### `audio.audio_effect.fx`
+```
+dictionary AudioEffectFXInfo {
+    DefList<AudioEffect>? def;                           // audio effect definitions
+    InvokeList<ByPulse<AudioEffect>[]>? param_change;    // audio effect parameter changes by pulse
+    InvokeList<ByPulse<AudioEffect>[][2]>? long_invoke;  // audio effect invocation (and parameter changes) by FX notes
+}
+```
+- Note: `audio.audio_effect.fx.long_invoke[].y` should be the same as `y` of an existing long FX note on the corresponding lane, otherwise the event is ignored.
+
+#### `audio.audio_effect.laser`
+```
+dictionary AudioEffectLaserInfo {
+    DefList<AudioEffect>? def;                         // audio effect definitions
+    InvokeList<ByPulse<AudioEffect>[]>? param_change;  // audio effect parameter changes by pulse
+    InvokeList<ByPulse<AudioEffect>[]>? pulse_invoke;  // audio effect invocation (and parameter changes) by pulse
+}
+```
+
+##### `audio.audio_effect.xxx.def`
 ```
 dictionary Def<AudioEffect> {
-    DOMString type;      // name of the audio effect to inherit (e.g. "flanger")
+    DOMString type;      // audio effect type (e.g. "flanger")
     AudioEffect? v {
         // Custom fields for each audio effect type
     };
-    DOMString? filename; // can be specified only if type="audio_swap"
+    DOMString? filename; // This can be specified only if type="switch_audio". The filename of an audio file.
 }
 ```
 - Examples:
@@ -197,13 +225,13 @@ dictionary Def<AudioEffect> {
                         "v": 80.0
                     }
                 ],
-                "depth.off": [
+                "depth": [
                     {
                         "y": 0,
                         "v": 30.0
                     }
                 ],
-                "depth.on.min": [
+                "depth.on": [
                     {
                         "y": 0,
                         "v": 40.0
@@ -224,7 +252,7 @@ dictionary Def<AudioEffect> {
        {
            "type":"tapestop",
            "v":{
-                "trigger.off": [
+                "trigger": [
                     {
                         "y": 0,
                         "v": 0.0
@@ -270,15 +298,14 @@ dictionary Def<AudioEffect> {
     4. "`type=SwitchAudio;fileName=music.ogg`" in KSH
        ```
        {
-           "type":"audio_swap",
+           "type":"switch_audio",
            "filename":"music.ogg" // not in "v" because "filename" is not changeable in invocation
        }
        ```
-- No audio effects are predefined in default.
-    - You need to define all audio effects used in kson explicitly.
+- Audio effects in the "Audio effects & parameter list" are predefined with its default value.
 
 
-### Audio effect parameter types
+#### Audio effect parameter types
 
 Values of all these types are set by a floating-point value.
 
@@ -312,7 +339,7 @@ Values of all these types are set by a floating-point value.
         - `12.0` means one octave
     - The value must be between `-48.0` and `48.0`
     - Fields:
-        - `@quantize` (bool)
+        - (OPTIONAL) `@quantize` (bool)
             - `true`: the value is ceiled (e.g. `12.9` -> `12.0`, `-1.1` -> `-2.0`)
             - `false`: the value is not ceiled
 - int
@@ -322,7 +349,7 @@ Values of all these types are set by a floating-point value.
     - Floating-point value
 
 
-### Audio effects & parameter list
+#### Audio effects & parameter list
 
 - `retrigger`
     - `update_period` (length, default:`0.5`)
@@ -344,13 +371,13 @@ Values of all these types are set by a floating-point value.
     - `depth` (sample, default:`45.0`)
     - `feedback` (rate, default:`0.6`)
     - `stereo_width` (rate, default:`0.0`)
-    - `vol` (rate, default:`0.75`)
+    - (OPTIONAL) `vol` (rate, default:`0.75`)
     - `mix` (rate, default:`.off=0.0, .on=0.8`)
 - `pitch_shift`
     - `pitch` (pitch, default:`0.0`)
-    - `pitch@quantize` (bool, default:`1.0`)
-    - `chunk_size` (sample, default:`700.0`)
-    - `overlap` (rate, default:`0.4`)
+    - (OPTIONAL) `pitch@quantize` (bool, default:`1.0`)
+    - (OPTIONAL) `chunk_size` (sample, default:`700.0`)
+    - (OPTIONAL) `overlap` (rate, default:`0.4`)
         - Note: This parameter is described as `overWrap` in KSH format, but it's a spelling mistake.
     - `mix` (rate, default:`.off=0.0, .on=1.0`)
 - `bitcrusher`
@@ -397,12 +424,14 @@ Values of all these types are set by a floating-point value.
     - `release_time` (length, default:`0.0625`)
     - `release_time@tempo_sync` (bool, default:`1.0`)
     - `ratio` (float, default:`.off=1.0, .on=5.0`)
-        - The type of this parameter has been changed to "float" from "int" (in KSH format).
-- `audio_swap`
-    - (`filename` (filename))
+        - The type of this parameter has been changed from "int" to "float" (in KSH format).
+- `switch_audio`
+    - (`filename` (string))
+        - Note that this is not in `v` but at the root of `Def<AudioEffect>`
+    - (OPTIONAL) (`fallback` (string))
         - Note that this is not in `v` but at the root of `Def<AudioEffect>`
 - `high_pass_filter`
-    - `env` (rate, default:`.off=0.0, .on.min=0.0, .on.max=0.0`)
+    - `env` (rate, default:`.off=0.0, .on.min=0.0, .on.max=1.0`)
         - This parameter determines an envelope value of the cutoff frequency.
             - The cutoff frequency = `lo_freq` + `env` * (`hi_freq`-`lo_freq`)
             - This parameter is set to `0.0-1.0` in default.
@@ -411,40 +440,51 @@ Values of all these types are set by a floating-point value.
     - `lo_freq` (freq, default:??? `/*FIXME*/`)
     - `hi_freq` (freq, default:??? `/*FIXME*/`)
     - `q` (float, default:??? `/*FIXME*/`)
-    - `delay` (sample, default:`0.0`)
+    - (OPTIONAL) `delay` (sample, default:`0.0`)
     - `mix` (rate, default:`.off=0.0, .on=1.0`)
 - `low_pass_filter`
-    - `env` (rate, default:`.off=0.0, .on.min=0.0, .on.max=0.0`)
+    - `env` (rate, default:`.off=0.0, .on.min=0.0, .on.max=1.0`)
     - `lo_freq` (freq, default:??? `/*FIXME*/`)
     - `hi_freq` (freq, default:??? `/*FIXME*/`)
     - `q` (float, default:??? `/*FIXME*/`)
-    - `delay` (sample, default:`0.0`)
+    - (OPTIONAL) `delay` (sample, default:`0.0`)
     - `mix` (rate, default:`.off=0.0, .on=1.0`)
 - `peaking_filter`
-    - `env` (rate, default:`.off=0.0, .on.min=0.0, .on.max=0.0`)
+    - `env` (rate, default:`.off=0.0, .on.min=0.0, .on.max=1.0`)
     - `lo_freq` (freq, default:??? `/*FIXME*/`)
     - `hi_freq` (freq, default:??? `/*FIXME*/`)
     - `gain` (dB, default:??? `/*FIXME*/`)
     - `q` (float, default:??? `/*FIXME*/`)
-    - `delay` (sample, default:`50.0`)
+    - (OPTIONAL) `delay` (sample, default:`0.0`)
     - `mix` (rate, default:`.off=0.0, .on=1.0`)
 
 ### Audio effect subparameters
 
-- Each audio effect parameter has `xxx.on`/`xxx.off` subparameters used when the audio effect is active/inactive.
-    - `xxx.on` has `xxx.on.min`/`xxx.on.max` subparameters used when left laser cursor is at left/right (or right laser cursor is right/left).
-        - For long BT/FX notes, `xxx.on.min` is used.
+- Each audio effect parameter has `xxx.on` subparameter that is used when the audio effect is activated by notes.
+    - `xxx.on` has `xxx.on.max` subparameter that is used when left laser cursor is at the rightmost (or right laser cursor is the leftmost).
+        - For long BT/FX notes, `xxx.on.max` is just ignored.
     - Note that specifying parent parameter affects all the subparameters.
-        - If a lower level of subparameter is specified, it has a higher priority of values.
-            - If `xxx` and `xxx.on.max` is specified, firstly the values of all subparameters are filled with the specified value of `xxx`, then the value of `xxx.on.max` is replaced with the specified value.
+        - If a subparameter value is specified, it overrides the parent parameter value.
+            - For example, if you specify `xxx` and `xxx.on.max`, first all values of `xxx`, `xxx.on` and `xxx.on.max` will be filled with the specified `xxx` value, then the value of `xxx.on.max` will be replaced with the specified `xxx.on.max` value.
         - Examples:
             - ```
-              "xxx.on":[{"y":0, "v":100}]
+              "xxx":[{"y":0, "v":100}]
               ```
               is identical to 
               ```
-              "xxx.on.min":[{"y":0, "v":100}],
+              "xxx":[{"y":0, "v":100}],
+              "xxx.on":[{"y":0, "v":100}],
               "xxx.on.max":[{"y":0, "v":100}]
+              ```
+            - ```
+              "xxx":[{"y":0, "v":100}],
+              "xxx.on":[{"y":0, "v":200}]
+              ```
+              is identical to 
+              ```
+              "xxx":{"y":0, "v":100},
+              "xxx.on":{"y":0, "v":200},
+              "xxx.on.max":{"y":0, "v":200}
               ```
             - ```
               "xxx":[{"y":0, "v":100}],
@@ -452,22 +492,21 @@ Values of all these types are set by a floating-point value.
               ```
               is identical to 
               ```
-              "xxx.on.min":{"y":0, "v":100},
-              "xxx.on.max":{"y":0, "v":200},
-              "xxx.off":{"y":0, "v":100}
+              "xxx":{"y":0, "v":100},
+              "xxx.on":{"y":0, "v":100},
+              "xxx.on.max":{"y":0, "v":200}
               ```
 
-### `audio.legacy`
+### `audio.legacy` (OPTIONAL)
 ```
 dictionary LegacyAudioInfo {
-    bool laser_slam_auto_vol = false;  // whether to scale the sound volume considering the width of the laser slam
     LegacyAudioBgmInfo? bgm;
 }
 ```
 
-### `audio.legacy.bgm`
+### `audio.legacy.bgm` (OPTIONAL)
 ```
-dictionary LegacyAudioBgmInfo {
+dictionary LegacyAudioBGMInfo {
     DOMString[]? fp_filenames;  // filenames of prerendered BGM with audio effects from legacy KSH charts
                                 // e.g. [ "xxx_f.ogg", "xxx_p.ogg", "xxx_fp.ogg" ]
 }
@@ -486,45 +525,55 @@ dictionary CameraInfo {
 ### `camera.tilt`
 ```
 dictionary TiltInfo {
-    ByPulse<GraphSectionPoint[]>[]? manual;   // manual tilt (-1.0 - 1.0)
-    Interval[]? keep;                         // tilt keep
-                                              // (while a tilt keep event, the value is only updated to larger absolute values with the same sign)
+    ByPulse<double>[]? scale;                 // tilt scale (default: 1.0); i.e., normal/bigger/biggest tilt in KSH format
+    ByPulse<GraphSectionPoint[]>[]? manual;   // manual tilt
+                                              // Note: The left laser being on the right edge is equal to 1.0, and the right laser being on the left edge is equal to -1.0.
+                                              // Note: Two or more graph sections cannot be overlapped.
+                                              // Note: "camera.tilt.scale" does not affect the scale of manual tilt. Manual tilt is always evaluated with a scale of 1.0.
+    ByPulse<bool>[]? keep;                    // whether tilt is kept or not
+                                              // (while tilt is kept, the tilt amount value is updated only to a larger absolute value with the same sign)
 }
 ```
 
 ### `camera.cam`
 ```
 dictionary CamInfo {
-    CamGraphs body;                               // cam value changes
-    CamGraphs? tilt_assign;                       // tilt=>cam value translation scales (for NORMAL/BIGGER/BIGGEST tilt)
-    CamPatternInfo pattern;                       // cam pattern
-}
-```
-- The default value of "tilt_assign" is `{"rotation_z":[{"y":0, "v":14.0}]}`
-
-#### `camera.cam.pattern`
-```
-dictionary CamPatternInfo {
-    DefList<CamPattern>? def;                        // cam pattern definitions
-    InvokeList<ByPulse<CamPattern>[]>? pulse_event;  // cam pattern invocation by pulse
-    InvokeList<ByNotes<CamPattern>>? note_event;     // cam pattern invocation by notes
+    CamGraphs? body;                              // cam value changes
+    CamPatternInfo? pattern;                      // cam pattern
 }
 ```
 
-#### `camera.cam.body` / `camera.cam.tilt_assign`
+#### `camera.cam.body`
 ```
 dictionary CamGraphs {
     GraphPoint[]? zoom;                           // zoom_bottom
     GraphPoint[]? shift_x;                        // zoom_side
     GraphPoint[]? rotation_x;                     // zoom_top
     GraphPoint[]? rotation_z;                     // rotation degree  (affects both lane & jdgline relatively)
-    GraphPoint[]? rotation_z.lane;                // rotation degree  (lane only)
-    GraphPoint[]? rotation_z.jdgline;             // rotation degree  (judgment line only)
+    GraphPoint[]? rotation_z.lane;                // (OPTIONAL) rotation degree  (lane only)
+    GraphPoint[]? rotation_z.jdgline;             // (OPTIONAL) rotation degree  (judgment line only)
+    GraphPoint[]? center_split;                   // center_split
 }
 ```
-- KSM: -300 - 300 => kson: -3.0 - 3.0
+- KSH: -300 - 300 => kson: -3.0 - 3.0
 
-#### `camera.cam.pattern.def`
+#### `camera.cam.pattern`
+```
+dictionary CamPatternInfo {
+    CamPatternLaserInfo laser;                    // cam pattern for laser slams
+}
+```
+
+##### `camera.cam.pattern.laser`
+```
+dictionary CamPatternLaserInfo {
+    DefList<CamPattern>? def;                        // cam pattern definitions
+    InvokeList<ByPulse<CamPattern>[]>? pulse_event;  // cam pattern invocation by pulse
+    InvokeList<ByPulse<CamPattern>[]>? slam_invoke;  // cam pattern invocation by laser slam notes
+}
+```
+
+#### `camera.cam.pattern.laser.def`
 ```
 dictionary Def<CamPattern> {
     // body (unchangeable in invocation)
@@ -535,16 +584,22 @@ dictionary Def<CamPattern> {
         GraphSectionRelPoint[]? rotation_z;          // rotation degree  (affects both lane & jdgline relatively)
         GraphSectionRelPoint[]? rotation_z.lane;     // rotation degree  (lane only)
         GraphSectionRelPoint[]? rotation_z.jdgline;  // rotation degree  (judgment line only)
+        GraphSectionRelPoint[]? center_split;        // center_split
     };
+    
+    // standard duration
+    //   if a different value is set in invocation.v.l, Def<CamPattern>.body.ry will be scaled
+    //       ry = Def<CamPattern>.body.ry * invocation.v.l / Def<CamPattern>.l
+    unsigned long l;
+
+    // whether to automatically flip the shift_x/rotation_z/rotation_z.lane/rotation_z.jdgline values by right-to-left laser slams
+    // (only used when the pattern is invoked by note_event of a laser slam)
+    bool auto_flip = true;
 
     // parameters (changeable in invocation, the default values are only used in Def)
     CamPattern v {
-        unsigned long l;                          // standard duration
-                                                  // if a differrent value is set in invocation.v.l, Def<CamPattern>.body.ry will be scaled
-                                                  //     ry = Def<CamPattern>.body.ry * invocation.v.l / Def<CamPattern>.v.l
-        double scale = 1.0;                       // standard scale (normally only specified in invocation)
-                                                  //     scale = invocation.v.scale / Def<CamPattern>.v.scale
-                                                  // (set this value to -1.0 for right-to-left laser slams)
+        unsigned long? l;                         // duration
+        double scale = 1.0;                       // scale
         unsigned long repeat = 1;                 // number of repeat
         double repeat_scale = 1.0;                // rate of the current "scale" to that of the previous repeat
                                                   // (set "-1.0" to generate a loop like a sine wave)
@@ -593,183 +648,59 @@ Since the BG specification is still under discussion, the legacy KSH background 
 
 ```
 dictionary BgInfo {
-    LegacyBgInfo? legacy;
+    LegacyBgInfo? legacy;  // (OPTIONAL)
 }
 ```
 
-<details>
-<summary>
-Previously-proposed BG specification here
-</summary>
-
-## `bg`
-```
-dictionary BgInfo {
-    LayerInfo? layer;  // layer-related data
-    MovieInfo? movie;  // movie-related data
-}
-```
-
-### `bg.layer`
-```
-dictionary LayerInfo {
-    DefList<Layer>? def;                        // layer definitions
-    InvokeList<ByPulse<Layer>[]>? pulse_event;  // layer invocation (parameter changes) by pulse
-    InvokeList<ByNotes<Layer>>? note_event;     // layer invocation (parameter changes) by notes
-}
-```
-
-#### `bg.layer.def`
-```
-dictionary Def<Layer> {
-    // image files
-    //     one file: use one image regardless of the gauge
-    //     two files: use second image when gauge >= 70%
-    ImageFile image[] {
-        // image filename
-        DOMString filename;
-
-        // size of one frame in pixels
-        // (if not specified, the entire image is regarded as one frame)
-        unsigned long? w;
-        unsigned long? h;
-
-        unsigned long frame;   // number of frames
-
-        // offset position in pixels
-        unsigned long offset_x = 0;
-        unsigned long offset_y = 0;
-
-        // relative pixels of the next frame
-        unsigned long dx = w;
-        unsigned long dy = 0;
-    }
-
-    // parameters (changeable in invocation, the default values are only used in Def)
-    Layer? v {
-        bool visible = true;         // self-explanatory
-        long l = 0;                  // pulses for one loop of the animation
-                                     // (if the value is set to 0, the animation stops at the current frame)
-        double frame = 0.0;          // frame index (this parameter means "frame offset" in Def and "seeking to a frame" in invocation)
-                                     // Note: the value is rounded down to an integer when it is used (e.g. 5.7 => 5),
-                                     //       but the real value is considered in transition
-                                     // Note: modulo value is used if the frame index is out of range ("frame" is the value already rounded down)
-                                     //     (frame index) = frame % (number of frames)                        (if frame >= 0)
-                                     //     (frame index) = frame % (number of frames) + (number of frames)   (if frame < 0)
-        double x = 0.0;              // x-axis position (0 = center, positive = right)
-        double y = 0.0;              // y-axis position (0 = center, positive = up)
-        double z = 0.0;              // order of drawing layers (smaller = higher priority)
-                                     //     negative values: in front of the lane
-                                     //     positive values (or 0.0): behind the lane
-        double opacity = 1.0;        // self-explanatory (0-1)
-        double rotation = 0.0;       // rotation in degrees
-        DOMString mode = "normal";   // blend mode ("normal"/"additive")
-    };
-
-    // layer pattern
-    LayerPatternInfo pattern;
-}
-```
-
-#### `bg.layer.def.pattern`
-```
-dictionary LayerPatternInfo {
-    DefList<LayerPattern> def;                  // layer pattern definitions
-    InvokeList<ByPulse<Layer>[]>? pulse_event;  // layer pattern invocation by pulse
-    InvokeList<ByNotes<Layer>>? note_event;     // layer pattern invocation by notes
-}
-```
-
-#### `bg.layer.def.pattern.def`
-```
-dictionary Def<LayerPattern> {
-    // body (unchangeable in invocation)
-    LayerPatternGraphs body {
-        GraphSectionRelPoint[]? l;
-        GraphSectionRelPoint[]? frame;
-        GraphSectionRelPoint[]? x;
-        GraphSectionRelPoint[]? y;
-        GraphSectionRelPoint[]? z;
-        GraphSectionRelPoint[]? opacity;
-        GraphSectionRelPoint[]? rotation;
-    };
-
-    // parameters (changeable in invocation, the default values are only used in Def)
-    LayerPattern v {
-        unsigned long l;                          // standard duration
-                                                  // if a differrent value is set in invocation.v.l, Def<LayerPattern>.body.ry will be scaled
-                                                  //     ry = Def<LayerPattern>.body.ry * invocation.v.l / Def<LayerPattern>.v.l
-        double scale = 1.0;                       // standard scale (normally only specified in invocation)
-                                                  //     scale = invocation.v.scale / Def<LayerPattern>.v.scale
-        unsigned long repeat = 1;                 // number of repeat
-        double repeat_scale = 1.0;                // rate of the current "scale" to that of the previous repeat
-                                                  // (set "-1.0" to generate a loop like a sine wave)
-        double decay_order = 0;                   // order of the decay that scales layer values
-                                                  // (note that this decay is applied even if repeat=1)
-                                                  // - equation: `value * (1.0 - ((l - y) / l))^decay_order`
-                                                  // - examples
-                                                  //     0: no decay, 1: linear decay, 2: squared decay, negative: increasing
-    };
-}
-```
-
-### `bg.movie`
-```
-dictionary MovieInfo {
-    DOMString filename;              // self-explanatory
-    long offset = 0;                 // offset in milliseconds (starting point of the video file)
-}
-```
-
-</details>
-
-### `bg.legacy`
+### `bg.legacy` (OPTIONAL)
 ```
 dictionary LegacyBgInfo {
-    KshBg[] bg;        // first index: when gauge < 70%, second index: when gauge >= 70%
-    KshLayer[] layer;  // first index: when gauge < 70%, second index: when gauge >= 70%
-    KshMovie movie;
+    KshBg[]? bg;        // first index: when gauge < 70%, second index: when gauge >= 70%
+    KshLayer[]? layer;  // first index: when gauge < 70%, second index: when gauge >= 70%
+    KshMovie? movie;
 }
 ```
 - If the array of bg/layer has only one item, that bg/layer is always used regardless of the gauge percentage.
 - If the array of layer has only one item and the layer image has two rows in one image, the first row (upper-half) is used when gauge < 70%, and the second row (lower-half) is used when gauge > 70%.
 
-#### `bg.legacy.bg[xxx]`
+#### `bg.legacy.bg[xxx]` (OPTIONAL)
 ```
 dictionary KshBg {
-    DOMString filename;         // self-explanatory (can be KSM default BG image such as "`desert`")
-    KshRotationInfo? rotation;  // rotation conditions
+    DOMString filename = "desert";  // self-explanatory (can be KSM default BG image such as "`desert`")
+    KshRotationInfo rotation = {"tilt":true, "spin":false};  // rotation conditions
 }
 ```
 
-#### `bg.legacy.layer[xxx]`
+#### `bg.legacy.layer[xxx]` (OPTIONAL)
 ```
 dictionary KshLayer {
-    DOMString filename;         // self-explanatory (can be KSM default animation layer such as "`arrow`")
-    long duration;              // one-loop duration in milliseconds
-    KshRotationInfo? rotation;  // rotation conditions
+    DOMString filename = "arrow";  // self-explanatory (can be KSM default animation layer such as "`arrow`")
+    long duration = 0;             // one-loop duration in milliseconds
+                                   //   If the value is negative, the animation is played backwards.
+                                   //   If the value is zero, the play speed is tempo-synced and set to 1f/0.035measure (=28.571f/measure).
+    KshRotationInfo rotation = {"tilt":true, "spin":true};  // rotation conditions
 }
 ```
 
-#### `bg.legacy.bg[xxx].rotation` / `bg.legacy.layer[xxx].rotation`
+#### `bg.legacy.bg[xxx].rotation` / `bg.legacy.layer[xxx].rotation` (OPTIONAL)
 ```
 dictionary KshRotationInfo {
-    bool tilt;  // whether lane tilts affect rotation of BG/layer
-    bool spin;  // whether lane spins affect rotation of BG/layer
+    bool? tilt;  // whether lane tilts affect rotation of BG/layer
+    bool? spin;  // whether lane spins affect rotation of BG/layer
 }
 ```
 
-#### `bg.legacy.movie`
+#### `bg.legacy.movie` (OPTIONAL)
 ```
 dictionary KshMovie {
-    DOMString filename;  // self-explanatory
-    long offset;         // movie offset in millisecond
+    DOMString? filename;  // self-explanatory
+    long offset = 0;         // movie offset in millisecond
 }
 ```
 
 -----------------------------------------------------------------------------------
 
-## `impl`
+## `impl` (OPTIONAL)
 ```
 // Client list using implementation-dependent options
 dictionary ClientList {
@@ -778,26 +709,13 @@ dictionary ClientList {
 }
 ```
 
-### `impl.xxx`
+### `impl.xxx` (OPTIONAL)
 ```
 dictionary ImplInfo {
-    any?     meta;    // meta data
-    any?     beat;    // beat-related data
-    any?     gauge;   // gauge-related data
-    any?     note;    // note-related data
-    any?     audio;   // audio-related data
-    any?     camera;  // camera-related data
-    any?     bg;      // background-related data
-    any?     other;   // others
+    // Not specified. This area is free for use by kson clients and kson editors.
+    // To avoid conflicts with other clients, it is recommended to have a top object whose key is the client name.
 }
 ```
-- This allows you to use undefined options in kson spec..
-- If known parameters in kson spec. is set, these parameters are forked by clients.
-    - The replacement affects each parameter
-        - e.g. even if "note":{} is set, the notes will not be deleted
-    - But an array is regarded as a parameter
-        - e.g. if "note":{"bt":[]} is set, the BT notes will be deleted,
-          and this will not affect the other lanes
 
 -----------------------------------------------------------------------------------
 
@@ -821,6 +739,11 @@ dictionary ByMeasureIndex<T> {
 
 ### event triggered by pulse
 ```
+dictionary ByPulse {
+    unsigned long y;          // pulse number
+}
+```
+```
 dictionary ByPulse<T> {
     unsigned long y;          // pulse number
     T? v;                     // body
@@ -830,34 +753,17 @@ dictionary ByPulse<T> {
 ### events triggered by BT/FX/laser notes
 ```
 dictionary ByNotes<T> {
-    ByBtnNote<T>[]? bt;       // events triggered by BT notes
-    ByBtnNote<T>[]? fx;       // events triggered by FX notes
-    ByLaserNote<T>[]? laser;  // events triggered by laser notes
+    ByNote<T>[][]? bt;      // events triggered by BT notes (first index: lane)
+    ByNote<T>[][]? fx;      // events triggered by FX notes (first index: lane)
+    ByNote<T>[][]? laser;   // events triggered by laser notes (first index: lane)
 }
 ```
 
-### event triggered by BT/FX note
+### event triggered by note
 ```
-dictionary ByBtnNote<T> {
-    unsigned long lane;     // lane index (corresponds to the 1st index of NoteInfo.bt/fx)
-    unsigned long idx;      // note index (corresponds to the 2nd index of NoteInfo.bt/fx)
+dictionary ByNote<T> {
+    unsigned long y;        // pulse number (same value as the pulse value of the note)
     T? v;                   // body
-    bool dom = true;        // domination flag (only in audio.audio_effect.note_event)
-                            // (true = allow only one audio effect whose note is pressed later, like SDVX
-                            //  false = allow multiple audio effects to be activated simultaneously, like KSH)
-}
-```
-
-### event triggered by laser point
-```
-dictionary ByLaserNote<T> {
-    unsigned long lane;     // lane index (corresponds to the 1st index of NoteInfo.laser)
-    unsigned long sec;      // section index (corresponds to the 2nd index of NoteInfo.laser)
-    unsigned long idx;      // point index (corresponds to the index of LaserSection.point)
-    T? v;                   // body
-    bool dom = true;        // domination flag (only in audio.audio_effect.note_event)
-                            // (true = allow only one audio effect whose knob has larger value is activated, like SDVX & KSH
-                            //  false = allow multiple audio effects to be activated simultaneously)
 }
 ```
 
@@ -914,7 +820,6 @@ dictionary DefList<T> {
 ```
 dictionary InvokeList<T> {
     T? ...(name is the key);  // values which overwrites Def<T>.v
-                              // (exception: v.l & v.scale & v.vol are multiplied by values in an invocation)
     ...
 }
 ```
