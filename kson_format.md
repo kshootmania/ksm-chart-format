@@ -109,9 +109,9 @@ dictionary LaserSection : ByPulse<GraphSectionPoint[]> {
 ## `audio`
 ```
 dictionary AudioInfo {
-    BgmInfo? bgm;                               // bgm-related data
-    KeySoundInfo? key_sound;                    // key-sound-related data
-    AudioEffectInfo? audio_effect;              // audio-effect-related data
+    BgmInfo? bgm;                   // bgm-related data
+    KeySoundInfo? key_sound;        // key-sound-related data
+    AudioEffectInfo? audio_effect;  // audio-effect-related data
 }
 ```
 
@@ -157,7 +157,7 @@ dictionary KeySoundFXInfo {
     KeySoundInvokeListFX? chip_event;  // key sound for chip FX notes
 }
 ```
-- Note: `audio.key_sound.laser.chip_event.xxx[lane][].y` should be the same as `y` of an existing chip FX note on the corresponding lane, otherwise the event is ignored.
+- Note: `audio.key_sound.fx.chip_event.xxx[lane][].y` should be the same as `y` of an existing chip FX note on the corresponding lane, otherwise the event is ignored.
 
 #### `audio.key_sound.fx.chip_event[lane]`
 ```
@@ -190,7 +190,7 @@ dictionary KeySoundLaserInfo {
 - Note: `audio.key_sound.laser.slam_event.xxx[].y` should be the same as `y` of an existing laser slam note, otherwise the event is ignored.
 - Note: The `vol` value changes do not affect key sounds currently being played.
 
-#### `audio.key_sound.laser.slam_event[lane]` (OPTIONAL)
+#### `audio.key_sound.laser.slam_event` (OPTIONAL)
 ```
 dictionary KeySoundInvokeListLaser {
     ByPulse[]? slam_up;     // (OPTIONAL)
@@ -236,7 +236,7 @@ dictionary AudioEffectLaserInfo {
 }
 ```
 
-##### `audio.audio_effect.xxx.def`
+##### `audio.audio_effect.fx.def`/`audio.audio_effect.laser.def`
 ```
 dictionary Def<AudioEffect> {
     DOMString type;      // audio effect type (e.g. "flanger")
@@ -657,14 +657,14 @@ dictionary CamPatternInvokeList {
 ```
 - Note: `camera.cam.pattern.laser.slam_event.xxx[].y` & `camera.cam.pattern.laser.slam_event.xxx[].d` should be the same as `y` & sign(`vf` - `v`) of an existing laser slam note, otherwise the event is ignored.
 
-#### `camera.cam.pattern.laser.slam_event.spin[].v`/`camera.cam.pattern.laser.slam_event.half_spin[].v`
+##### `camera.cam.pattern.laser.slam_event.spin[].v`/`camera.cam.pattern.laser.slam_event.half_spin[].v`
 ```
 dictionary CamPatternInvokeSpin {
     unsigned long l = 960;          // duration
 }
 ```
 
-#### `camera.cam.pattern.laser.slam_event.swing[].v` (OPTIONAL)
+##### `camera.cam.pattern.laser.slam_event.swing[].v` (OPTIONAL)
 ```
 dictionary CamPattern {
     unsigned long l = 960;          // duration
@@ -717,7 +717,7 @@ dictionary KshLayer {
 }
 ```
 
-#### `bg.legacy.layer[xxx].rotation` (OPTIONAL)
+##### `bg.legacy.layer[xxx].rotation` (OPTIONAL)
 ```
 dictionary KshLayerRotationInfo {
     bool tilt = true;  // whether lane tilts affect rotation of BG/layer
