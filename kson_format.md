@@ -349,7 +349,7 @@ Leading plus signs (e.g., "`+1`") and scientific notation (e.g., "`1e-3`", "`1E+
 - dB
     - Decibel value
     - Allowed formats:
-        `[float]dB`
+        - `[float]dB`
             - Requirement: float >= 0.0
             - Example: `3.0dB`
 - pitch
