@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.2.0-beta15`)
+# KSON Format Specification (version: `0.2.0-beta16`)
 - Encoding: UTF-8 (without BOM), LF
 - If a default value is specified in this document, the undefined value is replaced by the default value. Note that `null` is not replaced by the default value.
 - Supporting parameters/options marked "(OPTIONAL)" is optional in the kson client.
@@ -150,19 +150,19 @@ dictionary KeySoundInfo {
 ```
 dictionary KeySoundFXInfo {
     DefList<KeySound>? def;                           // key sound definitions
-    InvokeList<ByPulse<KeySound>[][2]>? chip_invoke;  // key sound invocation by chip FX notes
+    InvokeList<ByPulse<KeySound>[][2]>? chip_event;  // key sound invocation by chip FX notes
 }
 ```
-- Note: `audio.key_sound.laser.chip_invoke` should be the same as `y` of an existing chip FX note on the corresponding lane, otherwise the event is ignored.
+- Note: `audio.key_sound.laser.chip_event` should be the same as `y` of an existing chip FX note on the corresponding lane, otherwise the event is ignored.
 
 ### `audio.key_sound.laser` (OPTIONAL)
 ```
 dictionary KeySoundLaserInfo {
     DefList<KeySound>? def;                         // key sound definitions
-    InvokeList<ByPulse<KeySound>[]>? slam_invoke;   // key sound invocation by laser slam notes
+    InvokeList<ByPulse<KeySound>[]>? slam_event;   // key sound invocation by laser slam notes
 }
 ```
-- Note: `audio.key_sound.laser.slam_invoke` should be the same as `y` of an existing laser slam, otherwise the event is ignored.
+- Note: `audio.key_sound.laser.slam_event` should be the same as `y` of an existing laser slam, otherwise the event is ignored.
 - Note: `slam` is predefined in the kson client and is invoked in default.
 - (OPTIONAL) Note: `slam_up` & `slam_down` & `slam_swing` are predefined by kson clients.
 
@@ -189,17 +189,17 @@ dictionary AudioEffectInfo {
 dictionary AudioEffectFXInfo {
     DefList<AudioEffect>? def;                           // audio effect definitions
     InvokeList<ByPulse<AudioEffect>[]>? param_change;    // audio effect parameter changes by pulse
-    InvokeList<ByPulse<AudioEffect>[][2]>? long_invoke;  // audio effect invocation (and parameter changes) by FX notes
+    InvokeList<ByPulse<AudioEffect>[][2]>? long_event;  // audio effect invocation (and parameter changes) by FX notes
 }
 ```
-- Note: `audio.audio_effect.fx.long_invoke[].y` should be the same as `y` of an existing long FX note on the corresponding lane, otherwise the event is ignored.
+- Note: `audio.audio_effect.fx.long_event[].y` should be the same as `y` of an existing long FX note on the corresponding lane, otherwise the event is ignored.
 
 #### `audio.audio_effect.laser`
 ```
 dictionary AudioEffectLaserInfo {
     DefList<AudioEffect>? def;                         // audio effect definitions
     InvokeList<ByPulse<AudioEffect>[]>? param_change;  // audio effect parameter changes by pulse
-    InvokeList<ByPulse<AudioEffect>[]>? pulse_invoke;  // audio effect invocation (and parameter changes) by pulse
+    InvokeList<ByPulse<AudioEffect>[]>? pulse_event;  // audio effect invocation (and parameter changes) by pulse
 }
 ```
 
@@ -568,8 +568,7 @@ dictionary CamPatternInfo {
 ```
 dictionary CamPatternLaserInfo {
     DefList<CamPattern>? def;                        // cam pattern definitions
-    InvokeList<ByPulse<CamPattern>[]>? pulse_event;  // cam pattern invocation by pulse
-    InvokeList<ByPulse<CamPattern>[]>? slam_invoke;  // cam pattern invocation by laser slam notes
+    InvokeList<ByPulse<CamPattern>[]>? slam_event;  // cam pattern invocation by laser slam notes
 }
 ```
 
@@ -591,10 +590,6 @@ dictionary Def<CamPattern> {
     //   if a different value is set in invocation.v.l, Def<CamPattern>.body.ry will be scaled
     //       ry = Def<CamPattern>.body.ry * invocation.v.l / Def<CamPattern>.l
     unsigned long l;
-
-    // whether to automatically flip the shift_x/rotation_z/rotation_z.lane/rotation_z.jdgline values by right-to-left laser slams
-    // (only used when the pattern is invoked by note_event of a laser slam)
-    bool auto_flip = true;
 
     // parameters (changeable in invocation, the default values are only used in Def)
     CamPattern v {
@@ -694,7 +689,7 @@ dictionary KshRotationInfo {
 ```
 dictionary KshMovie {
     DOMString? filename;  // self-explanatory
-    long offset = 0;         // movie offset in millisecond
+    long offset = 0;      // movie offset in millisecond
 }
 ```
 
@@ -739,31 +734,9 @@ dictionary ByMeasureIndex<T> {
 
 ### event triggered by pulse
 ```
-dictionary ByPulse {
-    unsigned long y;          // pulse number
-}
-```
-```
 dictionary ByPulse<T> {
     unsigned long y;          // pulse number
     T? v;                     // body
-}
-```
-
-### events triggered by BT/FX/laser notes
-```
-dictionary ByNotes<T> {
-    ByNote<T>[][]? bt;      // events triggered by BT notes (first index: lane)
-    ByNote<T>[][]? fx;      // events triggered by FX notes (first index: lane)
-    ByNote<T>[][]? laser;   // events triggered by laser notes (first index: lane)
-}
-```
-
-### event triggered by note
-```
-dictionary ByNote<T> {
-    unsigned long y;        // pulse number (same value as the pulse value of the note)
-    T? v;                   // body
 }
 ```
 
