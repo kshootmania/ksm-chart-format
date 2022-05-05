@@ -677,6 +677,7 @@ dictionary CamPattern {
                                     // - equation: `value * (1.0 - ((l - ry) / l))^decay_order`
                                     // - 0: no decay, 1: linear decay, 2: squared decay
 }
+```
 
 -----------------------------------------------------------------------------------
 
