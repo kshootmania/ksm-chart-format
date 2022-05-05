@@ -136,7 +136,7 @@ dictionary BgmPreviewInfo {
 
 ### `audio.legacy` (OPTIONAL)
 ```
-dictionary LegacyAudioInfo {
+dictionary LegacyBgmInfo {
     DOMString[]? fp_filenames;  // filenames of prerendered BGM with audio effects from legacy KSH charts
                                 // e.g. [ "xxx_f.ogg", "xxx_p.ogg", "xxx_fp.ogg" ]
 }
@@ -183,19 +183,12 @@ dictionary KeySoundInvokeFX {
 ```
 dictionary KeySoundLaserInfo {
     ByPulse<double>? vol;                  // laser slam volume (default: 0.5)
-    KeySoundLaserLegacyInfo? legacy;       // (OPTIONAL) legacy information
     KeySoundInvokeListLaser? slam_event;   // (OPTIONAL) key sound invocation by laser slam notes
+    KeySoundLaserLegacyInfo? legacy;       // (OPTIONAL) legacy information
 }
 ```
 - Note: `audio.key_sound.laser.slam_event.xxx[].y` should be the same as `y` of an existing laser slam note, otherwise the event is ignored.
 - Note: The `vol` value changes do not affect key sounds currently being played.
-
-#### `audio.key_sound.laser.legacy`
-```
-dictionary KeySoundLaserLegacyInfo {
-    bool auto_vol = false;  // "chokkakuautovol" in KSH format
-}
-```
 
 #### `audio.key_sound.laser.slam_event[lane]` (OPTIONAL)
 ```
@@ -206,6 +199,13 @@ dictionary KeySoundInvokeListLaser {
     ByPulse[]? slam_mute;   // (OPTIONAL)
 
     // Note: Custom key sounds are not allowed to inserted here
+}
+```
+
+#### `audio.key_sound.laser.legacy`
+```
+dictionary KeySoundLaserLegacyInfo {
+    bool auto_vol = false;  // "chokkakuautovol" in KSH format
 }
 ```
 
