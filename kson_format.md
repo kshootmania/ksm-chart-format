@@ -151,7 +151,7 @@ dictionary KeySoundInfo {
 ```
 - Note: `fx` and `laser` have different ways of specifying the volume of key sounds.
 
-### `audio.key_sound.fx`
+#### `audio.key_sound.fx`
 ```
 dictionary KeySoundFXInfo {
     KeySoundInvokeListFX? chip_event;  // key sound for chip FX notes
@@ -159,7 +159,7 @@ dictionary KeySoundFXInfo {
 ```
 - Note: `audio.key_sound.fx.chip_event.xxx[lane][].y` should be the same as `y` of an existing chip FX note on the corresponding lane, otherwise the event is ignored.
 
-#### `audio.key_sound.fx.chip_event[lane]`
+##### `audio.key_sound.fx.chip_event[lane]`
 ```
 dictionary KeySoundInvokeListFX {
     ByPulse<KeySoundInvokeFX>[2][]? clap;         // (OPTIONAL)
@@ -172,14 +172,14 @@ dictionary KeySoundInvokeListFX {
 }
 ```
 
-### `audio.key_sound.fx.chip_event.xxx[lane][].v`
+##### `audio.key_sound.fx.chip_event.xxx[lane][].v`
 ```
 dictionary KeySoundInvokeFX {
     double vol = 1.0;  // key sound volume
 }
 ```
 
-### `audio.key_sound.laser`
+#### `audio.key_sound.laser`
 ```
 dictionary KeySoundLaserInfo {
     ByPulse<double>? vol;                  // laser slam volume (default: 0.5)
@@ -190,7 +190,7 @@ dictionary KeySoundLaserInfo {
 - Note: `audio.key_sound.laser.slam_event.xxx[].y` should be the same as `y` of an existing laser slam note, otherwise the event is ignored.
 - Note: The `vol` value changes do not affect key sounds currently being played.
 
-#### `audio.key_sound.laser.slam_event` (OPTIONAL)
+##### `audio.key_sound.laser.slam_event` (OPTIONAL)
 ```
 dictionary KeySoundInvokeListLaser {
     ByPulse[]? slam_up;     // (OPTIONAL)
@@ -202,7 +202,7 @@ dictionary KeySoundInvokeListLaser {
 }
 ```
 
-#### `audio.key_sound.laser.legacy`
+##### `audio.key_sound.laser.legacy`
 ```
 dictionary KeySoundLaserLegacyInfo {
     bool auto_vol = false;  // "chokkakuautovol" in KSH format
@@ -289,7 +289,7 @@ dictionary Def<AudioEffect> {
 - Audio effects in the "Audio effects & parameter list" are predefined with its default parameter values.
 
 
-#### Audio effect parameter types
+### Audio effect parameter types
 
 All parameter values are given by string, but the values must follow one of the allowed formats of the specified type.
 
@@ -372,7 +372,7 @@ Leading plus signs (e.g., "`+1`") and scientific notation (e.g., "`1e-3`", "`1E+
             - Example: `2.5`, `-10`
 
 
-#### Audio effect parameter value format
+### Audio effect parameter value format
 
 The parameter value consists of three values, Off/OnMin/OnMax, in the string format "Off>OnMin-OnMax".
 
@@ -394,7 +394,7 @@ Parameter values are written in one of the following formats:
     - Example: `0%>50%-100%`
 
 
-#### Audio effects & parameter list
+### Audio effects & parameter list
 
 - `retrigger`: This effect repeats audio. The repeat source is updated every `update_period` or when `update_trigger` is turned on.
     - `update_period` (length, default:`1/2`)
@@ -699,14 +699,14 @@ dictionary LegacyBgInfo {
 ```
 - If `bg` has a single element, that bg is always used regardless of the gauge percentage.
 
-#### `bg.legacy.bg[xxx]` (OPTIONAL)
+#### `bg.legacy.bg[]` (OPTIONAL)
 ```
 dictionary KshBg {
     DOMString filename = "desert";  // self-explanatory (can be KSM default BG image such as "`desert`")
 }
 ```
 
-#### `bg.legacy.layer[xxx]` (OPTIONAL)
+#### `bg.legacy.layer` (OPTIONAL)
 ```
 dictionary KshLayer {
     DOMString filename = "arrow";    // self-explanatory (can be KSM default animation layer such as "`arrow`")
