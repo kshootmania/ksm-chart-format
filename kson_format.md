@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.2.0-beta19`)
+# KSON Format Specification (version: `0.2.0-beta20`)
 - Encoding: UTF-8 (without BOM), LF
 - If a default values is specified in this document, undefined values are overwritten by the default value.
 - `null` value is not allowed in the entire kson file.
@@ -655,12 +655,11 @@ dictionary CamPatternInvokeList {
     ByPulseWithDirection<CamPatternInvokeSwing>[]? swing;     // (OPTIONAL)
 }
 ```
-- Note: `camera.cam.pattern.laser.slam_event.xxx[].y` & `d` should be the same as `y` & sign(`vf` - `v`) of an existing laser slam note on the corresponding lane, otherwise the event is ignored.
+- Note: `camera.cam.pattern.laser.slam_event.xxx[].y` & `camera.cam.pattern.laser.slam_event.xxx[].d` should be the same as `y` & sign(`vf` - `v`) of an existing laser slam note, otherwise the event is ignored.
 
 #### `camera.cam.pattern.laser.slam_event.spin[].v`/`camera.cam.pattern.laser.slam_event.half_spin[].v`
 ```
 dictionary CamPatternInvokeSpin {
-    int d;                          // spin direction, -1 (left) or 1 (right)
     unsigned long l = 960;          // duration
 }
 ```
@@ -668,7 +667,6 @@ dictionary CamPatternInvokeSpin {
 #### `camera.cam.pattern.laser.slam_event.swing[].v` (OPTIONAL)
 ```
 dictionary CamPattern {
-    int d;                          // swing direction, -1 (left) or 1 (right)
     unsigned long l = 960;          // duration
     double scale = 1.0;             // scale
     unsigned long repeat = 1;       // number of repetitions
@@ -699,7 +697,7 @@ dictionary LegacyBgInfo {
     KshMovie? movie;
 }
 ```
-- If the array of bg/layer has only one item, that bg/layer is always used regardless of the gauge percentage.
+- If `bg` has a single element, that bg is always used regardless of the gauge percentage.
 
 #### `bg.legacy.bg[xxx]` (OPTIONAL)
 ```
