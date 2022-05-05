@@ -157,7 +157,7 @@ dictionary KeySoundFXInfo {
     KeySoundInvokeListFX? chip_event;  // key sound for chip FX notes
 }
 ```
-- Note: `audio.key_sound.laser.chip_event[lane].xxx[].y` should be the same as `y` of an existing chip FX note on the corresponding lane, otherwise the event is ignored.
+- Note: `audio.key_sound.laser.chip_event.xxx[lane][].y` should be the same as `y` of an existing chip FX note on the corresponding lane, otherwise the event is ignored.
 
 #### `audio.key_sound.fx.chip_event[lane]`
 ```
@@ -188,7 +188,7 @@ dictionary KeySoundLaserInfo {
 }
 ```
 - Note: `audio.key_sound.laser.slam_event.xxx[].y` should be the same as `y` of an existing laser slam note, otherwise the event is ignored.
-- Note: `vol` does not affect key sounds currently being played.
+- Note: The `vol` value changes do not affect key sounds currently being played.
 
 #### `audio.key_sound.laser.legacy`
 ```
@@ -225,7 +225,7 @@ dictionary AudioEffectFXInfo {
     InvokeList<ByPulse<AudioEffect>[][2]>? long_event;  // audio effect invocation (and parameter changes) by FX notes
 }
 ```
-- Note: `audio.audio_effect.fx.long_event.xxx[].y` should be the same as `y` of an existing long FX note on the corresponding lane, otherwise the event is ignored.
+- Note: `audio.audio_effect.fx.long_event.xxx[lane][].y` should be the same as `y` of an existing long FX note on the corresponding lane, otherwise the event is ignored.
 
 #### `audio.audio_effect.laser`
 ```
@@ -303,7 +303,7 @@ Leading plus signs (e.g., "`+1`") and scientific notation (e.g., "`1e-3`", "`1E+
         - `1/[int]`: Specifies the percentage of one measure in fractional form. Tempo synced.
             - Requirement: int >= 1
             - Example: `1/4`
-        - `[float]`: Specifies the percentage of one measure in decimal format. Tempo synced.
+        - `[float]`: Specifies the percentage of one measure in decimal form. Tempo synced.
             - Requirement: float >= 0.0
             - Example: `2.0`, `0.25`, `0`
         - `[float]ms`: Specifies the duration in milliseconds. Not tempo synced.
@@ -475,7 +475,7 @@ Parameter values are written in one of the following formats:
         - LFO phase difference between the L/R channels
     - `mix` (rate, default:`0%>50%`)
         - Blending ratio of the original audio and the effect audio
-        - Note: For phaser effects, the mix value is doubled when used. A typical phaser effect is usually most effective at a mix value of 50%, but this makes it most effective at a mix value of `100%`. Note that the default value of `50%` is actually a mix value of 25%.
+        - Note: For phaser effects, the mix value is doubled when used. A typical phaser effect is usually most effective at a mix value of 50%, but this makes it most effective at a mix value of `100%`. Note that the default value `50%` is actually a mix value of 25%.
     - Note: `hiCutGain` parameter in KSH format has been removed in kson format because it is not a parameter of "Phaser" itself.
 - `wobble`: This effect oscillates the cutoff frequency of the low-pass filter with an LFO.
     - `wave_length` (length, default:`0`)
@@ -588,7 +588,7 @@ dictionary CameraInfo {
 ### `camera.tilt`
 ```
 dictionary TiltInfo {
-    ByPulse<double>[]? scale;                 // tilt scale (default: 1.0); i.e., normal/bigger/biggest tilt in KSH format
+    ByPulse<double>[]? scale;                 // tilt scale (default: 1.0)
     ByPulse<GraphSectionPoint[]>[]? manual;   // manual tilt
                                               // Note: The left laser being on the right edge is equal to a manual value of 1.0, and the right laser being on the left edge is equal to a manual value of -1.0.
                                               // Note: Two or more graph sections cannot be overlapped.
