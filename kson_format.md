@@ -692,12 +692,12 @@ dictionary BgInfo {
 ### `bg.legacy` (OPTIONAL)
 ```
 dictionary LegacyBgInfo {
-    KshBg[]? bg;        // first index: when gauge < 70%, second index: when gauge >= 70%
+    KshBg[2]? bg;        // first element: when gauge < 70%, second element: when gauge >= 70%
     KshLayer? layer;
     KshMovie? movie;
 }
 ```
-- If `bg` has a single element, that bg is always used regardless of the gauge percentage.
+- If `bg` has only a single element, that bg is always used, regardless of the percentage of the gauge.
 
 #### `bg.legacy.bg[]` (OPTIONAL)
 ```
