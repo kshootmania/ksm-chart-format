@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.2.0-beta20`)
+# KSON Format Specification (version: `0.2.0-beta21`)
 - Encoding: UTF-8 (without BOM), LF
 - If a default values is specified in this document, undefined values are overwritten by the default value.
 - `null` value is not allowed in the entire kson file.
@@ -76,8 +76,8 @@ dictionary TimeSig {
 ## `gauge`
 ```
 dictionary GaugeInfo {
-    unsigned long? total = 0;  // total ascension of gauge percentage in the entire chart (0 or 100-)
-                               // automatically set if zero
+    unsigned long total = 0;  // total ascension of gauge percentage in the entire chart (0 or 100-)
+                              // automatically set if zero
 }
 ```
 
@@ -118,7 +118,7 @@ dictionary AudioInfo {
 ### `audio.bgm`
 ```
 dictionary BgmInfo {
-    DOMString? filename;      // self-explanatory
+    DOMString filename = "";  // self-explanatory
     double vol = 1.0;         // bgm volume
     long offset = 0;          // offset in milliseconds (starting point of the audio file)
     BgmPreviewInfo? preview;  // preview information
@@ -666,7 +666,7 @@ dictionary CamPatternInvokeSpin {
 
 ##### `camera.cam.pattern.laser.slam_event.swing[].v` (OPTIONAL)
 ```
-dictionary CamPattern {
+dictionary CamPatternInvokeSwing {
     unsigned long l = 960;          // duration
     double scale = 1.0;             // scale
     unsigned long repeat = 1;       // number of repetitions
@@ -712,7 +712,7 @@ dictionary KshLayer {
     DOMString filename = "arrow";    // self-explanatory (can be KSM default animation layer such as "`arrow`")
     long duration = 0;               // one-loop duration in milliseconds
                                      //   If the value is negative, the animation is played backwards.
-                                     //   If the value is zero, the play speed is tempo-synced and set to 1f/0.035measure (=28.571f/measure).
+                                     //   If the value is zero, the play speed is tempo-synced and set to 1 frame per 0.035 measure (= 28.571... frames/measure).
     KshLayerRotationInfo? rotation;  // rotation conditions
 }
 ```
