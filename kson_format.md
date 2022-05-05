@@ -159,7 +159,7 @@ dictionary KeySoundFXInfo {
 ```
 - Note: `audio.key_sound.fx.chip_event.xxx[lane][].y` should be the same as `y` of an existing chip FX note on the corresponding lane, otherwise the event is ignored.
 
-##### `audio.key_sound.fx.chip_event[lane]`
+##### `audio.key_sound.fx.chip_event`
 ```
 dictionary KeySoundInvokeListFX {
     ByPulse<KeySoundInvokeFX>[2][]? clap;         // (OPTIONAL)
