@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.2.0-beta17`)
+# KSON Format Specification (version: `0.2.0-beta18`)
 - Encoding: UTF-8 (without BOM), LF
 - If a default values is specified in this document, undefined values are overwritten by the default value.
 - `null` value is not allowed in the entire kson file.
@@ -700,7 +700,6 @@ dictionary LegacyBgInfo {
 }
 ```
 - If the array of bg/layer has only one item, that bg/layer is always used regardless of the gauge percentage.
-- If the array of layer has only one item and the layer image has two rows in one image, the first row (upper-half) is used when gauge < 70%, and the second row (lower-half) is used when gauge > 70%.
 
 #### `bg.legacy.bg[xxx]` (OPTIONAL)
 ```
@@ -712,11 +711,11 @@ dictionary KshBg {
 #### `bg.legacy.layer[xxx]` (OPTIONAL)
 ```
 dictionary KshLayer {
-    DOMString filename = "arrow";  // self-explanatory (can be KSM default animation layer such as "`arrow`")
-    long duration = 0;             // one-loop duration in milliseconds
-                                   //   If the value is negative, the animation is played backwards.
-                                   //   If the value is zero, the play speed is tempo-synced and set to 1f/0.035measure (=28.571f/measure).
-    KshLayerRotationInfo rotation; // rotation conditions
+    DOMString filename = "arrow";    // self-explanatory (can be KSM default animation layer such as "`arrow`")
+    long duration = 0;               // one-loop duration in milliseconds
+                                     //   If the value is negative, the animation is played backwards.
+                                     //   If the value is zero, the play speed is tempo-synced and set to 1f/0.035measure (=28.571f/measure).
+    KshLayerRotationInfo? rotation;  // rotation conditions
 }
 ```
 
