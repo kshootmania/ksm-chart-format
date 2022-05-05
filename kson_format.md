@@ -198,7 +198,7 @@ dictionary KeySoundInvokeListLaser {
     ByPulse[]? slam_swing;  // (OPTIONAL)
     ByPulse[]? slam_mute;   // (OPTIONAL)
 
-    // Note: Custom key sounds are not allowed to inserted here
+    // Note: Inserting custom key sounds here is not allowed
 }
 ```
 
