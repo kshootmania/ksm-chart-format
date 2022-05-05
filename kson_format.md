@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.2.0-beta18`)
+# KSON Format Specification (version: `0.2.0-beta19`)
 - Encoding: UTF-8 (without BOM), LF
 - If a default values is specified in this document, undefined values are overwritten by the default value.
 - `null` value is not allowed in the entire kson file.
@@ -76,8 +76,8 @@ dictionary TimeSig {
 ## `gauge`
 ```
 dictionary GaugeInfo {
-    unsigned long? total;  // total ascension of gauge percentage in the entire chart (100-)
-                           // set automatically if not specified
+    unsigned long? total = 0;  // total ascension of gauge percentage in the entire chart (0 or 100-)
+                               // automatically set if zero
 }
 ```
 
@@ -86,9 +86,9 @@ dictionary GaugeInfo {
 ## `note`
 ```
 dictionary NoteInfo {
-    Interval[][4]? bt;               // BT notes (first index: lane) (l=0: chip note, l>0: long note)
-    Interval[][2]? fx;               // FX notes (first index: lane) (l=0: chip note, l>0: long note)
-    LaserSection[][2]? laser;        // laser notes (first index: lane (0: left knob, 1: right knob))
+    Interval[4][]? bt;               // BT notes (first index: lane) (l=0: chip note, l>0: long note)
+    Interval[2][]? fx;               // FX notes (first index: lane) (l=0: chip note, l>0: long note)
+    LaserSection[2][]? laser;        // laser notes (first index: lane (0: left knob, 1: right knob))
 }
 ```
 
@@ -162,13 +162,13 @@ dictionary KeySoundFXInfo {
 #### `audio.key_sound.fx.chip_event[lane]`
 ```
 dictionary KeySoundInvokeListFX {
-    ByPulse<KeySoundInvokeFX>[][2]? clap;         // (OPTIONAL)
-    ByPulse<KeySoundInvokeFX>[][2]? clap_impact;  // (OPTIONAL)
-    ByPulse<KeySoundInvokeFX>[][2]? clap_punchy;  // (OPTIONAL)
-    ByPulse<KeySoundInvokeFX>[][2]? snare;        // (OPTIONAL)
-    ByPulse<KeySoundInvokeFX>[][2]? snare_lo;     // (OPTIONAL)
+    ByPulse<KeySoundInvokeFX>[2][]? clap;         // (OPTIONAL)
+    ByPulse<KeySoundInvokeFX>[2][]? clap_impact;  // (OPTIONAL)
+    ByPulse<KeySoundInvokeFX>[2][]? clap_punchy;  // (OPTIONAL)
+    ByPulse<KeySoundInvokeFX>[2][]? snare;        // (OPTIONAL)
+    ByPulse<KeySoundInvokeFX>[2][]? snare_lo;     // (OPTIONAL)
 
-    ByPulse<KeySoundInvokeFX>[][2]? ...;          // Custom key sounds can be inserted here by using the filename of a WAVE file (.wav) as a key
+    ByPulse<KeySoundInvokeFX>[2][]? ...;          // Custom key sounds can be inserted here by using the filename of a WAVE file (.wav) as a key
 }
 ```
 
@@ -222,7 +222,7 @@ dictionary AudioEffectInfo {
 dictionary AudioEffectFXInfo {
     DefList<AudioEffect>? def;                          // audio effect definitions
     InvokeList<ByPulse<AudioEffect>[]>? param_change;   // audio effect parameter changes by pulse
-    InvokeList<ByPulse<AudioEffect>[][2]>? long_event;  // audio effect invocation (and parameter changes) by FX notes
+    InvokeList<ByPulse<AudioEffect>[2][]>? long_event;  // audio effect invocation (and parameter changes) by FX notes
 }
 ```
 - Note: `audio.audio_effect.fx.long_event.xxx[lane][].y` should be the same as `y` of an existing long FX note on the corresponding lane, otherwise the event is ignored.
@@ -719,7 +719,7 @@ dictionary KshLayer {
 }
 ```
 
-#### `bg.legacy.bg[xxx].rotation` / `bg.legacy.layer[xxx].rotation` (OPTIONAL)
+#### `bg.legacy.layer[xxx].rotation` (OPTIONAL)
 ```
 dictionary KshLayerRotationInfo {
     bool tilt = true;  // whether lane tilts affect rotation of BG/layer
