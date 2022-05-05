@@ -76,8 +76,8 @@ dictionary TimeSig {
 ## `gauge`
 ```
 dictionary GaugeInfo {
-    int? total;           // total ascension of gauge percentage in the entire chart (100-)
-                          // set automatically if not specified
+    unsigned long? total;  // total ascension of gauge percentage in the entire chart (100-)
+                           // set automatically if not specified
 }
 ```
 
