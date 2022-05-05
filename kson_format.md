@@ -4,7 +4,7 @@
 - `null` value is not allowed in the entire kson file.
 - Support for parameters/options marked "(OPTIONAL)" are optional, but must be ignored if not supported.
 - `xxx` and `...` denote placeholders.
-- The resolution of pulse value (`y`) is fixed at 240 per beat (i.e., 960 per measure).
+- The resolution of pulse value (`y`) is 240 per beat (i.e., 960 per measure).
 
 -----------------------------------------------------------------------------------
 
@@ -396,7 +396,7 @@ Parameter values are written in one of the following formats:
 
 ### Audio effects & parameter list
 
-- `retrigger`: This effect repeats audio. The repeat source is updated every `update_period` or when `update_trigger` is turned on.
+- `retrigger`: This effect repeats audio.
     - `update_period` (length, default:`1/2`)
         - Interval for automatic update of the repeat source
         - Additional requirement:
@@ -454,7 +454,7 @@ Parameter values are written in one of the following formats:
         - Number of samples to hold. A larger value results in lower sound quality.
     - `mix` (rate, default:`0%>100%`)
         - Blending ratio of the original audio and the effect audio
-- `phaser`: This effect applies an all-pass filter that shifts the phase of the waveform and layers the effect audio and the original audio.
+- `phaser`: This effect applies multiple all-pass filters that shift the phase of the waveform and layers the effect audio and the original audio.
     - `period` (length, default:`1/2`)
         - LFO period
     - `stage` (int, default:`6`)
@@ -476,7 +476,7 @@ Parameter values are written in one of the following formats:
     - `mix` (rate, default:`0%>50%`)
         - Blending ratio of the original audio and the effect audio
         - Note: For phaser effects, the mix value is doubled when used. A typical phaser effect is usually most effective at a mix value of 50%, but this makes it most effective at a mix value of `100%`. Note that the default value `50%` is actually a mix value of 25%.
-    - Note: `hiCutGain` parameter in KSH format has been removed in kson format because it is not a parameter of "Phaser" itself.
+    - Note: `hiCutGain` parameter in KSH format has been removed in kson format because it is not a parameter of the phaser itself.
 - `wobble`: This effect oscillates the cutoff frequency of the low-pass filter with an LFO.
     - `wave_length` (length, default:`0`)
         - LFO period
@@ -525,7 +525,7 @@ Parameter values are written in one of the following formats:
         - Release time
     - `ratio` (int, default:`1>5`)
         - Compression ratio
-            - A value of `1` compresses the audio by a factor of 1/1 (i.e., the original audio), and a value of 5 compresses the audio by a factor of 1/5.
+            - A value of `1` compresses the audio by a factor of 1/1 (i.e., the original audio), and a value of `5` compresses the audio by a factor of 1/5.
         - Additional requirement:
             - 1 <= int <= 100
 - `switch_audio`: This effect switches the playback to another audio file.
@@ -536,9 +536,9 @@ Parameter values are written in one of the following formats:
         - Envelope value of the cutoff frequency
         - Linear transition of the `env` value is translated into a log scale transition when used.
     - `lo_freq` (freq, default:??? `/*FIXME*/`)
-        - Cutoff frequency when the value of `env` is 0.0
+        - Cutoff frequency when `env` is 0.0
     - `hi_freq` (freq, default:??? `/*FIXME*/`)
-        - Cutoff frequency when the value of `env` is 1.0
+        - Cutoff frequency when `env` is 1.0
     - `q` (float, default:??? `/*FIXME*/`)
         - Q value of the filter
     - `mix` (rate, default:`0%>100%`)
@@ -548,9 +548,9 @@ Parameter values are written in one of the following formats:
         - Envelope value of the cutoff frequency
         - Linear transition of the `env` value is translated into a log scale transition when used.
     - `lo_freq` (freq, default:??? `/*FIXME*/`)
-        - Cutoff frequency when the value of `env` is 0.0
+        - Cutoff frequency when `env` is 0.0
     - `hi_freq` (freq, default:??? `/*FIXME*/`)
-        - Cutoff frequency when the value of `env` is 1.0
+        - Cutoff frequency when `env` is 1.0
     - `q` (float, default:??? `/*FIXME*/`)
         - Q value of the filter
     - `mix` (rate, default:`0%>100%`)
@@ -560,9 +560,9 @@ Parameter values are written in one of the following formats:
         - Envelope value of the cutoff frequency
         - Linear transition of the `env` value is translated into a log scale transition when used.
     - `lo_freq` (freq, default:??? `/*FIXME*/`)
-        - Cutoff frequency when the value of `env` is 0.0
+        - Cutoff frequency when `env` is 0.0
     - `hi_freq` (freq, default:??? `/*FIXME*/`)
-        - Cutoff frequency when the value of `env` is 1.0
+        - Cutoff frequency when `env` is 1.0
     - `gain` (dB, default:??? `/*FIXME*/`)
         - Gain value of the filter
     - `q` (float, default:??? `/*FIXME*/`)
