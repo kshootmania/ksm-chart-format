@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.3.0-beta2`)
+# KSON Format Specification (version: `0.3.0-beta3`)
 - Encoding: UTF-8 (without BOM), LF
 - If a default value is specified in this document, undefined values are overwritten by the default value.
 - `null` value is not allowed in the entire kson file.
@@ -335,12 +335,11 @@ Leading plus signs (e.g., "`+1`") and scientific notation (e.g., "`1e-3`", "`1E+
             - Requirement: int >= 1
             - Example: `1/2`
         - `[int]%`
-            - Requirement: int >= 0
+            - Requirement: 0 <= int <= 100
             - Example: `50%`
         - `[float]`
-            - Requirement: float >= 0.0
+            - Requirement: 0.0 <= float <= 1.0
             - Example: `0.5`
-    - Note: Some parameters can have values higher than `1.0` (e.g. `flanger.vol`).
 - freq
     - Frequency value (Hz)
     - Allowed formats:
