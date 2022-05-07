@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.3.0-beta1`)
+# KSON Format Specification (version: `0.3.0-beta2`)
 - Encoding: UTF-8 (without BOM), LF
 - If a default value is specified in this document, undefined values are overwritten by the default value.
 - `null` value is not allowed in the entire kson file.
@@ -20,6 +20,7 @@ dictionary kson {
     AudioInfo?    audio;       // audio-related data
     CameraInfo?   camera;      // camera-related data
     BgInfo?       bg;          // background-related data
+    EditorInfo?   editor;      // (OPTIONAL) data used only in editors
     ImplInfo?     impl;        // (OPTIONAL) implementation-dependent options for each client
 }
 ```
@@ -60,12 +61,9 @@ dictionary BeatInfo {
     ByPulse<double>[] bpm;                        // bpm changes
     ByMeasureIndex<TimeSig>[]? time_sig;          // time signature changes
                                                   // this is used for drawing bar lines and audio effects
-    Interval[]? stop;                             // stop events
-    ByPulse<double>[]? scroll_speed;              // (OPTIONAL) scroll speed changes (default: 1.0)
+    GraphPoint[]? scroll_speed;                   // scroll speed changes (default: 1.0)
 }
 ```
-- Two or more stops cannot be overlapped. To make the chart scroll backwards, set `scroll_speed` to a negative value instead.
-- `stop` has a higher priority than `scroll_speed`.
 
 ### `beat.time_sig`
 ```
@@ -734,6 +732,15 @@ dictionary KshLayerRotationInfo {
 dictionary KshMovie {
     DOMString? filename;  // self-explanatory
     long offset = 0;      // movie offset in millisecond
+}
+```
+
+-----------------------------------------------------------------------------------
+
+### `editor` (OPTIONAL)
+```
+dictionary EditorInfo {
+    ByPulse<DOMString>? comment;  // (OPTIONAL) comments that can be written in the editor
 }
 ```
 
