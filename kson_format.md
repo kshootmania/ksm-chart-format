@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.3.0-beta4`)
+# KSON Format Specification (version: `0.3.0-beta5`)
 - Encoding: UTF-8 (without BOM), LF
 - If a default value is specified in this document, undefined values are overwritten by the default value.
 - `null` value is not allowed in the entire kson file.
@@ -752,6 +752,7 @@ dictionary CompatInfo {
     KshUnknownInfo? ksh_unknown;  // (OPTIONAL) unrecognized data in ksh-to-kson conversion
 }
 ```
+- Note: If the "`ver`" field is not present in the KSH file, `ksh_version` is set to "`100`".
 
 ### `compat.ksh_unknown` (OPTIONAL)
 ```
