@@ -2,7 +2,7 @@
 - Encoding: UTF-8 (without BOM), LF
 - If a default value is specified in this document, undefined values are overwritten by the default value.
 - `null` value is not allowed in the entire kson file.
-- Support for parameters/options marked "(OPTIONAL)" are optional, but must be ignored if not supported.
+- Support for parameters/options marked "(OPTIONAL)" is optional, but must be ignored if not supported.
 - `xxx` and `...` denote placeholders.
 - The resolution of pulse value (`y`) is 240 per beat (i.e., 960 per measure).
 - The behavior for illegal values is undefined, and kson clients do not necessarily need to report an error even if there is an illegal value.
