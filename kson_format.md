@@ -136,7 +136,7 @@ dictionary BgmPreviewInfo {
 }
 ```
 
-### `audio.legacy` (OPTIONAL)
+#### `audio.bgm.legacy` (OPTIONAL)
 ```
 dictionary LegacyBgmInfo {
     DOMString[]? fp_filenames;  // filenames of prerendered BGM with audio effects from legacy KSH charts
