@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.3.0-beta3`)
+# KSON Format Specification (version: `0.3.0-beta4`)
 - Encoding: UTF-8 (without BOM), LF
 - If a default value is specified in this document, undefined values are overwritten by the default value.
 - `null` value is not allowed in the entire kson file.
@@ -21,7 +21,8 @@ dictionary kson {
     CameraInfo?   camera;      // camera-related data
     BgInfo?       bg;          // background-related data
     EditorInfo?   editor;      // (OPTIONAL) data used only in editors
-    ImplInfo?     impl;        // (OPTIONAL) implementation-dependent options for each client
+    CompatInfo?   compat;      // (OPTIONAL) compatibility data with KSH format
+    ImplInfo?     impl;        // (OPTIONAL) data that is sure to be for a specific client
 }
 ```
 
@@ -42,7 +43,6 @@ dictionary MetaInfo {
     DOMString?      jacket_filename;       // self-explanatory (can have a preset image "nowprinting1"/"nowprinting2"/"nowprinting3")
     DOMString?      jacket_author;         // self-explanatory
     DOMString?      information;           // (OPTIONAL) optional information shown in song selection
-    DOMString?      ksh_version;           // (OPTIONAL) "ver" field of KSH file (specified only if converted from KSH)
 }
 ```
 
@@ -745,6 +745,77 @@ dictionary EditorInfo {
 
 -----------------------------------------------------------------------------------
 
+### `compat` (OPTIONAL)
+```
+dictionary CompatInfo {
+    DOMString? ksh_version;       // (OPTIONAL) "ver" field of KSH file (specified only if converted from KSH)
+    KshUnknownInfo? ksh_unknown;  // (OPTIONAL) unrecognized data in ksh-to-kson conversion
+}
+```
+
+### `compat.ksh_unknown` (OPTIONAL)
+```
+dictionary KshUnknownInfo {
+    dictionary? meta;                          // (OPTIONAL) unrecognized option lines before the first bar line (value:DOMString)
+    InvokeList<ByPulse<DOMString>[]>? option;  // (OPTIONAL) unrecognized option lines after the first bar line
+    ByPulse<DOMString>[]? line;                // (OPTIONAL) unrecognized non-option lines
+}
+```
+- Note: In KSH format, a line with at least one "`=`" is recognized as an option line. The second or later "`=`" is recognized as part of the value.
+    - Examples:
+        - "`keyvalue`" => non-option line
+        - "`key=value`" => option line (key:"`key`", value:"`value`")
+        - "`key=value=value`" => option line (key:"`key`", value:"`value=value`")
+- Note: Unrecognized non-option lines before the first bar line ("--") are stored in `compat.ksh_unknown.line` as `y`=`0`.
+- Note: Since KSH format does not allow comment lines starting with "`;`", such lines are stored in `compat.ksh_unknown.option` or `compat.ksh_unknown.line` instead of `editor.comment`.
+- Example:
+    - KSH:
+        ```
+        title=...
+        ;some-extension1
+        extvalue=0
+        --
+        ;some-extension2
+        extvalue=100
+        0000|00|--
+        extvalue=200
+        0000|00|--
+        --
+        extvalue=300
+        ;some-extension3
+        ;some-extension4=100
+        0000|00|--
+        extvalue=400
+        0000|00|--
+        --
+        ```
+    - Converted `ksh_unknown` value in KSON:
+        ```
+        "ksh_unknown":{
+            "meta":{
+                "extvalue":"0"
+            },
+            "option":{
+                "extvalue":[
+                    { "y":0, "v":"100" },
+                    { "y":480, "v":"200" },
+                    { "y":960, "v":"300" },
+                    { "y":1440, "v":"400" }
+                ],
+                ";some-extension4":[
+                    { "y":960, "v":"100" }
+                ]
+            },
+            "line":[
+                { "y":0, "v":";some-extension1" },
+                { "y":0, "v":";some-extension2" },
+                { "y":960, "v":";some-extension3" },
+            ]
+        }
+        ```
+
+-----------------------------------------------------------------------------------
+
 ### `impl` (OPTIONAL)
 ```
 dictionary ImplInfo {
@@ -833,7 +904,7 @@ dictionary Def<T> {
 ### list of definitions
 ```
 dictionary DefList<T> {
-    Def<T>? ...(name is the key);
+    Def<T>? ...(key is the name);
     ...
 }
 ```
@@ -841,7 +912,7 @@ dictionary DefList<T> {
 ### list of invocations
 ```
 dictionary InvokeList<T> {
-    T? ...(name is the key);  // values which overwrites Def<T>.v
+    T? ...(key is the name);  // values which overwrites Def<T>.v
     ...
 }
 ```
