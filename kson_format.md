@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.3.0-beta5`)
+# KSON Format Specification (version: `0.3.0-beta6`)
 - Encoding: UTF-8 (without BOM), LF
 - If a default value is specified in this document, undefined values are overwritten by the default value.
 - `null` value is not allowed in the entire kson file.
@@ -533,43 +533,43 @@ Parameter values are written in one of the following formats:
     - (`filename` (string))
         - Note that this is not in `v` but at the root of `Def<AudioEffect>`
 - `high_pass_filter`: Bi-quad high-pass filter.
-    - `env` (rate, default:`0%-100%`)
+    - `v` (rate, default:`0%-100%`)
         - Envelope value of the cutoff frequency
-        - Linear transition of the `env` value is translated into a log scale transition when used.
+        - Linear transition of the `v` value is translated into a log scale transition when used.
     - `lo_freq` (freq, default:??? `/*FIXME*/`)
-        - Cutoff frequency when `env` is 0.0
+        - Cutoff frequency when `v` is 0.0
     - `hi_freq` (freq, default:??? `/*FIXME*/`)
-        - Cutoff frequency when `env` is 1.0
+        - Cutoff frequency when `v` is 1.0
     - `q` (float, default:??? `/*FIXME*/`)
         - Q value of the filter
     - `mix` (rate, default:`0%>100%`)
     - Note: `lo_freq` value may exceed the `hi_freq` value.
 - `low_pass_filter`: Bi-quad low-pass filter.
-    - `env` (rate, default:`0%-100%`)
+    - `v` (rate, default:`0%-100%`)
         - Envelope value of the cutoff frequency
-        - Linear transition of the `env` value is translated into a log scale transition when used.
+        - Linear transition of the `v` value is translated into a log scale transition when used.
     - `lo_freq` (freq, default:??? `/*FIXME*/`)
-        - Cutoff frequency when `env` is 0.0
+        - Cutoff frequency when `v` is 0.0
     - `hi_freq` (freq, default:??? `/*FIXME*/`)
-        - Cutoff frequency when `env` is 1.0
+        - Cutoff frequency when `v` is 1.0
     - `q` (float, default:??? `/*FIXME*/`)
         - Q value of the filter
     - `mix` (rate, default:`0%>100%`)
     - Note: `lo_freq` value may exceed the `hi_freq` value.
 - `peaking_filter`: Bi-quad peaking filter.
-    - `env` (rate, default:`0%-100%`)
+    - `v` (rate, default:`0%-100%`)
         - Envelope value of the cutoff frequency
-        - Linear transition of the `env` value is translated into a log scale transition when used.
+        - Linear transition of the `v` value is translated into a log scale transition when used.
     - `lo_freq` (freq, default:??? `/*FIXME*/`)
-        - Cutoff frequency when `env` is 0.0
+        - Cutoff frequency when `v` is 0.0
     - `hi_freq` (freq, default:??? `/*FIXME*/`)
-        - Cutoff frequency when `env` is 1.0
+        - Cutoff frequency when `v` is 1.0
     - `gain` (dB, default:??? `/*FIXME*/`)
         - Gain value of the filter
     - `q` (float, default:??? `/*FIXME*/`)
         - Q value of the filter
     - (OPTIONAL) `delay` (length, default:`0ms`)
-        - Delay time until the `env` value is applied
+        - Delay time until the `v` value is applied
         - Additional requirement:
             - The formats `1/[int]` and `[float]` are not allowed.
             - 0ms <= delay <= 160ms
