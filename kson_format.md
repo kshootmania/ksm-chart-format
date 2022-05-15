@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.3.0-beta6`)
+# KSON Format Specification (version: `0.3.0-beta7`)
 - Encoding: UTF-8 (without BOM), LF
 - If a default value is specified in this document, undefined values are overwritten by the default value.
 - `null` value is not allowed in the entire kson file.
@@ -347,12 +347,6 @@ Leading plus signs (e.g., "`+1`") and scientific notation (e.g., "`1e-3`", "`1E+
             - Requirement: 10 <= int <= 20000
         - `[float]kHz`
             - Requirement: 0.01 <= float <= 20.0
-- dB
-    - Decibel value
-    - Allowed formats:
-        - `[float]dB`
-            - Requirement: float >= 0.0
-            - Example: `3.0dB`
 - pitch
     - Key in music (12 per octave)
     - Allowed formats:
@@ -451,7 +445,7 @@ Parameter values are written in one of the following formats:
     - `mix` (rate, default:`0%>100%`)
         - Blending ratio of the original audio and the effect audio
 - `bitcrusher`: This effect reduces the quality of the audio wave. Also known as "Sample & Hold".
-    - `reduction` (sample, default:`0samples`)
+    - `reduction` (sample, default:`0samples-30samples`)
         - Number of samples to hold. A larger value results in lower sound quality.
     - `mix` (rate, default:`0%>100%`)
         - Blending ratio of the original audio and the effect audio
@@ -535,46 +529,46 @@ Parameter values are written in one of the following formats:
 - `high_pass_filter`: Bi-quad high-pass filter.
     - `v` (rate, default:`0%-100%`)
         - Envelope value of the cutoff frequency
-        - Linear transition of the `v` value is translated into a log scale transition when used.
-    - `lo_freq` (freq, default:??? `/*FIXME*/`)
+        - Note: This parameter is provided to make the frequency transition on a log scale rather than a linear scale.
+    - `freq` (freq, default:`100Hz`)
         - Cutoff frequency when `v` is 0.0
-    - `hi_freq` (freq, default:??? `/*FIXME*/`)
+    - `freq_max` (freq, default:`2200Hz`)
         - Cutoff frequency when `v` is 1.0
     - `q` (float, default:??? `/*FIXME*/`)
-        - Q value of the filter
+        - Q value of the biquad filter
     - `mix` (rate, default:`0%>100%`)
-    - Note: `lo_freq` value may exceed the `hi_freq` value.
+    - Note: `freq` value may exceed the `freq_max` value.
 - `low_pass_filter`: Bi-quad low-pass filter.
     - `v` (rate, default:`0%-100%`)
         - Envelope value of the cutoff frequency
-        - Linear transition of the `v` value is translated into a log scale transition when used.
-    - `lo_freq` (freq, default:??? `/*FIXME*/`)
+        - Note: This parameter is provided to make the frequency transition on a log scale rather than a linear scale.
+    - `freq` (freq, default:`15000Hz`)
         - Cutoff frequency when `v` is 0.0
-    - `hi_freq` (freq, default:??? `/*FIXME*/`)
+    - `freq_max` (freq, default:`800Hz`)
         - Cutoff frequency when `v` is 1.0
     - `q` (float, default:??? `/*FIXME*/`)
-        - Q value of the filter
+        - Q value of the biquad filter
     - `mix` (rate, default:`0%>100%`)
-    - Note: `lo_freq` value may exceed the `hi_freq` value.
+    - Note: `freq` value may exceed the `freq_max` value.
 - `peaking_filter`: Bi-quad peaking filter.
     - `v` (rate, default:`0%-100%`)
         - Envelope value of the cutoff frequency
-        - Linear transition of the `v` value is translated into a log scale transition when used.
-    - `lo_freq` (freq, default:??? `/*FIXME*/`)
+        - Note: This parameter is provided to make the frequency transition on a log scale rather than a linear scale.
+    - `freq` (freq, default:`50Hz`)
         - Cutoff frequency when `v` is 0.0
-    - `hi_freq` (freq, default:??? `/*FIXME*/`)
+    - `freq_max` (freq, default:`9000Hz`)
         - Cutoff frequency when `v` is 1.0
-    - `gain` (dB, default:??? `/*FIXME*/`)
-        - Gain value of the filter
-    - `q` (float, default:??? `/*FIXME*/`)
-        - Q value of the filter
+    - `gain` (rate, default:`50%`)
+        - Gain scale
+    - `q` (float, default:`1.2`)
+        - Q value of the biquad filter
     - (OPTIONAL) `delay` (length, default:`0ms`)
         - Delay time until the `v` value is applied
         - Additional requirement:
             - The formats `1/[int]` and `[float]` are not allowed.
             - 0ms <= delay <= 160ms
     - `mix` (rate, default:`0%>100%`)
-    - Note: `lo_freq` value may exceed the `hi_freq` value.
+    - Note: `freq` value may exceed the `freq_max` value.
 
 -----------------------------------------------------------------------------------
 
