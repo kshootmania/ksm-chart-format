@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.3.0-beta7`)
+# KSON Format Specification (version: `0.3.0-beta8`)
 - Encoding: UTF-8 (without BOM), LF
 - If a default value is specified in this document, undefined values are overwritten by the default value.
 - `null` value is not allowed in the entire kson file.
@@ -397,6 +397,7 @@ Parameter values are written in one of the following formats:
         - Additional requirement:
             - The formats `[float]ms` and `[float]s` are not allowed.
         - `0`: Automatic trigger update is disabled.
+        - This parameter allows kson clients to use only the OnMin value and ignore the Off and OnMax values.
         - Note: `update_period` interval count is reset at the beginning of each measure if `update_period` has a non-zero value.
     - `wave_length` (length, default:`0`)
         - Length of repetition
@@ -497,6 +498,8 @@ Parameter values are written in one of the following formats:
         - Additional requirement:
             - The formats `[float]ms` and `[float]s` are not allowed.
         - `0`: Automatic trigger update is disabled.
+        - This parameter allows kson clients to use only the OnMin value and just ignore the Off and OnMax values.
+        - Note: `update_period` interval count is reset at the beginning of each measure if `update_period` has a non-zero value.
     - `wave_length` (length, default:`0`)
         - Length of repetition
         - `0`: Not specified. (In KSM, the effect is bypassed if the value is `0`. Also, parameter changes to `0` are ignored.)
