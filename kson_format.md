@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.4.0-beta1`)
+# KSON Format Specification (version: `0.4.0-beta2`)
 - JSON format
 - File extension: `.kson`
 - Encoding: UTF-8 (without BOM), LF
@@ -224,19 +224,33 @@ dictionary AudioEffectInfo {
 #### `audio.audio_effect.fx`
 ```
 dictionary AudioEffectFXInfo {
-    dictionary<AudioEffectDef>? def;                   // audio effect definitions
-    dictionary<ByPulse<AudioEffect>[]>? param_change;  // audio effect parameter changes by pulse
-    dictionary<ByPulse<AudioEffect>[2][]>? long_event; // audio effect invocation (and parameter changes) by long notes
+    dictionary<AudioEffectDef>? def;                         // audio effect definitions
+    dictionary<dictionary<ByPulse<string>[]>>? param_change; // audio effect parameter changes by pulse
+    dictionary<ByPulse<AudioEffect>[2][]>? long_event;       // audio effect invocation (and parameter changes) by long notes
 }
 ```
 - Note: `audio.audio_effect.fx.long_event.xxx[lane][].y` should be the same as `y` of an existing long FX note on the corresponding lane, otherwise the event is ignored.
+- Example for `audio.audio_effect.fx.param_change`/`audio.audio_effect.laser.param_change`:
+    ```
+    "param_change":{
+        "retrigger":{
+            "update_period":[
+                {"y":960, "v":"0"},
+                {"y":1920, "v":"1/2"}
+            ],
+            "update_trigger":[
+                {"y":1200, "v":"on"}
+            ]
+        }
+    }
+    ```
 
 #### `audio.audio_effect.laser`
 ```
 dictionary AudioEffectLaserInfo {
-    dictionary<AudioEffectDef>? def;                   // audio effect definitions
-    dictionary<ByPulse<AudioEffect>[]>? param_change;  // audio effect parameter changes by pulse
-    dictionary<ByPulse[]>? pulse_event;                // audio effect invocation by pulse
+    dictionary<AudioEffectDef>? def;                         // audio effect definitions
+    dictionary<dictionary<ByPulse<string>[]>>? param_change; // audio effect parameter changes by pulse
+    dictionary<ByPulse[]>? pulse_event;                      // audio effect invocation by pulse
 }
 ```
 - Note: `audio.audio_effect.laser.pulse_event` cannot contain parameter changes. Use `audio.audio_effect.laser.param_change` instead.
