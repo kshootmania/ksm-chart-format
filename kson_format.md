@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.3.0`)
+# KSON Format Specification (version: `0.4.0-beta1`)
 - JSON format
 - File extension: `.kson`
 - Encoding: UTF-8 (without BOM), LF
@@ -403,6 +403,7 @@ Parameter values are written in one of the following formats:
             - The formats `[float]ms` and `[float]s` are not allowed.
         - `0`: Automatic trigger update is disabled.
         - This parameter allows kson clients to use only the OnMin value and ignore the Off and OnMax values.
+        - This parameter allows kson clients to ignore values specified in `audio.audio_effect.fx.long_event`.
         - Note: `update_period` interval count is reset at the beginning of each measure if `update_period` has a non-zero value.
     - `wave_length` (length, default:`0`)
         - Length of repetition
@@ -479,7 +480,7 @@ Parameter values are written in one of the following formats:
         - Note: For phaser effects, the mix value is doubled when used. A typical phaser effect is usually most effective at a mix value of 50%, but this makes it most effective at a mix value of `100%`. Note that the default value `50%` is actually a mix value of 25%.
     - Note: `hiCutGain` parameter in KSH format has been removed in kson format because it is not a parameter of the phaser itself.
 - `wobble`: This effect oscillates the cutoff frequency of the low-pass filter with an LFO.
-    - `wave_length` (length, default:`0`)
+    - `period` (length, default:`0`)
         - LFO period
         - `0`: Not specified. (In KSM, the effect is bypassed if the value is `0`. Also, parameter changes to `0` are ignored.)
         - Note: `wave_length` interval count is reset at the beginning of each measure if `update_period` has a non-zero value.
@@ -504,6 +505,7 @@ Parameter values are written in one of the following formats:
             - The formats `[float]ms` and `[float]s` are not allowed.
         - `0`: Automatic trigger update is disabled.
         - This parameter allows kson clients to use only the OnMin value and just ignore the Off and OnMax values.
+        - This parameter allows kson clients to ignore values specified in `audio.audio_effect.fx.long_event`.
         - Note: `update_period` interval count is reset at the beginning of each measure if `update_period` has a non-zero value.
     - `wave_length` (length, default:`0`)
         - Length of repetition
