@@ -690,23 +690,23 @@ dictionary BgInfo {
 ### `bg.legacy` (OPTIONAL)
 ```
 dictionary LegacyBgInfo {
-    KshBg[2]? bg;        // first element: when gauge < 70%, second element: when gauge >= 70%
-    KshLayer? layer;
-    KshMovie? movie;
+    KshBgInfo[2]? bg;        // first element: when gauge < 70%, second element: when gauge >= 70%
+    KshLayerInfo? layer;
+    KshMovieInfo? movie;
 }
 ```
 - If `bg` has only a single element, that bg is always used, regardless of the percentage of the gauge.
 
-#### `bg.legacy.bg[]` (OPTIONAL)
+#### `bg.legacy.bg[xxx]` (OPTIONAL)
 ```
-dictionary KshBg {
+dictionary KshBgInfo {
     DOMString filename = "desert";  // self-explanatory (can be KSM default BG image such as "`desert`")
 }
 ```
 
 #### `bg.legacy.layer` (OPTIONAL)
 ```
-dictionary KshLayer {
+dictionary KshLayerInfo {
     DOMString filename = "arrow";    // self-explanatory (can be KSM default animation layer such as "`arrow`")
     long duration = 0;               // one-loop duration in milliseconds
                                      //   If the value is negative, the animation is played backwards.
@@ -725,7 +725,7 @@ dictionary KshLayerRotationInfo {
 
 #### `bg.legacy.movie` (OPTIONAL)
 ```
-dictionary KshMovie {
+dictionary KshMovieInfo {
     DOMString? filename;  // self-explanatory
     long offset = 0;      // movie offset in millisecond
 }
