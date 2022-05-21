@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.3.0-beta8`)
+# KSON Format Specification (version: `0.3.0-beta9`)
 - Encoding: UTF-8 (without BOM), LF
 - If a default value is specified in this document, undefined values are overwritten by the default value.
 - `null` value is not allowed in the entire kson file.
@@ -222,9 +222,9 @@ dictionary AudioEffectInfo {
 #### `audio.audio_effect.fx`
 ```
 dictionary AudioEffectFXInfo {
-    DefList<AudioEffect>? def;                          // audio effect definitions
-    InvokeList<ByPulse<AudioEffect>[]>? param_change;   // audio effect parameter changes by pulse
-    InvokeList<ByPulse<AudioEffect>[2][]>? long_event;  // audio effect invocation (and parameter changes) by FX notes
+    dictionary<AudioEffectDef>? def;                   // audio effect definitions
+    dictionary<ByPulse<AudioEffect>[]>? param_change;  // audio effect parameter changes by pulse
+    dictionary<ByPulse<AudioEffect>[2][]>? long_event; // audio effect invocation (and parameter changes) by long note
 }
 ```
 - Note: `audio.audio_effect.fx.long_event.xxx[lane][].y` should be the same as `y` of an existing long FX note on the corresponding lane, otherwise the event is ignored.
@@ -232,20 +232,18 @@ dictionary AudioEffectFXInfo {
 #### `audio.audio_effect.laser`
 ```
 dictionary AudioEffectLaserInfo {
-    DefList<AudioEffect>? def;                         // audio effect definitions
-    InvokeList<ByPulse<AudioEffect>[]>? param_change;  // audio effect parameter changes by pulse
-    InvokeList<ByPulse[]>? pulse_event;                // audio effect invocation by pulse
+    dictionary<AudioEffectDef>? def;                   // audio effect definitions
+    dictionary<ByPulse<AudioEffect>[]>? param_change;  // audio effect parameter changes by pulse
+    dictionary<ByPulse[]>? pulse_event;                // audio effect invocation by pulse
 }
 ```
+- Note: `audio.audio_effect.laser.pulse_event` cannot contain parameter changes. Use `audio.audio_effect.laser.param_change` instead.
 
 ##### `audio.audio_effect.fx.def`/`audio.audio_effect.laser.def`
 ```
-dictionary Def<AudioEffect> {
-    DOMString type;      // audio effect type (e.g. "flanger")
-    AudioEffect? v {
-        DOMString ...;   // audio effect parameter values
-    };
-    DOMString? filename; // This can be specified only if type="switch_audio". The filename of an audio file.
+dictionary AudioEffectDef {
+    DOMString type;            // audio effect type (e.g. "flanger")
+    dictionary<DOMString>? v;  // audio effect parameter values
 }
 ```
 - Examples:
@@ -285,7 +283,9 @@ dictionary Def<AudioEffect> {
        ```
        {
            "type":"switch_audio",
-           "filename":"music.ogg" // not in "v" because "filename" is not changeable in invocation
+           "v":{
+                "filename": "music.ogg"
+           }
        }
        ```
 - Audio effects in the "Audio effects & parameter list" are predefined with its default parameter values.
@@ -365,6 +365,9 @@ Leading plus signs (e.g., "`+1`") and scientific notation (e.g., "`1e-3`", "`1E+
     - Allowed formats:
         - `[float]`
             - Example: `2.5`, `-10`
+- filename
+    - Filename string
+    - Parameter values of this type can only be specified in `audio.audio_effect.xxx.def` and cannot be changed via `param_change`/`long_event`/`laser_event`.
 
 
 ### Audio effect parameter value format
@@ -527,8 +530,7 @@ Parameter values are written in one of the following formats:
         - Additional requirement:
             - 1 <= int <= 100
 - `switch_audio`: This effect switches the playback to another audio file.
-    - (`filename` (string))
-        - Note that this is not in `v` but at the root of `Def<AudioEffect>`
+    - `filename` (filename)
 - `high_pass_filter`: Bi-quad high-pass filter.
     - `v` (rate, default:`0%-100%`)
         - Envelope value of the cutoff frequency
@@ -754,8 +756,8 @@ dictionary CompatInfo {
 ### `compat.ksh_unknown` (OPTIONAL)
 ```
 dictionary KshUnknownInfo {
-    dictionary? meta;                          // (OPTIONAL) unrecognized option lines before the first bar line (value:DOMString)
-    InvokeList<ByPulse<DOMString>[]>? option;  // (OPTIONAL) unrecognized option lines after the first bar line
+    dictionary<DOMString>? meta;               // (OPTIONAL) unrecognized option lines before the first bar line
+    dictionary<ByPulse<DOMString>[]>? option;  // (OPTIONAL) unrecognized option lines after the first bar line
     ByPulse<DOMString>[]? line;                // (OPTIONAL) unrecognized non-option lines
 }
 ```
@@ -889,31 +891,6 @@ dictionary GraphSectionPoint {
 ```
 - If `v` is undefined, it inherits the `vf` value of the previous element. Note that the first element must not have an undefined `v` value.
 - If `vf` is undefined, it inherits the `v` value.
-
-### definition
-```
-dictionary Def<T> {
-    T v;                     // changeable parameters (default values)
-
-    ...                      // unchangeable parameters (e.g. filename, audio effect type)
-}
-```
-
-### list of definitions
-```
-dictionary DefList<T> {
-    Def<T>? ...(key is the name);
-    ...
-}
-```
-
-### list of invocations
-```
-dictionary InvokeList<T> {
-    T? ...(key is the name);  // values which overwrites Def<T>.v
-    ...
-}
-```
 
 -----------------------------------------------------------------------------------
 
