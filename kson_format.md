@@ -1,4 +1,6 @@
 # KSON Format Specification (version: `0.3.0`)
+- JSON format
+- File extension: `.kson`
 - Encoding: UTF-8 (without BOM), LF
 - If a default value is specified in this document, undefined values are overwritten by the default value.
 - `null` value is not allowed in the entire kson file.
@@ -12,14 +14,14 @@
 ## Top-level object
 ```
 dictionary kson {
-    DOMString     version;     // kson version (Semantic Versioning like "x.y.z")
+    string        version;     // kson version (Semantic Versioning like "x.y.z")
     MetaInfo      meta;        // meta data, e.g. title, artist, ...
     BeatInfo      beat;        // beat-related data, e.g. bpm, time signature, ...
     GaugeInfo?    gauge;       // gauge-related data
     NoteInfo?     note;        // notes on each lane
     AudioInfo?    audio;       // audio-related data
     CameraInfo?   camera;      // camera-related data
-    BgInfo?       bg;          // background-related data
+    BGInfo?       bg;          // background-related data
     EditorInfo?   editor;      // (OPTIONAL) data used only in editors
     CompatInfo?   compat;      // (OPTIONAL) compatibility data with KSH format
     ImplInfo?     impl;        // (OPTIONAL) data that is sure to be for a specific client
@@ -31,18 +33,18 @@ dictionary kson {
 ## `meta`
 ```
 dictionary MetaInfo {
-    DOMString       title;                 // self-explanatory
-    DOMString?      title_img_filename;    // (OPTIONAL) use an image instead of song title text
-    DOMString       artist;                // self-explanatory
-    DOMString?      artist_img_filename;   // (OPTIONAL) use an image instead of song artist text
-    DOMString       chart_author;          // self-explanatory
-    DifficultyInfo  difficulty;            // self-explanatory
-    unsigned int    level;                 // self-explanatory, 1-20
-    DOMString       disp_bpm = "";         // displayed bpm (allowed characters: 0-9, "-", ".")
-    double          std_bpm = 0;           // (OPTIONAL) standard bpm for hi-speed values (should be between minimum bpm and maximum bpm in the chart); automatically set if zero
-    DOMString?      jacket_filename;       // self-explanatory (can have a preset image "nowprinting1"/"nowprinting2"/"nowprinting3")
-    DOMString?      jacket_author;         // self-explanatory
-    DOMString?      information;           // (OPTIONAL) optional information shown in song selection
+    string          title;                    // self-explanatory
+    string?         title_img_filename;       // (OPTIONAL) use an image instead of song title text
+    string          artist;                   // self-explanatory
+    string?         artist_img_filename;      // (OPTIONAL) use an image instead of song artist text
+    string          chart_author;             // self-explanatory
+    DifficultyInfo  difficulty;               // self-explanatory
+    unsigned int    level;                    // self-explanatory, 1-20
+    string          disp_bpm = "";            // displayed bpm (allowed characters: 0-9, "-", ".")
+    double          std_bpm = 0;              // (OPTIONAL) standard bpm for hi-speed values (should be between minimum bpm and maximum bpm in the chart); automatically set if zero
+    string?         jacket_filename;          // self-explanatory (can have a preset image "nowprinting1"/"nowprinting2"/"nowprinting3")
+    string?         jacket_author;            // self-explanatory
+    string?         information;              // (OPTIONAL) optional information shown in song selection
 }
 ```
 
@@ -111,7 +113,7 @@ dictionary LaserSection : ByPulse<GraphSectionPoint[]> {
 ## `audio`
 ```
 dictionary AudioInfo {
-    BgmInfo? bgm;                   // bgm-related data
+    BGMInfo? bgm;                   // bgm-related data
     KeySoundInfo? key_sound;        // key-sound-related data
     AudioEffectInfo? audio_effect;  // audio-effect-related data
 }
@@ -119,18 +121,18 @@ dictionary AudioInfo {
 
 ### `audio.bgm`
 ```
-dictionary BgmInfo {
-    DOMString filename = "";  // self-explanatory
+dictionary BGMInfo {
+    string filename = "";     // self-explanatory
     double vol = 1.0;         // bgm volume
     long offset = 0;          // offset in milliseconds (starting point of the audio file)
-    BgmPreviewInfo? preview;  // preview information
-    LegacyBgmInfo? legacy;    // (OPTIONAL) legacy information
+    BGMPreviewInfo? preview;  // preview information
+    LegacyBGMInfo? legacy;    // (OPTIONAL) legacy information
 }
 ```
 
 #### `audio.bgm.preview`
 ```
-dictionary BgmPreviewInfo {
+dictionary BGMPreviewInfo {
     unsigned long offset = 0;        // preview offset in milliseconds (starting point of the audio file)
     unsigned long duration = 15000;  // preview duration in milliseconds
 }
@@ -138,8 +140,8 @@ dictionary BgmPreviewInfo {
 
 #### `audio.bgm.legacy` (OPTIONAL)
 ```
-dictionary LegacyBgmInfo {
-    DOMString[]? fp_filenames;  // filenames of prerendered BGM with audio effects from legacy KSH charts
+dictionary LegacyBGMInfo {
+    string[]? fp_filenames;     // filenames of prerendered BGM with audio effects from legacy KSH charts
                                 // e.g. [ "xxx_f.ogg", "xxx_p.ogg", "xxx_fp.ogg" ]
 }
 ```
@@ -224,7 +226,7 @@ dictionary AudioEffectInfo {
 dictionary AudioEffectFXInfo {
     dictionary<AudioEffectDef>? def;                   // audio effect definitions
     dictionary<ByPulse<AudioEffect>[]>? param_change;  // audio effect parameter changes by pulse
-    dictionary<ByPulse<AudioEffect>[2][]>? long_event; // audio effect invocation (and parameter changes) by long note
+    dictionary<ByPulse<AudioEffect>[2][]>? long_event; // audio effect invocation (and parameter changes) by long notes
 }
 ```
 - Note: `audio.audio_effect.fx.long_event.xxx[lane][].y` should be the same as `y` of an existing long FX note on the corresponding lane, otherwise the event is ignored.
@@ -242,8 +244,8 @@ dictionary AudioEffectLaserInfo {
 ##### `audio.audio_effect.fx.def`/`audio.audio_effect.laser.def`
 ```
 dictionary AudioEffectDef {
-    DOMString type;            // audio effect type (e.g. "flanger")
-    dictionary<DOMString>? v;  // audio effect parameter values
+    string type;               // audio effect type (e.g. "flanger")
+    dictionary<string>? v;     // audio effect parameter values
 }
 ```
 - Examples:
@@ -684,42 +686,42 @@ dictionary CamPatternInvokeSwing {
 Since the BG specification is still under discussion, the legacy KSH background image (e.g. "`desert`") and layer (e.g. "`snow;1100;1`") is converted to "`legacy`" as they are for now.
 
 ```
-dictionary BgInfo {
-    LegacyBgInfo? legacy;  // (OPTIONAL)
+dictionary BGInfo {
+    LegacyBGInfo? legacy;  // (OPTIONAL)
 }
 ```
 
 ### `bg.legacy` (OPTIONAL)
 ```
-dictionary LegacyBgInfo {
-    KshBgInfo[2]? bg;        // first element: when gauge < 70%, second element: when gauge >= 70%
-    KshLayerInfo? layer;
-    KshMovieInfo? movie;
+dictionary LegacyBGInfo {
+    KSHBGInfo[2]? bg;        // first element: when gauge < 70%, second element: when gauge >= 70%
+    KSHLayerInfo? layer;
+    KSHMovieInfo? movie;
 }
 ```
 - If `bg` has only a single element, that bg is always used, regardless of the percentage of the gauge.
 
 #### `bg.legacy.bg[xxx]` (OPTIONAL)
 ```
-dictionary KshBgInfo {
-    DOMString filename = "desert";  // self-explanatory (can be KSM default BG image such as "`desert`")
+dictionary KSHBGInfo {
+    string filename = "desert";     // self-explanatory (can be KSM default BG image such as "`desert`")
 }
 ```
 
 #### `bg.legacy.layer` (OPTIONAL)
 ```
-dictionary KshLayerInfo {
-    DOMString filename = "arrow";    // self-explanatory (can be KSM default animation layer such as "`arrow`")
+dictionary KSHLayerInfo {
+    string filename = "arrow";       // self-explanatory (can be KSM default animation layer such as "`arrow`")
     long duration = 0;               // one-loop duration in milliseconds
                                      //   If the value is negative, the animation is played backwards.
                                      //   If the value is zero, the play speed is tempo-synced and set to 1 frame per 0.035 measure (= 28.571... frames/measure).
-    KshLayerRotationInfo? rotation;  // rotation conditions
+    KSHLayerRotationInfo? rotation;  // rotation conditions
 }
 ```
 
 ##### `bg.legacy.layer[xxx].rotation` (OPTIONAL)
 ```
-dictionary KshLayerRotationInfo {
+dictionary KSHLayerRotationInfo {
     bool tilt = true;  // whether lane tilts affect rotation of BG/layer
     bool spin = true;  // whether lane spins affect rotation of BG/layer
 }
@@ -727,8 +729,8 @@ dictionary KshLayerRotationInfo {
 
 #### `bg.legacy.movie` (OPTIONAL)
 ```
-dictionary KshMovieInfo {
-    DOMString? filename;  // self-explanatory
+dictionary KSHMovieInfo {
+    string? filename;     // self-explanatory
     long offset = 0;      // movie offset in millisecond
 }
 ```
@@ -738,7 +740,7 @@ dictionary KshMovieInfo {
 ### `editor` (OPTIONAL)
 ```
 dictionary EditorInfo {
-    ByPulse<DOMString>? comment;  // (OPTIONAL) comments that can be written in the editor
+    ByPulse<string>? comment;     // (OPTIONAL) comments that can be written in the editor
 }
 ```
 
@@ -747,18 +749,18 @@ dictionary EditorInfo {
 ### `compat` (OPTIONAL)
 ```
 dictionary CompatInfo {
-    DOMString? ksh_version;       // (OPTIONAL) "ver" field of KSH file (specified only if converted from KSH)
-    KshUnknownInfo? ksh_unknown;  // (OPTIONAL) unrecognized data in ksh-to-kson conversion
+    string? ksh_version;          // (OPTIONAL) "ver" field of KSH file (specified only if converted from KSH)
+    KSHUnknownInfo? ksh_unknown;  // (OPTIONAL) unrecognized data in ksh-to-kson conversion
 }
 ```
 - Note: If the "`ver`" field is not present in the KSH file, `ksh_version` is set to "`100`".
 
 ### `compat.ksh_unknown` (OPTIONAL)
 ```
-dictionary KshUnknownInfo {
-    dictionary<DOMString>? meta;               // (OPTIONAL) unrecognized option lines before the first bar line
-    dictionary<ByPulse<DOMString>[]>? option;  // (OPTIONAL) unrecognized option lines after the first bar line
-    ByPulse<DOMString>[]? line;                // (OPTIONAL) unrecognized non-option lines
+dictionary KSHUnknownInfo {
+    dictionary<string>? meta;                  // (OPTIONAL) unrecognized option lines before the first bar line
+    dictionary<ByPulse<string>[]>? option;     // (OPTIONAL) unrecognized option lines after the first bar line
+    ByPulse<string>[]? line;                   // (OPTIONAL) unrecognized non-option lines
 }
 ```
 - Note: In KSH format, a line with at least one "`=`" is recognized as an option line. The second or later "`=`" is recognized as part of the value.
@@ -904,12 +906,14 @@ dictionary GraphSectionPoint {
 
 # Change Log
 
-- `0.2.0` (05/06/2022)
+- `0.3.0` (05/21/2022)
+    - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/4/files
+- [`0.2.0`](https://github.com/m4saka/ksm-chart-format-spec/blob/bb88522d923a9051a71c1cd127f2db0d1fe20d0c/kson_format.md) (05/06/2022)
     - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/3/files
-- `0.1.0` (06/14/2020)
-    - No changes from the draft on 01/13/2020
+- [`0.1.0`](https://github.com/m4saka/ksh2kson/blob/8e9f39d5e93178dd306feaa890bcb43a6c4c9083/kson_format.md) (06/14/2020)
+- [First draft](https://gist.github.com/m4saka/a89594a17dc9422d75e01998bcfd2722/e65ae6b6b1d424a14fa050c3825990fde494c688) (02/02/2019)
 
 -----------------------------------------------------------------------------------
 
 # Acknowledgement
-This specification is initially based on the BMSON format (https://bmson-spec.readthedocs.io/en/master/doc/index.html) and albshin's kshon format (https://gist.github.com/albshin/cf535afc3f94f7d7f7c7e3d1d9ff41cf).
+This specification is initially based on the BMSON format (https://bmson-spec.readthedocs.io/en/master/doc/index.html) and albshin's idea of kshon format (https://gist.github.com/albshin/cf535afc3f94f7d7f7c7e3d1d9ff41cf).
