@@ -1,8 +1,8 @@
-# KSON Format Specification (version: `0.2.0`)
+# KSON Format Specification (version: `0.3.0`)
 - Encoding: UTF-8 (without BOM), LF
 - If a default value is specified in this document, undefined values are overwritten by the default value.
 - `null` value is not allowed in the entire kson file.
-- Support for parameters/options marked "(OPTIONAL)" are optional, but must be ignored if not supported.
+- Support for parameters/options marked "(OPTIONAL)" is optional, but must be ignored if not supported.
 - `xxx` and `...` denote placeholders.
 - The resolution of pulse value (`y`) is 240 per beat (i.e., 960 per measure).
 - The behavior for illegal values is undefined, and kson clients do not necessarily need to report an error even if there is an illegal value.
@@ -20,7 +20,9 @@ dictionary kson {
     AudioInfo?    audio;       // audio-related data
     CameraInfo?   camera;      // camera-related data
     BgInfo?       bg;          // background-related data
-    ImplInfo?     impl;        // (OPTIONAL) implementation-dependent options for each client
+    EditorInfo?   editor;      // (OPTIONAL) data used only in editors
+    CompatInfo?   compat;      // (OPTIONAL) compatibility data with KSH format
+    ImplInfo?     impl;        // (OPTIONAL) data that is sure to be for a specific client
 }
 ```
 
@@ -41,7 +43,6 @@ dictionary MetaInfo {
     DOMString?      jacket_filename;       // self-explanatory (can have a preset image "nowprinting1"/"nowprinting2"/"nowprinting3")
     DOMString?      jacket_author;         // self-explanatory
     DOMString?      information;           // (OPTIONAL) optional information shown in song selection
-    DOMString?      ksh_version;           // (OPTIONAL) "ver" field of KSH file (specified only if converted from KSH)
 }
 ```
 
@@ -60,7 +61,7 @@ dictionary BeatInfo {
     ByPulse<double>[] bpm;                        // bpm changes
     ByMeasureIndex<TimeSig>[]? time_sig;          // time signature changes
                                                   // this is used for drawing bar lines and audio effects
-    GraphPoint[]? scroll_speed;                   // scroll speed changes (e.g. stop events)
+    GraphPoint[]? scroll_speed;                   // scroll speed changes (default: 1.0)
 }
 ```
 
@@ -135,7 +136,7 @@ dictionary BgmPreviewInfo {
 }
 ```
 
-### `audio.legacy` (OPTIONAL)
+#### `audio.bgm.legacy` (OPTIONAL)
 ```
 dictionary LegacyBgmInfo {
     DOMString[]? fp_filenames;  // filenames of prerendered BGM with audio effects from legacy KSH charts
@@ -221,9 +222,9 @@ dictionary AudioEffectInfo {
 #### `audio.audio_effect.fx`
 ```
 dictionary AudioEffectFXInfo {
-    DefList<AudioEffect>? def;                          // audio effect definitions
-    InvokeList<ByPulse<AudioEffect>[]>? param_change;   // audio effect parameter changes by pulse
-    InvokeList<ByPulse<AudioEffect>[2][]>? long_event;  // audio effect invocation (and parameter changes) by FX notes
+    dictionary<AudioEffectDef>? def;                   // audio effect definitions
+    dictionary<ByPulse<AudioEffect>[]>? param_change;  // audio effect parameter changes by pulse
+    dictionary<ByPulse<AudioEffect>[2][]>? long_event; // audio effect invocation (and parameter changes) by long note
 }
 ```
 - Note: `audio.audio_effect.fx.long_event.xxx[lane][].y` should be the same as `y` of an existing long FX note on the corresponding lane, otherwise the event is ignored.
@@ -231,20 +232,18 @@ dictionary AudioEffectFXInfo {
 #### `audio.audio_effect.laser`
 ```
 dictionary AudioEffectLaserInfo {
-    DefList<AudioEffect>? def;                         // audio effect definitions
-    InvokeList<ByPulse<AudioEffect>[]>? param_change;  // audio effect parameter changes by pulse
-    InvokeList<ByPulse[]>? pulse_event;                // audio effect invocation by pulse
+    dictionary<AudioEffectDef>? def;                   // audio effect definitions
+    dictionary<ByPulse<AudioEffect>[]>? param_change;  // audio effect parameter changes by pulse
+    dictionary<ByPulse[]>? pulse_event;                // audio effect invocation by pulse
 }
 ```
+- Note: `audio.audio_effect.laser.pulse_event` cannot contain parameter changes. Use `audio.audio_effect.laser.param_change` instead.
 
 ##### `audio.audio_effect.fx.def`/`audio.audio_effect.laser.def`
 ```
-dictionary Def<AudioEffect> {
-    DOMString type;      // audio effect type (e.g. "flanger")
-    AudioEffect? v {
-        DOMString ...;   // audio effect parameter values
-    };
-    DOMString? filename; // This can be specified only if type="switch_audio". The filename of an audio file.
+dictionary AudioEffectDef {
+    DOMString type;            // audio effect type (e.g. "flanger")
+    dictionary<DOMString>? v;  // audio effect parameter values
 }
 ```
 - Examples:
@@ -284,7 +283,9 @@ dictionary Def<AudioEffect> {
        ```
        {
            "type":"switch_audio",
-           "filename":"music.ogg" // not in "v" because "filename" is not changeable in invocation
+           "v":{
+                "filename": "music.ogg"
+           }
        }
        ```
 - Audio effects in the "Audio effects & parameter list" are predefined with its default parameter values.
@@ -334,12 +335,11 @@ Leading plus signs (e.g., "`+1`") and scientific notation (e.g., "`1e-3`", "`1E+
             - Requirement: int >= 1
             - Example: `1/2`
         - `[int]%`
-            - Requirement: int >= 0
+            - Requirement: 0 <= int <= 100
             - Example: `50%`
         - `[float]`
-            - Requirement: float >= 0.0
+            - Requirement: 0.0 <= float <= 1.0
             - Example: `0.5`
-    - Note: Some parameters can have values higher than `1.0` (e.g. `flanger.vol`).
 - freq
     - Frequency value (Hz)
     - Allowed formats:
@@ -347,12 +347,6 @@ Leading plus signs (e.g., "`+1`") and scientific notation (e.g., "`1e-3`", "`1E+
             - Requirement: 10 <= int <= 20000
         - `[float]kHz`
             - Requirement: 0.01 <= float <= 20.0
-- dB
-    - Decibel value
-    - Allowed formats:
-        - `[float]dB`
-            - Requirement: float >= 0.0
-            - Example: `3.0dB`
 - pitch
     - Key in music (12 per octave)
     - Allowed formats:
@@ -371,6 +365,9 @@ Leading plus signs (e.g., "`+1`") and scientific notation (e.g., "`1e-3`", "`1E+
     - Allowed formats:
         - `[float]`
             - Example: `2.5`, `-10`
+- filename
+    - Filename string
+    - Parameter values of this type can only be specified in `audio.audio_effect.xxx.def` and cannot be changed via `param_change`/`long_event`/`laser_event`.
 
 
 ### Audio effect parameter value format
@@ -403,6 +400,7 @@ Parameter values are written in one of the following formats:
         - Additional requirement:
             - The formats `[float]ms` and `[float]s` are not allowed.
         - `0`: Automatic trigger update is disabled.
+        - This parameter allows kson clients to use only the OnMin value and ignore the Off and OnMax values.
         - Note: `update_period` interval count is reset at the beginning of each measure if `update_period` has a non-zero value.
     - `wave_length` (length, default:`0`)
         - Length of repetition
@@ -451,7 +449,7 @@ Parameter values are written in one of the following formats:
     - `mix` (rate, default:`0%>100%`)
         - Blending ratio of the original audio and the effect audio
 - `bitcrusher`: This effect reduces the quality of the audio wave. Also known as "Sample & Hold".
-    - `reduction` (sample, default:`0samples`)
+    - `reduction` (sample, default:`0samples-30samples`)
         - Number of samples to hold. A larger value results in lower sound quality.
     - `mix` (rate, default:`0%>100%`)
         - Blending ratio of the original audio and the effect audio
@@ -503,6 +501,8 @@ Parameter values are written in one of the following formats:
         - Additional requirement:
             - The formats `[float]ms` and `[float]s` are not allowed.
         - `0`: Automatic trigger update is disabled.
+        - This parameter allows kson clients to use only the OnMin value and just ignore the Off and OnMax values.
+        - Note: `update_period` interval count is reset at the beginning of each measure if `update_period` has a non-zero value.
     - `wave_length` (length, default:`0`)
         - Length of repetition
         - `0`: Not specified. (In KSM, the effect is bypassed if the value is `0`. Also, parameter changes to `0` are ignored.)
@@ -530,51 +530,50 @@ Parameter values are written in one of the following formats:
         - Additional requirement:
             - 1 <= int <= 100
 - `switch_audio`: This effect switches the playback to another audio file.
-    - (`filename` (string))
-        - Note that this is not in `v` but at the root of `Def<AudioEffect>`
+    - `filename` (filename)
 - `high_pass_filter`: Bi-quad high-pass filter.
-    - `env` (rate, default:`0%-100%`)
+    - `v` (rate, default:`0%-100%`)
         - Envelope value of the cutoff frequency
-        - Linear transition of the `env` value is translated into a log scale transition when used.
-    - `lo_freq` (freq, default:??? `/*FIXME*/`)
-        - Cutoff frequency when `env` is 0.0
-    - `hi_freq` (freq, default:??? `/*FIXME*/`)
-        - Cutoff frequency when `env` is 1.0
+        - Note: This parameter is provided to make the frequency transition on a log scale rather than a linear scale.
+    - `freq` (freq, default:`100Hz`)
+        - Cutoff frequency when `v` is 0.0
+    - `freq_max` (freq, default:`2200Hz`)
+        - Cutoff frequency when `v` is 1.0
     - `q` (float, default:??? `/*FIXME*/`)
-        - Q value of the filter
+        - Q value of the biquad filter
     - `mix` (rate, default:`0%>100%`)
-    - Note: `lo_freq` value may exceed the `hi_freq` value.
+    - Note: `freq` value may exceed the `freq_max` value.
 - `low_pass_filter`: Bi-quad low-pass filter.
-    - `env` (rate, default:`0%-100%`)
+    - `v` (rate, default:`0%-100%`)
         - Envelope value of the cutoff frequency
-        - Linear transition of the `env` value is translated into a log scale transition when used.
-    - `lo_freq` (freq, default:??? `/*FIXME*/`)
-        - Cutoff frequency when `env` is 0.0
-    - `hi_freq` (freq, default:??? `/*FIXME*/`)
-        - Cutoff frequency when `env` is 1.0
+        - Note: This parameter is provided to make the frequency transition on a log scale rather than a linear scale.
+    - `freq` (freq, default:`15000Hz`)
+        - Cutoff frequency when `v` is 0.0
+    - `freq_max` (freq, default:`800Hz`)
+        - Cutoff frequency when `v` is 1.0
     - `q` (float, default:??? `/*FIXME*/`)
-        - Q value of the filter
+        - Q value of the biquad filter
     - `mix` (rate, default:`0%>100%`)
-    - Note: `lo_freq` value may exceed the `hi_freq` value.
+    - Note: `freq` value may exceed the `freq_max` value.
 - `peaking_filter`: Bi-quad peaking filter.
-    - `env` (rate, default:`0%-100%`)
+    - `v` (rate, default:`0%-100%`)
         - Envelope value of the cutoff frequency
-        - Linear transition of the `env` value is translated into a log scale transition when used.
-    - `lo_freq` (freq, default:??? `/*FIXME*/`)
-        - Cutoff frequency when `env` is 0.0
-    - `hi_freq` (freq, default:??? `/*FIXME*/`)
-        - Cutoff frequency when `env` is 1.0
-    - `gain` (dB, default:??? `/*FIXME*/`)
-        - Gain value of the filter
-    - `q` (float, default:??? `/*FIXME*/`)
-        - Q value of the filter
+        - Note: This parameter is provided to make the frequency transition on a log scale rather than a linear scale.
+    - `freq` (freq, default:`50Hz`)
+        - Cutoff frequency when `v` is 0.0
+    - `freq_max` (freq, default:`9000Hz`)
+        - Cutoff frequency when `v` is 1.0
+    - `gain` (rate, default:`50%`)
+        - Gain scale
+    - `q` (float, default:`1.2`)
+        - Q value of the biquad filter
     - (OPTIONAL) `delay` (length, default:`0ms`)
-        - Delay time until the `env` value is applied
+        - Delay time until the `v` value is applied
         - Additional requirement:
             - The formats `1/[int]` and `[float]` are not allowed.
             - 0ms <= delay <= 160ms
     - `mix` (rate, default:`0%>100%`)
-    - Note: `lo_freq` value may exceed the `hi_freq` value.
+    - Note: `freq` value may exceed the `freq_max` value.
 
 -----------------------------------------------------------------------------------
 
@@ -693,23 +692,23 @@ dictionary BgInfo {
 ### `bg.legacy` (OPTIONAL)
 ```
 dictionary LegacyBgInfo {
-    KshBg[2]? bg;        // first element: when gauge < 70%, second element: when gauge >= 70%
-    KshLayer? layer;
-    KshMovie? movie;
+    KshBgInfo[2]? bg;        // first element: when gauge < 70%, second element: when gauge >= 70%
+    KshLayerInfo? layer;
+    KshMovieInfo? movie;
 }
 ```
 - If `bg` has only a single element, that bg is always used, regardless of the percentage of the gauge.
 
-#### `bg.legacy.bg[]` (OPTIONAL)
+#### `bg.legacy.bg[xxx]` (OPTIONAL)
 ```
-dictionary KshBg {
+dictionary KshBgInfo {
     DOMString filename = "desert";  // self-explanatory (can be KSM default BG image such as "`desert`")
 }
 ```
 
 #### `bg.legacy.layer` (OPTIONAL)
 ```
-dictionary KshLayer {
+dictionary KshLayerInfo {
     DOMString filename = "arrow";    // self-explanatory (can be KSM default animation layer such as "`arrow`")
     long duration = 0;               // one-loop duration in milliseconds
                                      //   If the value is negative, the animation is played backwards.
@@ -728,11 +727,92 @@ dictionary KshLayerRotationInfo {
 
 #### `bg.legacy.movie` (OPTIONAL)
 ```
-dictionary KshMovie {
+dictionary KshMovieInfo {
     DOMString? filename;  // self-explanatory
     long offset = 0;      // movie offset in millisecond
 }
 ```
+
+-----------------------------------------------------------------------------------
+
+### `editor` (OPTIONAL)
+```
+dictionary EditorInfo {
+    ByPulse<DOMString>? comment;  // (OPTIONAL) comments that can be written in the editor
+}
+```
+
+-----------------------------------------------------------------------------------
+
+### `compat` (OPTIONAL)
+```
+dictionary CompatInfo {
+    DOMString? ksh_version;       // (OPTIONAL) "ver" field of KSH file (specified only if converted from KSH)
+    KshUnknownInfo? ksh_unknown;  // (OPTIONAL) unrecognized data in ksh-to-kson conversion
+}
+```
+- Note: If the "`ver`" field is not present in the KSH file, `ksh_version` is set to "`100`".
+
+### `compat.ksh_unknown` (OPTIONAL)
+```
+dictionary KshUnknownInfo {
+    dictionary<DOMString>? meta;               // (OPTIONAL) unrecognized option lines before the first bar line
+    dictionary<ByPulse<DOMString>[]>? option;  // (OPTIONAL) unrecognized option lines after the first bar line
+    ByPulse<DOMString>[]? line;                // (OPTIONAL) unrecognized non-option lines
+}
+```
+- Note: In KSH format, a line with at least one "`=`" is recognized as an option line. The second or later "`=`" is recognized as part of the value.
+    - Examples:
+        - "`keyvalue`" => non-option line
+        - "`key=value`" => option line (key:"`key`", value:"`value`")
+        - "`key=value=value`" => option line (key:"`key`", value:"`value=value`")
+- Note: Unrecognized non-option lines before the first bar line ("--") are stored in `compat.ksh_unknown.line` as `y`=`0`.
+- Note: Since KSH format does not allow comment lines starting with "`;`", such lines are stored in `compat.ksh_unknown.option` or `compat.ksh_unknown.line` instead of `editor.comment`.
+- Example:
+    - KSH:
+        ```
+        title=...
+        ;some-extension1
+        extvalue=0
+        --
+        ;some-extension2
+        extvalue=100
+        0000|00|--
+        extvalue=200
+        0000|00|--
+        --
+        extvalue=300
+        ;some-extension3
+        ;some-extension4=100
+        0000|00|--
+        extvalue=400
+        0000|00|--
+        --
+        ```
+    - Converted `ksh_unknown` value in KSON:
+        ```
+        "ksh_unknown":{
+            "meta":{
+                "extvalue":"0"
+            },
+            "option":{
+                "extvalue":[
+                    { "y":0, "v":"100" },
+                    { "y":480, "v":"200" },
+                    { "y":960, "v":"300" },
+                    { "y":1440, "v":"400" }
+                ],
+                ";some-extension4":[
+                    { "y":960, "v":"100" }
+                ]
+            },
+            "line":[
+                { "y":0, "v":";some-extension1" },
+                { "y":0, "v":";some-extension2" },
+                { "y":960, "v":";some-extension3" },
+            ]
+        }
+        ```
 
 -----------------------------------------------------------------------------------
 
@@ -811,31 +891,6 @@ dictionary GraphSectionPoint {
 ```
 - If `v` is undefined, it inherits the `vf` value of the previous element. Note that the first element must not have an undefined `v` value.
 - If `vf` is undefined, it inherits the `v` value.
-
-### definition
-```
-dictionary Def<T> {
-    T v;                     // changeable parameters (default values)
-
-    ...                      // unchangeable parameters (e.g. filename, audio effect type)
-}
-```
-
-### list of definitions
-```
-dictionary DefList<T> {
-    Def<T>? ...(name is the key);
-    ...
-}
-```
-
-### list of invocations
-```
-dictionary InvokeList<T> {
-    T? ...(name is the key);  // values which overwrites Def<T>.v
-    ...
-}
-```
 
 -----------------------------------------------------------------------------------
 
