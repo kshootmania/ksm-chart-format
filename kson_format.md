@@ -255,7 +255,7 @@ dictionary AudioEffectLaserInfo {
 ```
 - Note: `audio.audio_effect.laser.pulse_event` cannot contain parameter changes. Use `audio.audio_effect.laser.param_change` instead.
 
-##### `audio.audio_effect.fx.def`/`audio.audio_effect.laser.def`
+##### `audio.audio_effect.fx.def.xxx`/`audio.audio_effect.laser.def.xxx`
 ```
 dictionary AudioEffectDef {
     string type;               // audio effect type (e.g. "flanger")
