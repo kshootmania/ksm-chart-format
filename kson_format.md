@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.4.0-beta2`)
+# KSON Format Specification (version: `0.4.0-beta3`)
 - JSON format
 - File extension: `.kson`
 - Encoding: UTF-8 (without BOM), LF
@@ -462,6 +462,8 @@ Parameter values are written in one of the following formats:
         - Size of the waveform section. The larger the value, the better the sound quality, but the sound will be delayed.
     - (OPTIONAL) `overlap` (rate, default:`40%`)
         - Crossfade time ratio between waveform sections
+        - Additional requirement:
+            - 0.0 <= float <= 0.5
         - Note: This parameter was described as `overWrap` in KSH format, but it was a spelling mistake.
     - `mix` (rate, default:`0%>100%`)
         - Blending ratio of the original audio and the effect audio
