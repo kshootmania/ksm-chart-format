@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.4.0-beta3`)
+# KSON Format Specification (version: `0.4.0-beta4`)
 - JSON format
 - File extension: `.kson`
 - Encoding: UTF-8 (without BOM), LF
@@ -251,6 +251,7 @@ dictionary AudioEffectLaserInfo {
     dictionary<AudioEffectDef>? def;                         // audio effect definitions
     dictionary<dictionary<ByPulse<string>[]>>? param_change; // audio effect parameter changes by pulse
     dictionary<ByPulse[]>? pulse_event;                      // audio effect invocation by pulse
+    long peaking_filter_delay = 0;                           // (OPTIONAL) peaking filter delay time in milliseconds (0-160)
 }
 ```
 - Note: `audio.audio_effect.laser.pulse_event` cannot contain parameter changes. Use `audio.audio_effect.laser.param_change` instead.
@@ -587,11 +588,6 @@ Parameter values are written in one of the following formats:
         - Gain scale
     - `q` (float, default:`1.2`)
         - Q value of the biquad filter
-    - (OPTIONAL) `delay` (length, default:`0ms`)
-        - Delay time until the `v` value is applied
-        - Additional requirement:
-            - The formats `1/[int]` and `[float]` are not allowed.
-            - 0ms <= delay <= 160ms
     - `mix` (rate, default:`0%>100%`)
     - Note: `freq` value may exceed the `freq_max` value.
 
