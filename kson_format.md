@@ -905,7 +905,7 @@ dictionary GraphSectionPoint {
 
 # Requirements
 
-- All arrays that have `y` or `ry` (e.g. `ByPulse<T>[]`) must be ordered by `y` or `ry`.
+- All arrays that have `y` or `ry` or `idx` (e.g. `ByPulse<T>[]`) must be ordered by `y` or `ry` or `idx`.
 
 - The first point of arrays that have `ry` (e.g. the first point of `GraphPoint[]`) must not have nonzero `ry`.
 
