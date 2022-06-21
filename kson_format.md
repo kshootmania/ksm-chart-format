@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.4.0-beta4`)
+# KSON Format Specification (version: `0.4.0-beta5`)
 - JSON format
 - File extension: `.kson`
 - Encoding: UTF-8 (without BOM), LF
@@ -60,16 +60,17 @@ dictionary DifficultyInfo {
 ## `beat`
 ```
 dictionary BeatInfo {
-    ByPulse<double>[] bpm;                        // bpm changes
-    ByMeasureIndex<TimeSig>[]? time_sig;          // time signature changes
-                                                  // this is used for drawing bar lines and audio effects
-    GraphPoint[]? scroll_speed;                   // scroll speed changes (default: 1.0)
+    ByPulse<double>[] bpm;       // bpm changes
+    TimeSig[]? time_sig;         // time signature changes
+                                 // this is used for drawing bar lines and audio effects
+    GraphPoint[]? scroll_speed;  // scroll speed changes (default: 1.0)
 }
 ```
 
-### `beat.time_sig`
+### `beat.time_sig[xxx]`
 ```
 dictionary TimeSig {
+    unsigned long idx;    // measure index
     unsigned long n;      // numerator
     unsigned long d;      // denominator
 }
@@ -849,14 +850,6 @@ dictionary ImplInfo {
 dictionary Interval {
     unsigned long y;          // pulse number
     unsigned long l = 0;      // length
-}
-```
-
-### event triggered by measure index
-```
-dictionary ByMeasureIndex<T> {
-    unsigned long idx;        // measure index
-    T? v;                     // body
 }
 ```
 
