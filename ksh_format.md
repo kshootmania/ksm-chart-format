@@ -344,7 +344,7 @@ The list of body options is as follows:
             - Behave as a linear graph (the same as lane zooms)
                 - An immediate change can be created by successive two lines of the "`tilt`" option.
                 - Note: No "`;`" separator allowed in KSH files although an immediate change is set by using "`;`".
-- "`zoom_top`", "`zoom_bottom`", "`zoom_side`"
+- "`zoom_top`", "`zoom_bottom`", "`zoom_side`", "`center_split`"
     - A value change of camera controls (int)
     - The values behave as a linear graph (the same as manual tilts)
         - An immediate change can be created by successive two lines of the same options.
@@ -357,6 +357,8 @@ The list of body options is as follows:
             - The lower side of the lane gets closer with a larger value.
         - "`zoom_side`"
             - The holizontal position of the lane is shifted in the left (-) or right (+) direction.
+        - "`center_split`"
+            - This creates a margin in the middle of the highway. Every 100 creates a margin of one lane.
 - "`laserrange_l`", "`laserrange_r`"
     - A wide-range laser setting (string)
     - Should be placed just before the beginning of the series of laser objects.
@@ -390,14 +392,16 @@ The list of body options is as follows:
     - The parameter for a long FX note with legacy audio effect specification (with a character other than "`1`") (int)
     - This is the same parameter as the second value of "`fx-l`" and "`fx-r`".
 - "`fx-l_se`", "`fx-r_se`"
-    - The key sound setting for a chip FX note (string)
-    - Should be set to a filename or one of these preset sounds:
-        - "`clap`"
-        - "`clap_punchy`"
-        - "`clap_impact`"
-        - "`snare`"
-        - "`snare_lo`"
-    - `.wav` is recommended for audio file types.
+    - Format: "`<name>;<volume>`"
+        - `<name>`: Key sound name (string)
+            - Should be set to a filename or one of these preset sounds:
+                - "`clap`"
+                - "`clap_punchy`"
+                - "`clap_impact`"
+                - "`snare`"
+                - "`snare_lo`"
+            - `.wav` is recommended for audio file types.
+        - `<volume>`: Key sound volume (int, 0-100, default:"`100`")
 - "`filtertype`" (default:"`peak`")
     - The type of audio effects for laser notes (string)
     - See "`filtertype`" in the header for more information.
