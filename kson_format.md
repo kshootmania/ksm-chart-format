@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.4.0-beta6`)
+# KSON Format Specification (version: `0.4.0-beta7`)
 - JSON format
 - File extension: `.kson`
 - Encoding: UTF-8 (without BOM), LF
@@ -42,8 +42,9 @@ dictionary MetaInfo {
     unsigned int    level;                    // self-explanatory, 1-20
     string          disp_bpm = "";            // displayed bpm (allowed characters: 0-9, "-", ".")
     double          std_bpm = 0;              // (OPTIONAL) standard bpm for hi-speed values (should be between minimum bpm and maximum bpm in the chart); automatically set if zero
-    string?         jacket_filename;          // self-explanatory (can have a preset image "nowprinting1"/"nowprinting2"/"nowprinting3")
+    string?         jacket_filename;          // self-explanatory (preset images without file extensions are also acceptable; in KSM, either "nowprinting1"/"nowprinting2"/"nowprinting3")
     string?         jacket_author;            // self-explanatory
+    string?         icon_filename;            // (OPTIONAL) icon image displayed on the music selection (preset images without file extensions are also acceptable; in KSM, files in "imgs/icon")
     string?         information;              // (OPTIONAL) optional information shown in song selection
 }
 ```
