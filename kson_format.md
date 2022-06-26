@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.4.0-beta5`)
+# KSON Format Specification (version: `0.4.0-beta6`)
 - JSON format
 - File extension: `.kson`
 - Encoding: UTF-8 (without BOM), LF
@@ -719,14 +719,14 @@ dictionary LegacyBGInfo {
 #### `bg.legacy.bg[xxx]` (OPTIONAL)
 ```
 dictionary KSHBGInfo {
-    string filename = "desert";     // self-explanatory (can be KSM default BG image such as "`desert`")
+    string? filename;        // self-explanatory (can be KSM default BG image such as "desert")
 }
 ```
 
 #### `bg.legacy.layer` (OPTIONAL)
 ```
 dictionary KSHLayerInfo {
-    string filename = "arrow";       // self-explanatory (can be KSM default animation layer such as "`arrow`")
+    string? filename;                // self-explanatory (can be KSM default animation layer such as "arrow")
     long duration = 0;               // one-loop duration in milliseconds
                                      //   If the value is negative, the animation is played backwards.
                                      //   If the value is zero, the play speed is tempo-synced and set to 1 frame per 0.035 measure (= 28.571... frames/measure).
