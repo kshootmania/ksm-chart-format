@@ -255,7 +255,7 @@ The list of header options is as follows:
     - This can be also placed after the first bar line.
     - This value is also used for "`hpf1`" and "`lpf1`" to adjust the resonance of these.
         - Note: The current KSM uses an additional peaking filter to the HPF and LPF to sharpen the sound around the cutoff frequency, so the gain value is also applied for these filters. But the shape of the frequency response by HPF and LPF can (should) be adjusted by the Q factor, and essentially the additional peaking filter is not required. This is a bad design and can be fixed in a future version for implementing the user-defined peaking/hi-pass/low-pass filters.
-- "`pfilterdelay`" (default:"`50`")
+- "`pfilterdelay`" (default:"`40`")
     - The timing delay (in milliseconds) of the peaking filter for laser audio effects (int, 0-160)
     - This value is ignored if the legacy laser audio effects (audio file) is used.
     - This value is not applied to HPF and LPF and BITC.
