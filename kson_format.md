@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.4.0-beta7`)
+# KSON Format Specification (version: `0.4.0-beta8`)
 - JSON format
 - File extension: `.kson`
 - Encoding: UTF-8 (without BOM), LF
@@ -97,8 +97,6 @@ dictionary NoteInfo {
     LaserSection[2][]? laser;        // laser notes (first index: lane (0: left knob, 1: right knob))
 }
 ```
-
-- For long BT/FX notes, if the end point of one note and the start point of another note are at the same time (i.e., `y` is the same as `y + l` of the previous note), they are joined as one long note when played. This is mainly used when several audio effects are switched in one long FX note.
 - Two or more notes cannot be overlapped on a single lane.
 
 ### `note.laser[lane][idx]`
@@ -163,7 +161,7 @@ dictionary KeySoundFXInfo {
     KeySoundInvokeListFX? chip_event;  // key sound for chip FX notes
 }
 ```
-- Note: `audio.key_sound.fx.chip_event.xxx[lane][].y` should be the same as `y` of an existing chip FX note on the corresponding lane, otherwise the event is ignored.
+- Note: `audio.key_sound.fx.chip_event.xxx[lane][].y` should be the same as `y` of an existing chip FX note on the corresponding lane; otherwise, the event is ignored.
 
 ##### `audio.key_sound.fx.chip_event`
 ```
@@ -193,7 +191,7 @@ dictionary KeySoundLaserInfo {
     KeySoundLaserLegacyInfo? legacy;       // (OPTIONAL) legacy information
 }
 ```
-- Note: `audio.key_sound.laser.slam_event.xxx[].y` should be the same as `y` of an existing laser slam note, otherwise the event is ignored.
+- Note: `audio.key_sound.laser.slam_event.xxx[].y` should be the same as `y` of an existing laser slam note; otherwise, the event is ignored.
 - Note: The `vol` value changes do not affect key sounds currently being played.
 
 ##### `audio.key_sound.laser.slam_event` (OPTIONAL)
@@ -231,7 +229,7 @@ dictionary AudioEffectFXInfo {
     dictionary<ByPulse<AudioEffect>[2][]>? long_event;       // audio effect invocation (and parameter changes) by long notes
 }
 ```
-- Note: `audio.audio_effect.fx.long_event.xxx[lane][].y` should be the same as `y` of an existing long FX note on the corresponding lane, otherwise the event is ignored.
+- Note: `audio.audio_effect.fx.long_event.xxx[lane][].y` should be in the range `[y, y + l)` of an existing long FX note on the corresponding lane; otherwise, the event is ignored.
 - Example for `audio.audio_effect.fx.param_change`/`audio.audio_effect.laser.param_change`:
     ```
     "param_change":{
@@ -307,7 +305,8 @@ dictionary AudioEffectDef {
            }
        }
        ```
-- Audio effects in the "Audio effects & parameter list" are predefined with its default parameter values.
+- Audio effects in the "Audio effects & parameter list" are predefined with default parameter values. These predefined effects can be overridden by redefining them with the same name.
+- An audio effect with a name of an empty string ("") is predefined as no effect. This is used to set a single long FX note to no audio effect from the middle of the note. Note that long FX notes with no effects assigned do not necessarily need to explicitly set `long_event` for this audio effect. The behavior of overriding an audio effect definition with an empty string ("") name is undefined.
 
 
 ### Audio effect parameter types
@@ -386,16 +385,16 @@ Leading plus signs (e.g., "`+1`") and scientific notation (e.g., "`1e-3`", "`1E+
             - Example: `2.5`, `-10`
 - filename
     - Filename string
-    - Parameter values of this type can only be specified in `audio.audio_effect.xxx.def` and cannot be changed via `param_change`/`long_event`/`laser_event`.
+    - Parameter values of this type can only be specified in `audio.audio_effect.xxx.def` and cannot be changed via `param_change`/`long_event`.
 
 
 ### Audio effect parameter value format
 
 The parameter value consists of three values, Off/OnMin/OnMax, in the string format "Off>OnMin-OnMax".
 
-While pressing the long FX note assigned to the corresponding audio effect, the value is set to OnMin, otherwise the value is set to Off. OnMax is ignored for long FX notes.
+While pressing the long FX note assigned to the corresponding audio effect, the value is set to OnMin; otherwise, the value is set to Off. OnMax is ignored for long FX notes.
 
-While the laser note is judged, the value transitions between OnMin and OnMax depending on the laser cursor position; otherwise the value is set to Off.
+While the laser note is judged, the value transitions between OnMin and OnMax depending on the laser cursor position; otherwise, the value is set to Off.
 
 Parameter values are written in one of the following formats:
 - `Off`
@@ -673,7 +672,7 @@ dictionary CamPatternInvokeList {
     ByPulseWithDirection<CamPatternInvokeSwing>[]? swing;     // (OPTIONAL)
 }
 ```
-- Note: `camera.cam.pattern.laser.slam_event.xxx[].y` & `camera.cam.pattern.laser.slam_event.xxx[].d` should be the same as `y` & sign(`vf` - `v`) of an existing laser slam note, otherwise the event is ignored.
+- Note: `camera.cam.pattern.laser.slam_event.xxx[].y` & `camera.cam.pattern.laser.slam_event.xxx[].d` should be the same as `y` & sign(`vf` - `v`) of an existing laser slam note; otherwise, the event is ignored.
 
 ##### `camera.cam.pattern.laser.slam_event.spin[].v`/`camera.cam.pattern.laser.slam_event.half_spin[].v`
 ```
