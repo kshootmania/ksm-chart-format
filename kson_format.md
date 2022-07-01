@@ -71,9 +71,9 @@ dictionary BeatInfo {
 ### `beat.time_sig[xxx]`
 ```
 dictionary TimeSig {
-    unsigned long idx;    // measure index
-    unsigned long n;      // numerator
-    unsigned long d;      // denominator
+    unsigned int idx;   // measure index
+    unsigned int n;     // numerator
+    unsigned int d;     // denominator
 }
 ```
 
@@ -82,8 +82,8 @@ dictionary TimeSig {
 ## `gauge`
 ```
 dictionary GaugeInfo {
-    unsigned long total = 0;  // total ascension of gauge percentage in the entire chart (0 or 100-)
-                              // automatically set if zero
+    unsigned int total = 0; // total ascension of gauge percentage in the entire chart (0 or 100-)
+                            // automatically set if zero
 }
 ```
 
@@ -102,9 +102,9 @@ dictionary NoteInfo {
 ### `note.laser[lane][idx]`
 ```
 dictionary LaserSection : ByPulse<GraphSectionPoint[]> {
-    unsigned long y;                // pulse number
-    GraphSectionPoint[] v;          // laser points (0.0-1.0)
-    unsigned char w = 1;            // x-axis scale (1-2), sets whether this laser section is 2x-widen or not
+    unsigned int y;             // pulse number
+    GraphSectionPoint[] v;      // laser points (0.0-1.0)
+    unsigned char w = 1;        // x-axis scale (1-2), sets whether this laser section is 2x-widen or not
 }
 ```
 
@@ -124,7 +124,7 @@ dictionary AudioInfo {
 dictionary BGMInfo {
     string filename = "";     // self-explanatory
     double vol = 1.0;         // bgm volume
-    long offset = 0;          // offset in milliseconds (starting point of the audio file)
+    int offset = 0;           // offset in milliseconds (starting point of the audio file)
     BGMPreviewInfo? preview;  // preview information
     LegacyBGMInfo? legacy;    // (OPTIONAL) legacy information
 }
@@ -133,8 +133,8 @@ dictionary BGMInfo {
 #### `audio.bgm.preview`
 ```
 dictionary BGMPreviewInfo {
-    unsigned long offset = 0;        // preview offset in milliseconds (starting point of the audio file)
-    unsigned long duration = 15000;  // preview duration in milliseconds
+    unsigned int offset = 0;        // preview offset in milliseconds (starting point of the audio file)
+    unsigned int duration = 15000;  // preview duration in milliseconds
 }
 ```
 
@@ -251,7 +251,7 @@ dictionary AudioEffectLaserInfo {
     dictionary<AudioEffectDef>? def;                         // audio effect definitions
     dictionary<dictionary<ByPulse<string>[]>>? param_change; // audio effect parameter changes by pulse
     dictionary<ByPulse[]>? pulse_event;                      // audio effect invocation by pulse
-    long peaking_filter_delay = 0;                           // (OPTIONAL) peaking filter delay time in milliseconds (0-160)
+    int peaking_filter_delay = 0;                            // (OPTIONAL) peaking filter delay time in milliseconds (0-160)
 }
 ```
 - Note: `audio.audio_effect.laser.pulse_event` cannot contain parameter changes. Use `audio.audio_effect.laser.param_change` instead.
@@ -677,16 +677,16 @@ dictionary CamPatternInvokeList {
 ##### `camera.cam.pattern.laser.slam_event.spin[].v`/`camera.cam.pattern.laser.slam_event.half_spin[].v`
 ```
 dictionary CamPatternInvokeSpin {
-    unsigned long l = 960;          // duration
+    unsigned int l = 960;           // duration
 }
 ```
 
 ##### `camera.cam.pattern.laser.slam_event.swing[].v` (OPTIONAL)
 ```
 dictionary CamPatternInvokeSwing {
-    unsigned long l = 960;          // duration
+    unsigned int l = 960;           // duration
     double scale = 1.0;             // scale
-    unsigned long repeat = 1;       // number of repetitions
+    unsigned int repeat = 1;        // number of repetitions
     int decay_order = 0;            // order of the decay that scales camera values (0-2)
                                     // (note that this decay is applied even if repeat=1)
                                     // - equation: `value * (1.0 - ((l - ry) / l))^decay_order`
@@ -727,7 +727,7 @@ dictionary KSHBGInfo {
 ```
 dictionary KSHLayerInfo {
     string? filename;                // self-explanatory (can be KSM default animation layer such as "arrow")
-    long duration = 0;               // one-loop duration in milliseconds
+    int duration = 0;                // one-loop duration in milliseconds
                                      //   If the value is negative, the animation is played backwards.
                                      //   If the value is zero, the play speed is tempo-synced and set to 1 frame per 0.035 measure (= 28.571... frames/measure).
     KSHLayerRotationInfo? rotation;  // rotation conditions
@@ -746,7 +746,7 @@ dictionary KSHLayerRotationInfo {
 ```
 dictionary KSHMovieInfo {
     string? filename;     // self-explanatory
-    long offset = 0;      // movie offset in millisecond
+    int offset = 0;       // movie offset in millisecond
 }
 ```
 
@@ -848,41 +848,41 @@ dictionary ImplInfo {
 ### interval
 ```
 dictionary Interval {
-    unsigned long y;          // pulse number
-    unsigned long l = 0;      // length
+    unsigned int y;         // pulse number
+    unsigned int l = 0;     // length
 }
 ```
 
 ### event triggered by pulse
 ```
 dictionary ByPulse {
-    unsigned long y;          // pulse number
+    unsigned int y;         // pulse number
 }
 ```
 ```
 dictionary ByPulse<T> {
-    unsigned long y;          // pulse number
-    T? v;                     // body
+    unsigned int y;         // pulse number
+    T? v;                   // body
 }
 ```
 
 ### event triggered by pulse (with laser slam direction)
 ```
 dictionary ByPulseWithDirection<T> {
-    unsigned long y;          // pulse number
-    int d;                    // laser slam direction, -1 (left) or 1 (right)
-    T? v;                     // body
+    unsigned int y;         // pulse number
+    int d;                  // laser slam direction, -1 (left) or 1 (right)
+    T? v;                   // body
 }
 ```
 
 ### graph (whole chart)
 ```
 dictionary GraphPoint {
-    unsigned long y;          // absolute pulse number
-    double? v;                // value
-    double? vf;               // second value (for an immediate change)
-    double a = 0.0;           // x-coordinate of the curve control point (0.0-1.0)
-    double b = 0.0;           // y-coordinate of the curve control point (0.0-1.0)
+    unsigned int y;         // absolute pulse number
+    double? v;              // value
+    double? vf;             // second value (for an immediate change)
+    double a = 0.0;         // x-coordinate of the curve control point (0.0-1.0)
+    double b = 0.0;         // y-coordinate of the curve control point (0.0-1.0)
 }
 ```
 - If `v` is undefined, it inherits the `vf` value of the previous element. Note that the first element must not have an undefined `v` value.
@@ -891,11 +891,11 @@ dictionary GraphPoint {
 ### graph point (for graph sections = `ByPulse<GraphSectionPoint[]>`)
 ```
 dictionary GraphSectionPoint {
-    unsigned long ry;        // relative pulse number
-    double? v;               // value
-    double? vf;              // second value (for an immediate change)
-    double a = 0.0;          // x-coordinate of the curve control point (0.0-1.0)
-    double b = 0.0;          // y-coordinate of the curve control point (0.0-1.0)
+    unsigned int ry;        // relative pulse number
+    double? v;              // value
+    double? vf;             // second value (for an immediate change)
+    double a = 0.0;         // x-coordinate of the curve control point (0.0-1.0)
+    double b = 0.0;         // y-coordinate of the curve control point (0.0-1.0)
 }
 ```
 - If `v` is undefined, it inherits the `vf` value of the previous element. Note that the first element must not have an undefined `v` value.
@@ -913,7 +913,9 @@ dictionary GraphSectionPoint {
 
 # Change Log
 
-- `0.3.0` (05/21/2022)
+- `0.4.0` (07/02/2022)
+    - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/5/files
+- [`0.3.0`](https://github.com/m4saka/ksm-chart-format-spec/commit/c64b2e4613c8db8a458c53b7bb5dc7e1e4711fa2) (05/21/2022)
     - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/4/files
 - [`0.2.0`](https://github.com/m4saka/ksm-chart-format-spec/blob/bb88522d923a9051a71c1cd127f2db0d1fe20d0c/kson_format.md) (05/06/2022)
     - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/3/files
