@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.3.0`)
+# KSON Format Specification (version: `0.4.0`)
 - JSON format
 - File extension: `.kson`
 - Encoding: UTF-8 (without BOM), LF
@@ -42,8 +42,9 @@ dictionary MetaInfo {
     unsigned int    level;                    // self-explanatory, 1-20
     string          disp_bpm = "";            // displayed bpm (allowed characters: 0-9, "-", ".")
     double          std_bpm = 0;              // (OPTIONAL) standard bpm for hi-speed values (should be between minimum bpm and maximum bpm in the chart); automatically set if zero
-    string?         jacket_filename;          // self-explanatory (can have a preset image "nowprinting1"/"nowprinting2"/"nowprinting3")
+    string?         jacket_filename;          // self-explanatory (preset images without file extensions are also acceptable; in KSM, either "nowprinting1"/"nowprinting2"/"nowprinting3")
     string?         jacket_author;            // self-explanatory
+    string?         icon_filename;            // (OPTIONAL) icon image displayed on the music selection (preset images without file extensions are also acceptable; in KSM, files in "imgs/icon")
     string?         information;              // (OPTIONAL) optional information shown in song selection
 }
 ```
@@ -60,16 +61,17 @@ dictionary DifficultyInfo {
 ## `beat`
 ```
 dictionary BeatInfo {
-    ByPulse<double>[] bpm;                        // bpm changes
-    ByMeasureIndex<TimeSig>[]? time_sig;          // time signature changes
-                                                  // this is used for drawing bar lines and audio effects
-    GraphPoint[]? scroll_speed;                   // scroll speed changes (default: 1.0)
+    ByPulse<double>[] bpm;       // bpm changes
+    TimeSig[]? time_sig;         // time signature changes
+                                 // this is used for drawing bar lines and audio effects
+    GraphPoint[]? scroll_speed;  // scroll speed changes (default: 1.0)
 }
 ```
 
-### `beat.time_sig`
+### `beat.time_sig[xxx]`
 ```
 dictionary TimeSig {
+    unsigned long idx;    // measure index
     unsigned long n;      // numerator
     unsigned long d;      // denominator
 }
@@ -95,8 +97,6 @@ dictionary NoteInfo {
     LaserSection[2][]? laser;        // laser notes (first index: lane (0: left knob, 1: right knob))
 }
 ```
-
-- For long BT/FX notes, if the end point of one note and the start point of another note are at the same time (i.e., `y` is the same as `y + l` of the previous note), they are joined as one long note when played. This is mainly used when several audio effects are switched in one long FX note.
 - Two or more notes cannot be overlapped on a single lane.
 
 ### `note.laser[lane][idx]`
@@ -161,7 +161,7 @@ dictionary KeySoundFXInfo {
     KeySoundInvokeListFX? chip_event;  // key sound for chip FX notes
 }
 ```
-- Note: `audio.key_sound.fx.chip_event.xxx[lane][].y` should be the same as `y` of an existing chip FX note on the corresponding lane, otherwise the event is ignored.
+- Note: `audio.key_sound.fx.chip_event.xxx[lane][].y` should be the same as `y` of an existing chip FX note on the corresponding lane; otherwise, the event is ignored.
 
 ##### `audio.key_sound.fx.chip_event`
 ```
@@ -191,7 +191,7 @@ dictionary KeySoundLaserInfo {
     KeySoundLaserLegacyInfo? legacy;       // (OPTIONAL) legacy information
 }
 ```
-- Note: `audio.key_sound.laser.slam_event.xxx[].y` should be the same as `y` of an existing laser slam note, otherwise the event is ignored.
+- Note: `audio.key_sound.laser.slam_event.xxx[].y` should be the same as `y` of an existing laser slam note; otherwise, the event is ignored.
 - Note: The `vol` value changes do not affect key sounds currently being played.
 
 ##### `audio.key_sound.laser.slam_event` (OPTIONAL)
@@ -224,24 +224,39 @@ dictionary AudioEffectInfo {
 #### `audio.audio_effect.fx`
 ```
 dictionary AudioEffectFXInfo {
-    dictionary<AudioEffectDef>? def;                   // audio effect definitions
-    dictionary<ByPulse<AudioEffect>[]>? param_change;  // audio effect parameter changes by pulse
-    dictionary<ByPulse<AudioEffect>[2][]>? long_event; // audio effect invocation (and parameter changes) by long notes
+    dictionary<AudioEffectDef>? def;                         // audio effect definitions
+    dictionary<dictionary<ByPulse<string>[]>>? param_change; // audio effect parameter changes by pulse
+    dictionary<ByPulse<AudioEffect>[2][]>? long_event;       // audio effect invocation (and parameter changes) by long notes
 }
 ```
-- Note: `audio.audio_effect.fx.long_event.xxx[lane][].y` should be the same as `y` of an existing long FX note on the corresponding lane, otherwise the event is ignored.
+- Note: `audio.audio_effect.fx.long_event.xxx[lane][].y` should be in the range `[y, y + l)` of an existing long FX note on the corresponding lane; otherwise, the event is ignored.
+- Example for `audio.audio_effect.fx.param_change`/`audio.audio_effect.laser.param_change`:
+    ```
+    "param_change":{
+        "retrigger":{
+            "update_period":[
+                {"y":960, "v":"0"},
+                {"y":1920, "v":"1/2"}
+            ],
+            "update_trigger":[
+                {"y":1200, "v":"on"}
+            ]
+        }
+    }
+    ```
 
 #### `audio.audio_effect.laser`
 ```
 dictionary AudioEffectLaserInfo {
-    dictionary<AudioEffectDef>? def;                   // audio effect definitions
-    dictionary<ByPulse<AudioEffect>[]>? param_change;  // audio effect parameter changes by pulse
-    dictionary<ByPulse[]>? pulse_event;                // audio effect invocation by pulse
+    dictionary<AudioEffectDef>? def;                         // audio effect definitions
+    dictionary<dictionary<ByPulse<string>[]>>? param_change; // audio effect parameter changes by pulse
+    dictionary<ByPulse[]>? pulse_event;                      // audio effect invocation by pulse
+    long peaking_filter_delay = 0;                           // (OPTIONAL) peaking filter delay time in milliseconds (0-160)
 }
 ```
 - Note: `audio.audio_effect.laser.pulse_event` cannot contain parameter changes. Use `audio.audio_effect.laser.param_change` instead.
 
-##### `audio.audio_effect.fx.def`/`audio.audio_effect.laser.def`
+##### `audio.audio_effect.fx.def.xxx`/`audio.audio_effect.laser.def.xxx`
 ```
 dictionary AudioEffectDef {
     string type;               // audio effect type (e.g. "flanger")
@@ -290,7 +305,8 @@ dictionary AudioEffectDef {
            }
        }
        ```
-- Audio effects in the "Audio effects & parameter list" are predefined with its default parameter values.
+- Audio effects in the "Audio effects & parameter list" are predefined with default parameter values. These predefined effects can be overridden by redefining them with the same name.
+- An audio effect with a name of an empty string ("") is predefined as no effect. This is used to set a single long FX note to no audio effect from the middle of the note. Note that long FX notes with no effects assigned do not necessarily need to explicitly set `long_event` for this audio effect. The behavior of overriding an audio effect definition with an empty string ("") name is undefined.
 
 
 ### Audio effect parameter types
@@ -369,16 +385,16 @@ Leading plus signs (e.g., "`+1`") and scientific notation (e.g., "`1e-3`", "`1E+
             - Example: `2.5`, `-10`
 - filename
     - Filename string
-    - Parameter values of this type can only be specified in `audio.audio_effect.xxx.def` and cannot be changed via `param_change`/`long_event`/`laser_event`.
+    - Parameter values of this type can only be specified in `audio.audio_effect.xxx.def` and cannot be changed via `param_change`/`long_event`.
 
 
 ### Audio effect parameter value format
 
 The parameter value consists of three values, Off/OnMin/OnMax, in the string format "Off>OnMin-OnMax".
 
-While pressing the long FX note assigned to the corresponding audio effect, the value is set to OnMin, otherwise the value is set to Off. OnMax is ignored for long FX notes.
+While pressing the long FX note assigned to the corresponding audio effect, the value is set to OnMin; otherwise, the value is set to Off. OnMax is ignored for long FX notes.
 
-While the laser note is judged, the value transitions between OnMin and OnMax depending on the laser cursor position; otherwise the value is set to Off.
+While the laser note is judged, the value transitions between OnMin and OnMax depending on the laser cursor position; otherwise, the value is set to Off.
 
 Parameter values are written in one of the following formats:
 - `Off`
@@ -403,6 +419,7 @@ Parameter values are written in one of the following formats:
             - The formats `[float]ms` and `[float]s` are not allowed.
         - `0`: Automatic trigger update is disabled.
         - This parameter allows kson clients to use only the OnMin value and ignore the Off and OnMax values.
+        - This parameter allows kson clients to ignore values specified in `audio.audio_effect.fx.long_event`.
         - Note: `update_period` interval count is reset at the beginning of each measure if `update_period` has a non-zero value.
     - `wave_length` (length, default:`0`)
         - Length of repetition
@@ -447,6 +464,8 @@ Parameter values are written in one of the following formats:
         - Size of the waveform section. The larger the value, the better the sound quality, but the sound will be delayed.
     - (OPTIONAL) `overlap` (rate, default:`40%`)
         - Crossfade time ratio between waveform sections
+        - Additional requirement:
+            - 0.0 <= float <= 0.5
         - Note: This parameter was described as `overWrap` in KSH format, but it was a spelling mistake.
     - `mix` (rate, default:`0%>100%`)
         - Blending ratio of the original audio and the effect audio
@@ -479,7 +498,7 @@ Parameter values are written in one of the following formats:
         - Note: For phaser effects, the mix value is doubled when used. A typical phaser effect is usually most effective at a mix value of 50%, but this makes it most effective at a mix value of `100%`. Note that the default value `50%` is actually a mix value of 25%.
     - Note: `hiCutGain` parameter in KSH format has been removed in kson format because it is not a parameter of the phaser itself.
 - `wobble`: This effect oscillates the cutoff frequency of the low-pass filter with an LFO.
-    - `wave_length` (length, default:`0`)
+    - `period` (length, default:`0`)
         - LFO period
         - `0`: Not specified. (In KSM, the effect is bypassed if the value is `0`. Also, parameter changes to `0` are ignored.)
         - Note: `wave_length` interval count is reset at the beginning of each measure if `update_period` has a non-zero value.
@@ -504,6 +523,7 @@ Parameter values are written in one of the following formats:
             - The formats `[float]ms` and `[float]s` are not allowed.
         - `0`: Automatic trigger update is disabled.
         - This parameter allows kson clients to use only the OnMin value and just ignore the Off and OnMax values.
+        - This parameter allows kson clients to ignore values specified in `audio.audio_effect.fx.long_event`.
         - Note: `update_period` interval count is reset at the beginning of each measure if `update_period` has a non-zero value.
     - `wave_length` (length, default:`0`)
         - Length of repetition
@@ -569,11 +589,6 @@ Parameter values are written in one of the following formats:
         - Gain scale
     - `q` (float, default:`1.2`)
         - Q value of the biquad filter
-    - (OPTIONAL) `delay` (length, default:`0ms`)
-        - Delay time until the `v` value is applied
-        - Additional requirement:
-            - The formats `1/[int]` and `[float]` are not allowed.
-            - 0ms <= delay <= 160ms
     - `mix` (rate, default:`0%>100%`)
     - Note: `freq` value may exceed the `freq_max` value.
 
@@ -657,7 +672,7 @@ dictionary CamPatternInvokeList {
     ByPulseWithDirection<CamPatternInvokeSwing>[]? swing;     // (OPTIONAL)
 }
 ```
-- Note: `camera.cam.pattern.laser.slam_event.xxx[].y` & `camera.cam.pattern.laser.slam_event.xxx[].d` should be the same as `y` & sign(`vf` - `v`) of an existing laser slam note, otherwise the event is ignored.
+- Note: `camera.cam.pattern.laser.slam_event.xxx[].y` & `camera.cam.pattern.laser.slam_event.xxx[].d` should be the same as `y` & sign(`vf` - `v`) of an existing laser slam note; otherwise, the event is ignored.
 
 ##### `camera.cam.pattern.laser.slam_event.spin[].v`/`camera.cam.pattern.laser.slam_event.half_spin[].v`
 ```
@@ -704,14 +719,14 @@ dictionary LegacyBGInfo {
 #### `bg.legacy.bg[xxx]` (OPTIONAL)
 ```
 dictionary KSHBGInfo {
-    string filename = "desert";     // self-explanatory (can be KSM default BG image such as "`desert`")
+    string? filename;        // self-explanatory (can be KSM default BG image such as "desert")
 }
 ```
 
 #### `bg.legacy.layer` (OPTIONAL)
 ```
 dictionary KSHLayerInfo {
-    string filename = "arrow";       // self-explanatory (can be KSM default animation layer such as "`arrow`")
+    string? filename;                // self-explanatory (can be KSM default animation layer such as "arrow")
     long duration = 0;               // one-loop duration in milliseconds
                                      //   If the value is negative, the animation is played backwards.
                                      //   If the value is zero, the play speed is tempo-synced and set to 1 frame per 0.035 measure (= 28.571... frames/measure).
@@ -838,14 +853,6 @@ dictionary Interval {
 }
 ```
 
-### event triggered by measure index
-```
-dictionary ByMeasureIndex<T> {
-    unsigned long idx;        // measure index
-    T? v;                     // body
-}
-```
-
 ### event triggered by pulse
 ```
 dictionary ByPulse {
@@ -898,7 +905,7 @@ dictionary GraphSectionPoint {
 
 # Requirements
 
-- All arrays that have `y` or `ry` (e.g. `ByPulse<T>[]`) must be ordered by `y` or `ry`.
+- All arrays that have `y` or `ry` or `idx` (e.g. `ByPulse<T>[]`) must be ordered by `y` or `ry` or `idx`.
 
 - The first point of arrays that have `ry` (e.g. the first point of `GraphPoint[]`) must not have nonzero `ry`.
 
