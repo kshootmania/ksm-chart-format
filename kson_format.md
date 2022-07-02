@@ -52,7 +52,7 @@ dictionary MetaInfo {
 ### `meta.difficulty`
 ```
 dictionary DifficultyInfo {
-    unsigned char idx;  // 0-3 (0:light, 1:challenge, 2:extended, 3:infinite)
+    unsigned int idx;   // 0-3 (0:light, 1:challenge, 2:extended, 3:infinite)
 }
 ```
 
@@ -104,7 +104,7 @@ dictionary NoteInfo {
 dictionary LaserSection : ByPulse<GraphSectionPoint[]> {
     unsigned int y;             // pulse number
     GraphSectionPoint[] v;      // laser points (0.0-1.0)
-    unsigned char w = 1;        // x-axis scale (1-2), sets whether this laser section is 2x-widen or not
+    unsigned int w = 1;         // x-axis scale (1-2), sets whether this laser section is 2x-widen or not
 }
 ```
 
