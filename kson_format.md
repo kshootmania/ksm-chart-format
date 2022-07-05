@@ -423,7 +423,7 @@ Parameter values are written in one of the following formats:
         - Note: `update_period` interval count is reset at the beginning of each measure if `update_period` has a non-zero value.
     - `wave_length` (length, default:`0`)
         - Length of repetition
-        - `0`: Not specified. (In KSM, the effect is bypassed if the value is `0`. Also, parameter changes to `0` are ignored.)
+        - `0`: Not specified. (In KSM, the effect is bypassed if the value is `0`.)
         - Note: `wave_length` interval count is reset at the beginning of each measure if `update_period` has a non-zero value.
     - `rate` (rate, default:`70%`)
         - Length of the repeat audio
@@ -435,7 +435,7 @@ Parameter values are written in one of the following formats:
 - `gate`: This effect periodically switches the volume between 100% and 0%.
     - `wave_length` (length, default:`0`)
         - Interval
-        - `0`: Not specified. (In KSM, the effect is bypassed if the value is `0`. Also, parameter changes to `0` are ignored.)
+        - `0`: Not specified. (In KSM, the effect is bypassed if the value is `0`.)
         - Note: `wave_length` interval count is reset at the beginning of each measure.
     - `rate` (rate, default:`60%`)
         - Length of the audio
@@ -500,7 +500,7 @@ Parameter values are written in one of the following formats:
 - `wobble`: This effect oscillates the cutoff frequency of the low-pass filter with an LFO.
     - `period` (length, default:`0`)
         - LFO period
-        - `0`: Not specified. (In KSM, the effect is bypassed if the value is `0`. Also, parameter changes to `0` are ignored.)
+        - `0`: Not specified. (In KSM, the effect is bypassed if the value is `0`.)
         - Note: `wave_length` interval count is reset at the beginning of each measure if `update_period` has a non-zero value.
     - `lo_freq` (freq, default:`500Hz`)
         - Minimum frequency of LFO
@@ -527,7 +527,7 @@ Parameter values are written in one of the following formats:
         - Note: `update_period` interval count is reset at the beginning of each measure if `update_period` has a non-zero value.
     - `wave_length` (length, default:`0`)
         - Length of repetition
-        - `0`: Not specified. (In KSM, the effect is bypassed if the value is `0`. Also, parameter changes to `0` are ignored.)
+        - `0`: Not specified. (In KSM, the effect is bypassed if the value is `0`.)
         - Note: `wave_length` interval count is reset at the beginning of each measure if `update_period` has a non-zero value.
     - `update_trigger` (switch, default:`off>on`)
         - `on`: Updates the repeat source (the value is automatically set back to `off`)
@@ -924,5 +924,5 @@ dictionary GraphSectionPoint {
 
 -----------------------------------------------------------------------------------
 
-# Acknowledgement
-This specification is initially based on the BMSON format (https://bmson-spec.readthedocs.io/en/master/doc/index.html) and albshin's idea of kshon format (https://gist.github.com/albshin/cf535afc3f94f7d7f7c7e3d1d9ff41cf).
+# Acknowledgements
+This format is inspired by the BMSON format (https://bmson-spec.readthedocs.io/en/master/doc/index.html) and albshin's idea of kshon format (https://gist.github.com/albshin/cf535afc3f94f7d7f7c7e3d1d9ff41cf).
