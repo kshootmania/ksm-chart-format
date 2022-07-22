@@ -4,7 +4,7 @@
 - Encoding: UTF-8 (without BOM), LF
 - If a default value is specified in this document, undefined values are overwritten by the default value.
 - `null` value is not allowed in the entire kson file.
-- Support for parameters/options marked "(OPTIONAL)" is optional, but must be ignored if not supported.
+- Support for parameters/options marked "(OPTIONAL SUPPORT)" is optional, but must be ignored if not supported.
 - `xxx` and `...` denote placeholders.
 - The resolution of pulse value (`y`) is 240 per beat (i.e., 960 per measure).
 - The behavior for illegal values is undefined, and kson clients do not necessarily need to report an error even if there is an illegal value.
@@ -22,9 +22,9 @@ dictionary kson {
     AudioInfo?    audio;       // audio-related data
     CameraInfo?   camera;      // camera-related data
     BGInfo?       bg;          // background-related data
-    EditorInfo?   editor;      // (OPTIONAL) data used only in editors
-    CompatInfo?   compat;      // (OPTIONAL) compatibility data with KSH format
-    ImplInfo?     impl;        // (OPTIONAL) data that is sure to be for a specific client
+    EditorInfo?   editor;      // (OPTIONAL SUPPORT) data used only in editors
+    CompatInfo?   compat;      // (OPTIONAL SUPPORT) compatibility data with KSH format
+    ImplInfo?     impl;        // (OPTIONAL SUPPORT) data that is sure to be for a specific client
 }
 ```
 
@@ -34,18 +34,18 @@ dictionary kson {
 ```
 dictionary MetaInfo {
     string          title;                    // self-explanatory
-    string?         title_img_filename;       // (OPTIONAL) use an image instead of song title text
+    string?         title_img_filename;       // (OPTIONAL SUPPORT) use an image instead of song title text
     string          artist;                   // self-explanatory
-    string?         artist_img_filename;      // (OPTIONAL) use an image instead of song artist text
+    string?         artist_img_filename;      // (OPTIONAL SUPPORT) use an image instead of song artist text
     string          chart_author;             // self-explanatory
     DifficultyInfo  difficulty;               // self-explanatory
     unsigned int    level;                    // self-explanatory, 1-20
     string          disp_bpm = "";            // displayed bpm (allowed characters: 0-9, "-", ".")
-    double          std_bpm = 0;              // (OPTIONAL) standard bpm for hi-speed values (should be between minimum bpm and maximum bpm in the chart); automatically set if zero
+    double          std_bpm = 0;              // (OPTIONAL SUPPORT) standard bpm for hi-speed values (should be between minimum bpm and maximum bpm in the chart); automatically set if zero
     string?         jacket_filename;          // self-explanatory (preset images without file extensions are also acceptable; in KSM, either "nowprinting1"/"nowprinting2"/"nowprinting3")
     string?         jacket_author;            // self-explanatory
-    string?         icon_filename;            // (OPTIONAL) icon image displayed on the music selection (preset images without file extensions are also acceptable; in KSM, files in "imgs/icon")
-    string?         information;              // (OPTIONAL) optional information shown in song selection
+    string?         icon_filename;            // (OPTIONAL SUPPORT) icon image displayed on the music selection (preset images without file extensions are also acceptable; in KSM, files in "imgs/icon")
+    string?         information;              // (OPTIONAL SUPPORT) optional information shown in song selection
 }
 ```
 
@@ -126,7 +126,7 @@ dictionary BGMInfo {
     double vol = 1.0;         // bgm volume
     int offset = 0;           // offset in milliseconds (starting point of the audio file)
     BGMPreviewInfo? preview;  // preview information
-    LegacyBGMInfo? legacy;    // (OPTIONAL) legacy information
+    LegacyBGMInfo? legacy;    // (OPTIONAL SUPPORT) legacy information
 }
 ```
 
@@ -138,7 +138,7 @@ dictionary BGMPreviewInfo {
 }
 ```
 
-#### `audio.bgm.legacy` (OPTIONAL)
+#### `audio.bgm.legacy` (OPTIONAL SUPPORT)
 ```
 dictionary LegacyBGMInfo {
     string[]? fp_filenames;     // filenames of prerendered BGM with audio effects from legacy KSH charts
@@ -166,11 +166,11 @@ dictionary KeySoundFXInfo {
 ##### `audio.key_sound.fx.chip_event`
 ```
 dictionary KeySoundInvokeListFX {
-    ByPulse<KeySoundInvokeFX>[2][]? clap;         // (OPTIONAL)
-    ByPulse<KeySoundInvokeFX>[2][]? clap_impact;  // (OPTIONAL)
-    ByPulse<KeySoundInvokeFX>[2][]? clap_punchy;  // (OPTIONAL)
-    ByPulse<KeySoundInvokeFX>[2][]? snare;        // (OPTIONAL)
-    ByPulse<KeySoundInvokeFX>[2][]? snare_lo;     // (OPTIONAL)
+    ByPulse<KeySoundInvokeFX>[2][]? clap;         // (OPTIONAL SUPPORT)
+    ByPulse<KeySoundInvokeFX>[2][]? clap_impact;  // (OPTIONAL SUPPORT)
+    ByPulse<KeySoundInvokeFX>[2][]? clap_punchy;  // (OPTIONAL SUPPORT)
+    ByPulse<KeySoundInvokeFX>[2][]? snare;        // (OPTIONAL SUPPORT)
+    ByPulse<KeySoundInvokeFX>[2][]? snare_lo;     // (OPTIONAL SUPPORT)
 
     ByPulse<KeySoundInvokeFX>[2][]? ...;          // Custom key sounds can be inserted here by using the filename of a WAVE file (.wav) as a key
 }
@@ -187,20 +187,20 @@ dictionary KeySoundInvokeFX {
 ```
 dictionary KeySoundLaserInfo {
     ByPulse<double>? vol;                  // laser slam volume (default: 0.5)
-    KeySoundInvokeListLaser? slam_event;   // (OPTIONAL) key sound invocation by laser slam notes
-    KeySoundLaserLegacyInfo? legacy;       // (OPTIONAL) legacy information
+    KeySoundInvokeListLaser? slam_event;   // (OPTIONAL SUPPORT) key sound invocation by laser slam notes
+    KeySoundLaserLegacyInfo? legacy;       // (OPTIONAL SUPPORT) legacy information
 }
 ```
 - Note: `audio.key_sound.laser.slam_event.xxx[].y` should be the same as `y` of an existing laser slam note; otherwise, the event is ignored.
 - Note: The `vol` value changes do not affect key sounds currently being played.
 
-##### `audio.key_sound.laser.slam_event` (OPTIONAL)
+##### `audio.key_sound.laser.slam_event` (OPTIONAL SUPPORT)
 ```
 dictionary KeySoundInvokeListLaser {
-    ByPulse[]? slam_up;     // (OPTIONAL)
-    ByPulse[]? slam_down;   // (OPTIONAL)
-    ByPulse[]? slam_swing;  // (OPTIONAL)
-    ByPulse[]? slam_mute;   // (OPTIONAL)
+    ByPulse[]? slam_up;     // (OPTIONAL SUPPORT)
+    ByPulse[]? slam_down;   // (OPTIONAL SUPPORT)
+    ByPulse[]? slam_swing;  // (OPTIONAL SUPPORT)
+    ByPulse[]? slam_mute;   // (OPTIONAL SUPPORT)
 
     // Note: Inserting custom key sounds here is not allowed
 }
@@ -251,7 +251,7 @@ dictionary AudioEffectLaserInfo {
     dictionary<AudioEffectDef>? def;                         // audio effect definitions
     dictionary<dictionary<ByPulse<string>[]>>? param_change; // audio effect parameter changes by pulse
     dictionary<ByPulse[]>? pulse_event;                      // audio effect invocation by pulse
-    int peaking_filter_delay = 0;                            // (OPTIONAL) peaking filter delay time in milliseconds (0-160)
+    int peaking_filter_delay = 0;                            // (OPTIONAL SUPPORT) peaking filter delay time in milliseconds (0-160)
 }
 ```
 - Note: `audio.audio_effect.laser.pulse_event` cannot contain parameter changes. Use `audio.audio_effect.laser.param_change` instead.
@@ -371,7 +371,7 @@ Leading plus signs (e.g., "`+1`") and scientific notation (e.g., "`1e-3`", "`1E+
         - `[float]`
             - Requirement: -48.0 <= float <= 48.0
             - Example: `12.0`, `-6`
-    - (OPTIONAL) If the string value does not contain "." (i.e., the value is an integer), the transition value is quantized to an integer (e.g., `12.9`->`12`, `-1.1`->`-2`).
+    - (OPTIONAL SUPPORT) If the string value does not contain "." (i.e., the value is an integer), the transition value is quantized to an integer (e.g., `12.9`->`12`, `-1.1`->`-2`).
 - int
     - Integer value
     - Allowed formats:
@@ -453,16 +453,16 @@ Parameter values are written in one of the following formats:
         - Feedback rate
     - `stereo_width` (rate, default:`0%`)
         - LFO phase difference between the L/R channels
-    - (OPTIONAL) `vol` (rate, default:`75%`)
+    - (OPTIONAL SUPPORT) `vol` (rate, default:`75%`)
         - Volume of the effect audio
     - `mix` (rate, default:`0%>80%`)
         - Blending ratio of the original audio and the effect audio
 - `pitch_shift`: This effect changes the pitch (key) of the audio.
     - `pitch` (pitch, default:`0`)
         - Pitch (key)
-    - (OPTIONAL) `chunk_size` (sample, default:`700samples`)
+    - (OPTIONAL SUPPORT) `chunk_size` (sample, default:`700samples`)
         - Size of the waveform section. The larger the value, the better the sound quality, but the sound will be delayed.
-    - (OPTIONAL) `overlap` (rate, default:`40%`)
+    - (OPTIONAL SUPPORT) `overlap` (rate, default:`40%`)
         - Crossfade time ratio between waveform sections
         - Additional requirement:
             - 0.0 <= float <= 0.5
@@ -630,8 +630,8 @@ dictionary CamGraphs {
     GraphPoint[]? shift_x;                        // zoom_side
     GraphPoint[]? rotation_x;                     // zoom_top
     GraphPoint[]? rotation_z;                     // rotation degree  (affects both highway & jdgline relatively)
-    GraphPoint[]? rotation_z.highway;             // (OPTIONAL) rotation degree  (highway only)
-    GraphPoint[]? rotation_z.jdgline;             // (OPTIONAL) rotation degree  (judgment line only)
+    GraphPoint[]? rotation_z.highway;             // (OPTIONAL SUPPORT) rotation degree  (highway only)
+    GraphPoint[]? rotation_z.jdgline;             // (OPTIONAL SUPPORT) rotation degree  (judgment line only)
     GraphPoint[]? center_split;                   // center_split
 }
 ```
@@ -669,7 +669,7 @@ dictionary CamPatternLaserInfo {
 dictionary CamPatternInvokeList {
     ByPulseWithDirection<CamPatternInvokeSpin>[]? spin;
     ByPulseWithDirection<CamPatternInvokeSpin>[]? half_spin;
-    ByPulseWithDirection<CamPatternInvokeSwing>[]? swing;     // (OPTIONAL)
+    ByPulseWithDirection<CamPatternInvokeSwing>[]? swing;     // (OPTIONAL SUPPORT)
 }
 ```
 - Note: `camera.cam.pattern.laser.slam_event.xxx[].y` & `camera.cam.pattern.laser.slam_event.xxx[].d` should be the same as `y` & sign(`vf` - `v`) of an existing laser slam note; otherwise, the event is ignored.
@@ -681,7 +681,7 @@ dictionary CamPatternInvokeSpin {
 }
 ```
 
-##### `camera.cam.pattern.laser.slam_event.swing[].v` (OPTIONAL)
+##### `camera.cam.pattern.laser.slam_event.swing[].v` (OPTIONAL SUPPORT)
 ```
 dictionary CamPatternInvokeSwing {
     unsigned int l = 960;           // duration
@@ -702,11 +702,11 @@ Since the BG specification is still under discussion, the legacy KSH background 
 
 ```
 dictionary BGInfo {
-    LegacyBGInfo? legacy;  // (OPTIONAL)
+    LegacyBGInfo? legacy;  // (OPTIONAL SUPPORT)
 }
 ```
 
-### `bg.legacy` (OPTIONAL)
+### `bg.legacy` (OPTIONAL SUPPORT)
 ```
 dictionary LegacyBGInfo {
     KSHBGInfo[2]? bg;        // first element: when gauge < 70%, second element: when gauge >= 70%
@@ -716,14 +716,14 @@ dictionary LegacyBGInfo {
 ```
 - If `bg` has only a single element, that bg is always used, regardless of the percentage of the gauge.
 
-#### `bg.legacy.bg[xxx]` (OPTIONAL)
+#### `bg.legacy.bg[xxx]` (OPTIONAL SUPPORT)
 ```
 dictionary KSHBGInfo {
     string? filename;        // self-explanatory (can be KSM default BG image such as "desert")
 }
 ```
 
-#### `bg.legacy.layer` (OPTIONAL)
+#### `bg.legacy.layer` (OPTIONAL SUPPORT)
 ```
 dictionary KSHLayerInfo {
     string? filename;                // self-explanatory (can be KSM default animation layer such as "arrow")
@@ -734,7 +734,7 @@ dictionary KSHLayerInfo {
 }
 ```
 
-##### `bg.legacy.layer[xxx].rotation` (OPTIONAL)
+##### `bg.legacy.layer[xxx].rotation` (OPTIONAL SUPPORT)
 ```
 dictionary KSHLayerRotationInfo {
     bool tilt = true;  // whether lane tilts affect rotation of BG/layer
@@ -742,7 +742,7 @@ dictionary KSHLayerRotationInfo {
 }
 ```
 
-#### `bg.legacy.movie` (OPTIONAL)
+#### `bg.legacy.movie` (OPTIONAL SUPPORT)
 ```
 dictionary KSHMovieInfo {
     string? filename;     // self-explanatory
@@ -752,30 +752,30 @@ dictionary KSHMovieInfo {
 
 -----------------------------------------------------------------------------------
 
-### `editor` (OPTIONAL)
+### `editor` (OPTIONAL SUPPORT)
 ```
 dictionary EditorInfo {
-    ByPulse<string>? comment;     // (OPTIONAL) comments that can be written in the editor
+    ByPulse<string>? comment;     // (OPTIONAL SUPPORT) comments that can be written in the editor
 }
 ```
 
 -----------------------------------------------------------------------------------
 
-### `compat` (OPTIONAL)
+### `compat` (OPTIONAL SUPPORT)
 ```
 dictionary CompatInfo {
-    string? ksh_version;          // (OPTIONAL) "ver" field of KSH file (specified only if converted from KSH)
-    KSHUnknownInfo? ksh_unknown;  // (OPTIONAL) unrecognized data in ksh-to-kson conversion
+    string? ksh_version;          // (OPTIONAL SUPPORT) "ver" field of KSH file (specified only if converted from KSH)
+    KSHUnknownInfo? ksh_unknown;  // (OPTIONAL SUPPORT) unrecognized data in ksh-to-kson conversion
 }
 ```
 - Note: If the "`ver`" field is not present in the KSH file, `ksh_version` is set to "`100`".
 
-### `compat.ksh_unknown` (OPTIONAL)
+### `compat.ksh_unknown` (OPTIONAL SUPPORT)
 ```
 dictionary KSHUnknownInfo {
-    dictionary<string>? meta;                  // (OPTIONAL) unrecognized option lines before the first bar line
-    dictionary<ByPulse<string>[]>? option;     // (OPTIONAL) unrecognized option lines after the first bar line
-    ByPulse<string>[]? line;                   // (OPTIONAL) unrecognized non-option lines
+    dictionary<string>? meta;                  // (OPTIONAL SUPPORT) unrecognized option lines before the first bar line
+    dictionary<ByPulse<string>[]>? option;     // (OPTIONAL SUPPORT) unrecognized option lines after the first bar line
+    ByPulse<string>[]? line;                   // (OPTIONAL SUPPORT) unrecognized non-option lines
 }
 ```
 - Note: In KSH format, a line with at least one "`=`" is recognized as an option line. The second or later "`=`" is recognized as part of the value.
@@ -833,7 +833,7 @@ dictionary KSHUnknownInfo {
 
 -----------------------------------------------------------------------------------
 
-### `impl` (OPTIONAL)
+### `impl` (OPTIONAL SUPPORT)
 ```
 dictionary ImplInfo {
     // Not specified. This area is free for use by kson clients and kson editors.
