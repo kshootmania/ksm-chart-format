@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.4.0`)
+# KSON Format Specification (version: `0.5.0-beta1`)
 - JSON format
 - File extension: `.kson`
 - Encoding: UTF-8 (without BOM), LF
@@ -6,7 +6,7 @@
 - `null` value is not allowed in the entire kson file.
 - Support for parameters/options marked "(OPTIONAL SUPPORT)" is optional, but must be ignored if not supported.
 - `xxx` and `...` denote placeholders.
-- The resolution of pulse value (`y`) is 240 per beat (i.e., 960 per measure).
+- The resolution of `y` (pulse number) is 240 per beat (i.e., 960 per measure).
 - The behavior for illegal values is undefined, and kson clients do not necessarily need to report an error even if there is an illegal value.
 
 -----------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ dictionary MetaInfo {
     artist:              string          // self-explanatory
     artist_img_filename: string?         // (OPTIONAL SUPPORT) use an image instead of song artist text
     chart_author:        string          // self-explanatory
-    difficulty:          DifficultyInfo  // self-explanatory
+    difficulty:          uint            // 0-3 (0:light, 1:challenge, 2:extended, 3:infinite)
     level:               uint            // self-explanatory, 1-20
     disp_bpm:            string = ""     // displayed bpm (allowed characters: 0-9, "-", ".")
     std_bpm:             double          // (OPTIONAL SUPPORT) standard bpm for hi-speed values (should be between minimum bpm and maximum bpm in the chart); automatically set if zero
@@ -49,31 +49,22 @@ dictionary MetaInfo {
 }
 ```
 
-### `meta.difficulty`
-```
-dictionary DifficultyInfo {
-    idx: uint  // 0-3 (0:light, 1:challenge, 2:extended, 3:infinite)
-}
-```
-
 -----------------------------------------------------------------------------------
 
 ## `beat`
 ```
 dictionary BeatInfo {
-    bpm:          ByPulse<double>[]  // bpm changes
-    time_sig:     TimeSig[]?         // time signature changes
-                                     // this is used for drawing bar lines and audio effects
-    scroll_speed: GraphPoint[]?      // scroll speed changes (default: 1.0)
+    bpm:          ByPulse<double>[]                     // bpm changes
+    time_sig:     ByMeasureIdx<TimeSig>[] = [0, [4, 4]] // time signature changes
+    scroll_speed: GraphPoint[]?                         // scroll speed changes (default: 1.0)
 }
 ```
 
 ### `beat.time_sig[xxx]`
 ```
-dictionary TimeSig {
-    idx: uint  // measure index
-    n:   uint  // numerator
-    d:   uint  // denominator
+array TimeSig {
+    [0]: uint  // numerator
+    [1]: uint  // denominator
 }
 ```
 
@@ -92,19 +83,27 @@ dictionary GaugeInfo {
 ## `note`
 ```
 dictionary NoteInfo {
-    bt: Interval[4][]?         // BT notes (first index: lane) (l=0: chip note, l>0: long note)
-    fx: Interval[2][]?         // FX notes (first index: lane) (l=0: chip note, l>0: long note)
-    laser: LaserSection[2][]?  // laser notes (first index: lane (0: left knob, 1: right knob))
+    bt: (uint|ButtonNote)[4][]?  // BT notes (first index: lane); uint represents y (pulse number) of chip note
+    fx: (uint|ButtonNote)[2][]?  // FX notes (first index: lane); uint represents y (pulse number) of chip note
+    laser: LaserSection[2][]?    // laser notes (first index: lane (0: left knob, 1: right knob))
 }
 ```
 - Two or more notes cannot be overlapped on a single lane.
 
+### `note.bt[lane][idx]`/`note.fx[lane][idx]`
+```
+array ButtonNote {
+    [0]: uint  // y: pulse number
+    [1]: uint  // length (0: chip note, >0: long note)
+}
+```
+
 ### `note.laser[lane][idx]`
 ```
-dictionary LaserSection : ByPulse<GraphSectionPoint[]> {
-    y: uint                 // pulse number
-    v: GraphSectionPoint[]  // laser points (0.0-1.0)
-    w: uint = 1             // x-axis scale (1-2), sets whether this laser section is 2x-widen or not
+array LaserSection : ByPulse<GraphSectionPoint[]> {
+    [0]: uint                 // y: pulse number
+    [1]: GraphSectionPoint[]  // v: laser points (0.0-1.0)
+    [2]: uint = 1             // w: x-axis scale (1-2), sets whether this laser section is 2x-widen or not
 }
 ```
 
@@ -161,22 +160,22 @@ dictionary KeySoundFXInfo {
     chip_event: KeySoundInvokeListFX  // key sound for chip FX notes
 }
 ```
-- Note: `audio.key_sound.fx.chip_event.xxx[lane][].y` should be the same as `y` of an existing chip FX note on the corresponding lane; otherwise, the event is ignored.
 
 ##### `audio.key_sound.fx.chip_event`
 ```
 dictionary KeySoundInvokeListFX {
-    clap:        ByPulse<KeySoundInvokeFX>[2][]?  // (OPTIONAL SUPPORT)
-    clap_impact: ByPulse<KeySoundInvokeFX>[2][]?  // (OPTIONAL SUPPORT)
-    clap_punchy: ByPulse<KeySoundInvokeFX>[2][]?  // (OPTIONAL SUPPORT)
-    snare:       ByPulse<KeySoundInvokeFX>[2][]?  // (OPTIONAL SUPPORT)
-    snare_lo:    ByPulse<KeySoundInvokeFX>[2][]?  // (OPTIONAL SUPPORT)
+    clap:        (uint|ByPulse<KeySoundInvokeFX>)[2][]?  // (OPTIONAL SUPPORT) uint represents y (pulse number) of an invocation with default volume
+    clap_impact: (uint|ByPulse<KeySoundInvokeFX>)[2][]?  // (OPTIONAL SUPPORT)
+    clap_punchy: (uint|ByPulse<KeySoundInvokeFX>)[2][]?  // (OPTIONAL SUPPORT)
+    snare:       (uint|ByPulse<KeySoundInvokeFX>)[2][]?  // (OPTIONAL SUPPORT)
+    snare_lo:    (uint|ByPulse<KeySoundInvokeFX>)[2][]?  // (OPTIONAL SUPPORT)
 
-    ...:         ByPulse<KeySoundInvokeFX>[2][]?  // Custom key sounds can be inserted here by using the filename of a WAVE file (.wav) as a key
+    ...:         (uint|ByPulse<KeySoundInvokeFX>)[2][]?  // Custom key sounds can be inserted here by using the filename of a WAVE file (.wav) as a key
 }
 ```
+- Note: `y` (pulse number) should be the same as `y` of an existing laser slam note; otherwise, the event is ignored.
 
-##### `audio.key_sound.fx.chip_event.xxx[lane][].v`
+##### `audio.key_sound.fx.chip_event.xxx[lane][][1]`
 ```
 dictionary KeySoundInvokeFX {
     vol: double = 1.0  // key sound volume
@@ -186,25 +185,25 @@ dictionary KeySoundInvokeFX {
 #### `audio.key_sound.laser`
 ```
 dictionary KeySoundLaserInfo {
-    vol:        ByPulse<double>?           // laser slam volume (default: 0.5)
-    slam_event: KeySoundInvokeListLaser?   // (OPTIONAL SUPPORT) key sound invocation by laser slam notes
-    legacy:     KeySoundLaserLegacyInfo?   // (OPTIONAL SUPPORT) legacy information
+    vol:        ByPulse<double>[]?           // laser slam volume (default: 0.5)
+    slam_event: KeySoundInvokeListLaser?     // (OPTIONAL SUPPORT) key sound invocation by laser slam notes
+    legacy:     KeySoundLaserLegacyInfo?     // (OPTIONAL SUPPORT) legacy information
 }
 ```
-- Note: `audio.key_sound.laser.slam_event.xxx[].y` should be the same as `y` of an existing laser slam note; otherwise, the event is ignored.
 - Note: The `vol` value changes do not affect key sounds currently being played.
 
 ##### `audio.key_sound.laser.slam_event` (OPTIONAL SUPPORT)
 ```
 dictionary KeySoundInvokeListLaser {
-    slam_up:    ByPulse[]?  // (OPTIONAL SUPPORT)
-    slam_down:  ByPulse[]?  // (OPTIONAL SUPPORT)
-    slam_swing: ByPulse[]?  // (OPTIONAL SUPPORT)
-    slam_mute:  ByPulse[]?  // (OPTIONAL SUPPORT)
+    slam_up:    uint[]?  // (OPTIONAL SUPPORT) uint represents y (pulse number)
+    slam_down:  uint[]?  // (OPTIONAL SUPPORT)
+    slam_swing: uint[]?  // (OPTIONAL SUPPORT)
+    slam_mute:  uint[]?  // (OPTIONAL SUPPORT)
 
     // Note: Inserting custom key sounds here is not allowed
 }
 ```
+- Note: `y` (pulse number) should be the same as `y` of an existing laser slam note; otherwise, the event is ignored.
 
 ##### `audio.key_sound.laser.legacy`
 ```
@@ -229,17 +228,17 @@ dictionary AudioEffectFXInfo {
     long_event:   dictionary<ByPulse<AudioEffect>[2][]>?     // audio effect invocation (and parameter changes) by long notes
 }
 ```
-- Note: `audio.audio_effect.fx.long_event.xxx[lane][].y` should be in the range `[y, y + l)` of an existing long FX note on the corresponding lane; otherwise, the event is ignored.
+- Note: `y` (pulse number) of `long_event` should be in the range `[y, y + length)` of an existing long FX note on the corresponding lane; otherwise, the event is ignored.
 - Example for `audio.audio_effect.fx.param_change`/`audio.audio_effect.laser.param_change`:
     ```
     "param_change":{
         "retrigger":{
             "update_period":[
-                {"y":960, "v":"0"},
-                {"y":1920, "v":"1/2"}
+                [960, "0"],
+                [1920, "1/2"]
             ],
             "update_trigger":[
-                {"y":1200, "v":"on"}
+                [1200, "on"]
             ]
         }
     }
@@ -638,16 +637,7 @@ dictionary CamGraphs {
 - KSH: -300 - 300 => kson: -3.0 - 3.0
 - Subparameters (`rotation_z.highway`/`rotation_z.jdgline`) affect the value relatively.
     - For example, the actual value of `rotation_z.highway` will be `rotation_z + rotation_z.highway`.
-        - ```
-          "rotation_z":[{"y":0, "v":1.0}],
-          "rotation_z.highway":[{"y":0, "v":0.5}]
-          ```
-          is equivalent to 
-          ```
-          "rotation_z":[{"y":0, "v":0.0}],
-          "rotation_z.highway":[{"y":0, "v":1.5}],
-          "rotation_z.jdgline":[{"y":0, "v":1.0}]
-          ```
+        - `rotation_z:1.0, rotation_z.highway:0.5` is equivalent to `rotation_z:0.0, rotation_z.highway:1.5, rotation_z.jdgline:1.0`
 
 #### `camera.cam.pattern`
 ```
@@ -672,7 +662,7 @@ dictionary CamPatternInvokeList {
     swing:     ByPulseWithDirection<CamPatternInvokeSwing>[]?     // (OPTIONAL SUPPORT)
 }
 ```
-- Note: `camera.cam.pattern.laser.slam_event.xxx[].y` & `camera.cam.pattern.laser.slam_event.xxx[].d` should be the same as `y` & sign(`vf` - `v`) of an existing laser slam note; otherwise, the event is ignored.
+- Note: `y` (pulse number) & `d` (laser slam direction) should be the same as `y` & sign(`vf` - `v`) of an existing laser slam note; otherwise, the event is ignored.
 
 ##### `camera.cam.pattern.laser.slam_event.spin[].v`/`camera.cam.pattern.laser.slam_event.half_spin[].v`
 ```
@@ -697,14 +687,13 @@ dictionary CamPatternInvokeSwing {
 -----------------------------------------------------------------------------------
 
 ## `bg`
-
-Since the BG specification is still under discussion, the legacy KSH background image (e.g. "`desert`") and layer (e.g. "`snow;1100;1`") is converted to "`legacy`" as they are for now.
-
 ```
 dictionary BGInfo {
+    filename: string?      // (OPTIONAL SUPPORT) filename of background graphics file
     legacy: LegacyBGInfo?  // (OPTIONAL SUPPORT)
 }
 ```
+- Note: The file format of `bg.filename` is not speficied. If the format of the file specified in `bg.filename` is supported by the kson client, `bg.filename` is used; otherwise, it falls back to other built-in background graphics (which MAY be specified in `legacy`).
 
 ### `bg.legacy` (OPTIONAL SUPPORT)
 ```
@@ -755,7 +744,7 @@ dictionary KSHMovieInfo {
 ### `editor` (OPTIONAL SUPPORT)
 ```
 dictionary EditorInfo {
-    comment: ByPulse<string>?  // (OPTIONAL SUPPORT) comments that can be written in the editor
+    comment: ByPulse<string>[]?  // (OPTIONAL SUPPORT) comments that can be written in the editor
 }
 ```
 
@@ -783,7 +772,7 @@ dictionary KSHUnknownInfo {
         - "`keyvalue`" => non-option line
         - "`key=value`" => option line (key:"`key`", value:"`value`")
         - "`key=value=value`" => option line (key:"`key`", value:"`value=value`")
-- Note: Unrecognized non-option lines before the first bar line ("--") are stored in `compat.ksh_unknown.line` as `y`=`0`.
+- Note: Unrecognized non-option lines before the first bar line ("--") are stored in `compat.ksh_unknown.line` as `y` (pulse number) is `0`.
 - Note: Since KSH format does not allow comment lines starting with "`;`", such lines are stored in `compat.ksh_unknown.option` or `compat.ksh_unknown.line` instead of `editor.comment`.
 - Example:
     - KSH:
@@ -814,19 +803,19 @@ dictionary KSHUnknownInfo {
             },
             "option":{
                 "extvalue":[
-                    { "y":0, "v":"100" },
-                    { "y":480, "v":"200" },
-                    { "y":960, "v":"300" },
-                    { "y":1440, "v":"400" }
+                    [0, "100"],
+                    [480, "200"],
+                    [960, "300"],
+                    [1440, "400"]
                 ],
                 ";some-extension4":[
-                    { "y":960, "v":"100" }
+                    [960, "100"]
                 ]
             },
             "line":[
-                { "y":0, "v":";some-extension1" },
-                { "y":0, "v":";some-extension2" },
-                { "y":960, "v":";some-extension3" },
+                [0, ";some-extension1"],
+                [0, ";some-extension2"],
+                [960, ";some-extension3"],
             ]
         }
         ```
@@ -845,69 +834,79 @@ dictionary ImplInfo {
 
 ## Common objects
 
-### interval
-```
-dictionary Interval {
-    y: uint      // pulse number
-    l: uint = 0  // length
-}
-```
-
 ### event triggered by pulse
 ```
-dictionary ByPulse {
-    y: uint  // pulse number
+array ByPulse<T> {
+    [0]: uint  // y: pulse number
+    [1]: T     // v: value
 }
 ```
-```
-dictionary ByPulse<T> {
-    y: uint  // pulse number
-    v: T?    // body
-}
-```
+- The array size of `ByPulse<T>` MUST be 2.
 
 ### event triggered by pulse (with laser slam direction)
 ```
-dictionary ByPulseWithDirection<T> {
-    y: uint  // pulse number
-    d: int   // laser slam direction, -1 (left) or 1 (right)
-    v: T?    // body
+array ByPulseWithDirection<T> {
+    [0]: uint  // y: pulse number
+    [1]: int   // d: laser slam direction, -1 (left) or 1 (right)
+    [2]: T?    // v: value
 }
 ```
+- The array size of `ByPulseWithDirection<T>` MUST be 2 or 3.
+
+### event triggered by measure index
+```
+array ByMeasureIdx<T> {
+    [0]: uint  // idx: measure index
+    [1]: T     // v: value
+}
+```
+- The array size of `ByMeasureIdx<T>` MUST be 2.
+
+### graph value
+```
+array GraphValue {
+    [0]: double  // v: value
+    [1]: double  // vf: second value (for an immediate change)
+}
+```
+- The array size of `GraphValue` MUST be 2.
+
+### graph curve value
+```
+array GraphCurveValue {
+    [0]: double  // a: x-coordinate of the curve control point (0.0-1.0)
+    [1]: double  // b: y-coordinate of the curve control point (0.0-1.0)
+}
+```
+- The array size of `GraphCurveValue` MUST be 2.
 
 ### graph (whole chart)
 ```
-dictionary GraphPoint {
-    y:  uint          // absolute pulse number
-    v:  double?       // value
-    vf: double?       // second value (for an immediate change)
-    a:  double = 0.0  // x-coordinate of the curve control point (0.0-1.0)
-    b:  double = 0.0  // y-coordinate of the curve control point (0.0-1.0)
+array GraphPoint {
+    [0]: uint                          // y: absolute pulse number
+    [1]: double|GraphValue             // v: graph value; if double is used, v and vf are set to the same value
+    [2]: GraphCurveValue = [0.0, 0.0]  // curve: graph curve value
 }
 ```
-- If `v` is undefined, it inherits the `vf` value of the previous element. Note that the first element must not have an undefined `v` value.
-- If `vf` is undefined, it inherits the `v` value.
+- The array size of `ByPulseWithDirection<T>` MUST be 2 or 3.
 
 ### graph point (for graph sections = `ByPulse<GraphSectionPoint[]>`)
 ```
-dictionary GraphSectionPoint {
-    ry: uint          // relative pulse number
-    v:  double?       // value
-    vf: double?       // second value (for an immediate change)
-    a:  double = 0.0  // x-coordinate of the curve control point (0.0-1.0)
-    b:  double = 0.0  // y-coordinate of the curve control point (0.0-1.0)
+array GraphSectionPoint {
+    [0]: uint                          // ry: relative pulse number
+    [1]: double|GraphValue             // v: graph value; if double is used, v and vf are set to the same value
+    [2]: GraphCurveValue = [0.0, 0.0]  // curve: graph curve value
 }
 ```
-- If `v` is undefined, it inherits the `vf` value of the previous element. Note that the first element must not have an undefined `v` value.
-- If `vf` is undefined, it inherits the `v` value.
+- The array size of `ByPulseWithDirection<T>` MUST be 2 or 3.
 
 -----------------------------------------------------------------------------------
 
 # Requirements
 
-- All arrays that have `y` or `ry` or `idx` (e.g. `ByPulse<T>[]`) must be ordered by `y` or `ry` or `idx`.
+- All arrays that have `[0]` (a.k.a. `y`, `ry`, `idx`) must be ordered by `[0]`.
 
-- The first point of arrays that have `ry` (e.g. the first point of `GraphPoint[]`) must not have nonzero `ry`.
+- The first point of arrays that have `ry` (e.g. the first point of `GraphSectionPoint[]`) must not have nonzero `ry`.
 
 -----------------------------------------------------------------------------------
 
