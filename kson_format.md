@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.5.0-beta1`)
+# KSON Format Specification (version: `0.5.0-beta2`)
 - JSON format
 - File extension: `.kson`
 - Encoding: UTF-8 (without BOM), LF
@@ -34,8 +34,10 @@ dictionary kson {
 ```
 dictionary MetaInfo {
     title:               string          // self-explanatory
+    title_translit:      string?         // (OPTIONAL SUPPORT) transliterated title
     title_img_filename:  string?         // (OPTIONAL SUPPORT) use an image instead of song title text
     artist:              string          // self-explanatory
+    artist_translit:     string?         // (OPTIONAL SUPPORT) transliterated artist name
     artist_img_filename: string?         // (OPTIONAL SUPPORT) use an image instead of song artist text
     chart_author:        string          // self-explanatory
     difficulty:          uint            // 0-3 (0:light, 1:challenge, 2:extended, 3:infinite)
