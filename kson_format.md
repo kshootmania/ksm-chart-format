@@ -14,17 +14,17 @@
 ## Top-level object
 ```
 dictionary kson {
-    string        version;     // kson version (Semantic Versioning like "x.y.z")
-    MetaInfo      meta;        // meta data, e.g. title, artist, ...
-    BeatInfo      beat;        // beat-related data, e.g. bpm, time signature, ...
-    GaugeInfo?    gauge;       // gauge-related data
-    NoteInfo?     note;        // notes on each lane
-    AudioInfo?    audio;       // audio-related data
-    CameraInfo?   camera;      // camera-related data
-    BGInfo?       bg;          // background-related data
-    EditorInfo?   editor;      // (OPTIONAL SUPPORT) data used only in editors
-    CompatInfo?   compat;      // (OPTIONAL SUPPORT) compatibility data with KSH format
-    ImplInfo?     impl;        // (OPTIONAL SUPPORT) data that is sure to be for a specific client
+    version: string       // kson version (Semantic Versioning like "x.y.z")
+    meta:    MetaInfo     // meta data, e.g. title, artist, ...
+    beat:    BeatInfo     // beat-related data, e.g. bpm, time signature, ...
+    gauge:   GaugeInfo?   // gauge-related data
+    note:    NoteInfo?    // notes on each lane
+    audio:   AudioInfo?   // audio-related data
+    camera:  CameraInfo?  // camera-related data
+    bg:      BGInfo?      // background-related data
+    editor:  EditorInfo?  // (OPTIONAL SUPPORT) data used only in editors
+    compat:  CompatInfo?  // (OPTIONAL SUPPORT) compatibility data with KSH format
+    impl:    ImplInfo?    // (OPTIONAL SUPPORT) data that is sure to be for a specific client
 }
 ```
 
@@ -33,26 +33,26 @@ dictionary kson {
 ## `meta`
 ```
 dictionary MetaInfo {
-    string          title;                    // self-explanatory
-    string?         title_img_filename;       // (OPTIONAL SUPPORT) use an image instead of song title text
-    string          artist;                   // self-explanatory
-    string?         artist_img_filename;      // (OPTIONAL SUPPORT) use an image instead of song artist text
-    string          chart_author;             // self-explanatory
-    DifficultyInfo  difficulty;               // self-explanatory
-    unsigned int    level;                    // self-explanatory, 1-20
-    string          disp_bpm = "";            // displayed bpm (allowed characters: 0-9, "-", ".")
-    double          std_bpm = 0;              // (OPTIONAL SUPPORT) standard bpm for hi-speed values (should be between minimum bpm and maximum bpm in the chart); automatically set if zero
-    string?         jacket_filename;          // self-explanatory (preset images without file extensions are also acceptable; in KSM, either "nowprinting1"/"nowprinting2"/"nowprinting3")
-    string?         jacket_author;            // self-explanatory
-    string?         icon_filename;            // (OPTIONAL SUPPORT) icon image displayed on the music selection (preset images without file extensions are also acceptable; in KSM, files in "imgs/icon")
-    string?         information;              // (OPTIONAL SUPPORT) optional information shown in song selection
+    title:               string          // self-explanatory
+    title_img_filename:  string?         // (OPTIONAL SUPPORT) use an image instead of song title text
+    artist:              string          // self-explanatory
+    artist_img_filename: string?         // (OPTIONAL SUPPORT) use an image instead of song artist text
+    chart_author:        string          // self-explanatory
+    difficulty:          DifficultyInfo  // self-explanatory
+    level:               uint            // self-explanatory, 1-20
+    disp_bpm:            string = ""     // displayed bpm (allowed characters: 0-9, "-", ".")
+    std_bpm:             double          // (OPTIONAL SUPPORT) standard bpm for hi-speed values (should be between minimum bpm and maximum bpm in the chart); automatically set if zero
+    jacket_filename:     string?         // self-explanatory (preset images without file extensions are also acceptable; in KSM, either "nowprinting1"/"nowprinting2"/"nowprinting3")
+    jacket_author:       string?         // self-explanatory
+    icon_filename:       string?         // (OPTIONAL SUPPORT) icon image displayed on the music selection (preset images without file extensions are also acceptable; in KSM, files in "imgs/icon")
+    information:         string?         // (OPTIONAL SUPPORT) optional information shown in song selection
 }
 ```
 
 ### `meta.difficulty`
 ```
 dictionary DifficultyInfo {
-    unsigned int idx;   // 0-3 (0:light, 1:challenge, 2:extended, 3:infinite)
+    idx: uint  // 0-3 (0:light, 1:challenge, 2:extended, 3:infinite)
 }
 ```
 
@@ -61,19 +61,19 @@ dictionary DifficultyInfo {
 ## `beat`
 ```
 dictionary BeatInfo {
-    ByPulse<double>[] bpm;       // bpm changes
-    TimeSig[]? time_sig;         // time signature changes
-                                 // this is used for drawing bar lines and audio effects
-    GraphPoint[]? scroll_speed;  // scroll speed changes (default: 1.0)
+    bpm:          ByPulse<double>[]  // bpm changes
+    time_sig:     TimeSig[]?         // time signature changes
+                                     // this is used for drawing bar lines and audio effects
+    scroll_speed: GraphPoint[]?      // scroll speed changes (default: 1.0)
 }
 ```
 
 ### `beat.time_sig[xxx]`
 ```
 dictionary TimeSig {
-    unsigned int idx;   // measure index
-    unsigned int n;     // numerator
-    unsigned int d;     // denominator
+    idx: uint  // measure index
+    n:   uint  // numerator
+    d:   uint  // denominator
 }
 ```
 
@@ -82,8 +82,8 @@ dictionary TimeSig {
 ## `gauge`
 ```
 dictionary GaugeInfo {
-    unsigned int total = 0; // total ascension of gauge percentage in the entire chart (0 or 100-)
-                            // automatically set if zero
+    total: uint = 0  // total ascension of gauge percentage in the entire chart (0 or 100-)
+                     // automatically set if zero
 }
 ```
 
@@ -92,9 +92,9 @@ dictionary GaugeInfo {
 ## `note`
 ```
 dictionary NoteInfo {
-    Interval[4][]? bt;               // BT notes (first index: lane) (l=0: chip note, l>0: long note)
-    Interval[2][]? fx;               // FX notes (first index: lane) (l=0: chip note, l>0: long note)
-    LaserSection[2][]? laser;        // laser notes (first index: lane (0: left knob, 1: right knob))
+    bt: Interval[4][]?         // BT notes (first index: lane) (l=0: chip note, l>0: long note)
+    fx: Interval[2][]?         // FX notes (first index: lane) (l=0: chip note, l>0: long note)
+    laser: LaserSection[2][]?  // laser notes (first index: lane (0: left knob, 1: right knob))
 }
 ```
 - Two or more notes cannot be overlapped on a single lane.
@@ -102,9 +102,9 @@ dictionary NoteInfo {
 ### `note.laser[lane][idx]`
 ```
 dictionary LaserSection : ByPulse<GraphSectionPoint[]> {
-    unsigned int y;             // pulse number
-    GraphSectionPoint[] v;      // laser points (0.0-1.0)
-    unsigned int w = 1;         // x-axis scale (1-2), sets whether this laser section is 2x-widen or not
+    y: uint                 // pulse number
+    v: GraphSectionPoint[]  // laser points (0.0-1.0)
+    w: uint = 1             // x-axis scale (1-2), sets whether this laser section is 2x-widen or not
 }
 ```
 
@@ -113,44 +113,44 @@ dictionary LaserSection : ByPulse<GraphSectionPoint[]> {
 ## `audio`
 ```
 dictionary AudioInfo {
-    BGMInfo? bgm;                   // bgm-related data
-    KeySoundInfo? key_sound;        // key-sound-related data
-    AudioEffectInfo? audio_effect;  // audio-effect-related data
+    bgm:          BGMInfo?          // bgm-related data
+    key_sound:    KeySoundInfo?     // key-sound-related data
+    audio_effect: AudioEffectInfo?  // audio-effect-related data
 }
 ```
 
 ### `audio.bgm`
 ```
 dictionary BGMInfo {
-    string filename = "";     // self-explanatory
-    double vol = 1.0;         // bgm volume
-    int offset = 0;           // offset in milliseconds (starting point of the audio file)
-    BGMPreviewInfo? preview;  // preview information
-    LegacyBGMInfo? legacy;    // (OPTIONAL SUPPORT) legacy information
+    filename:  string = ""       // self-explanatory
+    vol:       double = 1.0      // bgm volume
+    offset:    int = 0           // offset in milliseconds (starting point of the audio file)
+    preview:   BGMPreviewInfo?   // preview information
+    legacy:    LegacyBGMInfo?    // (OPTIONAL SUPPORT) legacy information
 }
 ```
 
 #### `audio.bgm.preview`
 ```
 dictionary BGMPreviewInfo {
-    unsigned int offset = 0;        // preview offset in milliseconds (starting point of the audio file)
-    unsigned int duration = 15000;  // preview duration in milliseconds
+    offset:   uint = 0        // preview offset in milliseconds (starting point of the audio file)
+    duration: uint = 15000    // preview duration in milliseconds
 }
 ```
 
 #### `audio.bgm.legacy` (OPTIONAL SUPPORT)
 ```
 dictionary LegacyBGMInfo {
-    string[]? fp_filenames;     // filenames of prerendered BGM with audio effects from legacy KSH charts
-                                // e.g. [ "xxx_f.ogg", "xxx_p.ogg", "xxx_fp.ogg" ]
+    fp_filenames: string[]      // filenames of prerendered BGM with audio effects from legacy KSH charts
+                                // e.g. [ "xxx_f.ogg" ], [ "xxx_f.ogg", "xxx_p.ogg", "xxx_fp.ogg" ]
 }
 ```
 
 ### `audio.key_sound`
 ```
 dictionary KeySoundInfo {
-    KeySoundFXInfo? fx;        // key sound for FX notes
-    KeySoundLaserInfo? laser;  // key sound for laser slams
+    fx:     KeySoundFXInfo?     // key sound for FX notes
+    laser:  KeySoundLaserInfo?  // key sound for laser slams
 }
 ```
 - Note: `fx` and `laser` have different ways of specifying the volume of key sounds.
@@ -158,7 +158,7 @@ dictionary KeySoundInfo {
 #### `audio.key_sound.fx`
 ```
 dictionary KeySoundFXInfo {
-    KeySoundInvokeListFX? chip_event;  // key sound for chip FX notes
+    chip_event: KeySoundInvokeListFX  // key sound for chip FX notes
 }
 ```
 - Note: `audio.key_sound.fx.chip_event.xxx[lane][].y` should be the same as `y` of an existing chip FX note on the corresponding lane; otherwise, the event is ignored.
@@ -166,29 +166,29 @@ dictionary KeySoundFXInfo {
 ##### `audio.key_sound.fx.chip_event`
 ```
 dictionary KeySoundInvokeListFX {
-    ByPulse<KeySoundInvokeFX>[2][]? clap;         // (OPTIONAL SUPPORT)
-    ByPulse<KeySoundInvokeFX>[2][]? clap_impact;  // (OPTIONAL SUPPORT)
-    ByPulse<KeySoundInvokeFX>[2][]? clap_punchy;  // (OPTIONAL SUPPORT)
-    ByPulse<KeySoundInvokeFX>[2][]? snare;        // (OPTIONAL SUPPORT)
-    ByPulse<KeySoundInvokeFX>[2][]? snare_lo;     // (OPTIONAL SUPPORT)
+    clap:        ByPulse<KeySoundInvokeFX>[2][]?  // (OPTIONAL SUPPORT)
+    clap_impact: ByPulse<KeySoundInvokeFX>[2][]?  // (OPTIONAL SUPPORT)
+    clap_punchy: ByPulse<KeySoundInvokeFX>[2][]?  // (OPTIONAL SUPPORT)
+    snare:       ByPulse<KeySoundInvokeFX>[2][]?  // (OPTIONAL SUPPORT)
+    snare_lo:    ByPulse<KeySoundInvokeFX>[2][]?  // (OPTIONAL SUPPORT)
 
-    ByPulse<KeySoundInvokeFX>[2][]? ...;          // Custom key sounds can be inserted here by using the filename of a WAVE file (.wav) as a key
+    ...:         ByPulse<KeySoundInvokeFX>[2][]?  // Custom key sounds can be inserted here by using the filename of a WAVE file (.wav) as a key
 }
 ```
 
 ##### `audio.key_sound.fx.chip_event.xxx[lane][].v`
 ```
 dictionary KeySoundInvokeFX {
-    double vol = 1.0;  // key sound volume
+    vol: double = 1.0  // key sound volume
 }
 ```
 
 #### `audio.key_sound.laser`
 ```
 dictionary KeySoundLaserInfo {
-    ByPulse<double>? vol;                  // laser slam volume (default: 0.5)
-    KeySoundInvokeListLaser? slam_event;   // (OPTIONAL SUPPORT) key sound invocation by laser slam notes
-    KeySoundLaserLegacyInfo? legacy;       // (OPTIONAL SUPPORT) legacy information
+    vol:        ByPulse<double>?           // laser slam volume (default: 0.5)
+    slam_event: KeySoundInvokeListLaser?   // (OPTIONAL SUPPORT) key sound invocation by laser slam notes
+    legacy:     KeySoundLaserLegacyInfo?   // (OPTIONAL SUPPORT) legacy information
 }
 ```
 - Note: `audio.key_sound.laser.slam_event.xxx[].y` should be the same as `y` of an existing laser slam note; otherwise, the event is ignored.
@@ -197,10 +197,10 @@ dictionary KeySoundLaserInfo {
 ##### `audio.key_sound.laser.slam_event` (OPTIONAL SUPPORT)
 ```
 dictionary KeySoundInvokeListLaser {
-    ByPulse[]? slam_up;     // (OPTIONAL SUPPORT)
-    ByPulse[]? slam_down;   // (OPTIONAL SUPPORT)
-    ByPulse[]? slam_swing;  // (OPTIONAL SUPPORT)
-    ByPulse[]? slam_mute;   // (OPTIONAL SUPPORT)
+    slam_up:    ByPulse[]?  // (OPTIONAL SUPPORT)
+    slam_down:  ByPulse[]?  // (OPTIONAL SUPPORT)
+    slam_swing: ByPulse[]?  // (OPTIONAL SUPPORT)
+    slam_mute:  ByPulse[]?  // (OPTIONAL SUPPORT)
 
     // Note: Inserting custom key sounds here is not allowed
 }
@@ -209,24 +209,24 @@ dictionary KeySoundInvokeListLaser {
 ##### `audio.key_sound.laser.legacy`
 ```
 dictionary KeySoundLaserLegacyInfo {
-    bool auto_vol = false;  // "chokkakuautovol" in KSH format
+    auto_vol: bool = false  // "chokkakuautovol" in KSH format
 }
 ```
 
 ### `audio.audio_effect`
 ```
 dictionary AudioEffectInfo {
-    AudioEffectFXInfo? fx;        // audio effects for FX notes
-    AudioEffectLaserInfo? laser;  // audio effects for laser notes
+    fx:     AudioEffectFXInfo?     // audio effects for FX notes
+    laser:  AudioEffectLaserInfo?  // audio effects for laser notes
 }
 ```
 
 #### `audio.audio_effect.fx`
 ```
 dictionary AudioEffectFXInfo {
-    dictionary<AudioEffectDef>? def;                         // audio effect definitions
-    dictionary<dictionary<ByPulse<string>[]>>? param_change; // audio effect parameter changes by pulse
-    dictionary<ByPulse<AudioEffect>[2][]>? long_event;       // audio effect invocation (and parameter changes) by long notes
+    def:          dictionary<AudioEffectDef>?                // audio effect definitions
+    param_change: dictionary<dictionary<ByPulse<string>[]>>? // audio effect parameter changes by pulse
+    long_event:   dictionary<ByPulse<AudioEffect>[2][]>?     // audio effect invocation (and parameter changes) by long notes
 }
 ```
 - Note: `audio.audio_effect.fx.long_event.xxx[lane][].y` should be in the range `[y, y + l)` of an existing long FX note on the corresponding lane; otherwise, the event is ignored.
@@ -248,10 +248,10 @@ dictionary AudioEffectFXInfo {
 #### `audio.audio_effect.laser`
 ```
 dictionary AudioEffectLaserInfo {
-    dictionary<AudioEffectDef>? def;                         // audio effect definitions
-    dictionary<dictionary<ByPulse<string>[]>>? param_change; // audio effect parameter changes by pulse
-    dictionary<ByPulse[]>? pulse_event;                      // audio effect invocation by pulse
-    int peaking_filter_delay = 0;                            // (OPTIONAL SUPPORT) peaking filter delay time in milliseconds (0-160)
+    def: dictionary<AudioEffectDef>?                         // audio effect definitions
+    param_change: dictionary<dictionary<ByPulse<string>[]>>? // audio effect parameter changes by pulse
+    pulse_event: dictionary<ByPulse[]>?                      // audio effect invocation by pulse
+    peaking_filter_delay: int = 0                            // (OPTIONAL SUPPORT) peaking filter delay time in milliseconds (0-160)
 }
 ```
 - Note: `audio.audio_effect.laser.pulse_event` cannot contain parameter changes. Use `audio.audio_effect.laser.param_change` instead.
@@ -259,8 +259,8 @@ dictionary AudioEffectLaserInfo {
 ##### `audio.audio_effect.fx.def.xxx`/`audio.audio_effect.laser.def.xxx`
 ```
 dictionary AudioEffectDef {
-    string type;               // audio effect type (e.g. "flanger")
-    dictionary<string>? v;     // audio effect parameter values
+    type: string               // audio effect type (e.g. "flanger")
+    v:    dictionary<string>?  // audio effect parameter values
 }
 ```
 - Examples:
@@ -597,20 +597,20 @@ Parameter values are written in one of the following formats:
 ## `camera`
 ```
 dictionary CameraInfo {
-    TiltInfo? tilt;        // tilt-related data
-    CamInfo? cam;          // cam-related data
+    tilt: TiltInfo?        // tilt-related data
+    cam:  CamInfo?         // cam-related data
 }
 ```
 
 ### `camera.tilt`
 ```
 dictionary TiltInfo {
-    ByPulse<double>[]? scale;                 // tilt scale (default: 1.0)
-    ByPulse<GraphSectionPoint[]>[]? manual;   // manual tilt
+    scale:  ByPulse<double>[]?                // tilt scale (default: 1.0)
+    manual: ByPulse<GraphSectionPoint[]>[]?   // manual tilt
                                               // Note: The left laser being on the right edge is equal to a manual value of 1.0, and the right laser being on the left edge is equal to a manual value of -1.0.
                                               // Note: Two or more graph sections cannot be overlapped.
                                               // Note: "camera.tilt.scale" does not affect the scale of manual tilt. Manual tilt is always evaluated with a scale of 1.0.
-    ByPulse<bool>[]? keep;                    // whether tilt is kept or not
+    keep:   ByPulse<bool>[]?                  // whether tilt is kept or not
                                               // (while tilt is kept, the tilt amount value is updated only to a larger absolute value with the same sign)
 }
 ```
@@ -618,21 +618,21 @@ dictionary TiltInfo {
 ### `camera.cam`
 ```
 dictionary CamInfo {
-    CamGraphs? body;                              // cam value changes
-    CamPatternInfo? pattern;                      // cam pattern
+    body:    CamGraphs?       // cam value changes
+    pattern: CamPatternInfo?  // cam pattern
 }
 ```
 
 #### `camera.cam.body`
 ```
 dictionary CamGraphs {
-    GraphPoint[]? zoom;                           // zoom_bottom
-    GraphPoint[]? shift_x;                        // zoom_side
-    GraphPoint[]? rotation_x;                     // zoom_top
-    GraphPoint[]? rotation_z;                     // rotation degree  (affects both highway & jdgline relatively)
-    GraphPoint[]? rotation_z.highway;             // (OPTIONAL SUPPORT) rotation degree  (highway only)
-    GraphPoint[]? rotation_z.jdgline;             // (OPTIONAL SUPPORT) rotation degree  (judgment line only)
-    GraphPoint[]? center_split;                   // center_split
+    zoom:               GraphPoint[]?  // zoom_bottom
+    shift_x:            GraphPoint[]?  // zoom_side
+    rotation_x:         GraphPoint[]?  // zoom_top
+    rotation_z:         GraphPoint[]?  // rotation degree (affects both highway & jdgline relatively)
+    rotation_z.highway: GraphPoint[]?  // (OPTIONAL SUPPORT) rotation degree (highway only)
+    rotation_z.jdgline: GraphPoint[]?  // (OPTIONAL SUPPORT) rotation degree (judgment line only)
+    center_split:       GraphPoint[]?  // center_split
 }
 ```
 - KSH: -300 - 300 => kson: -3.0 - 3.0
@@ -652,14 +652,14 @@ dictionary CamGraphs {
 #### `camera.cam.pattern`
 ```
 dictionary CamPatternInfo {
-    CamPatternLaserInfo? laser;         // cam pattern for laser slams
+    laser: CamPatternLaserInfo?  // cam pattern for laser slams
 }
 ```
 
 ##### `camera.cam.pattern.laser`
 ```
 dictionary CamPatternLaserInfo {
-    CamPatternInvokeList? slam_event;   // cam pattern invocation by laser slam notes
+    slam_event: CamPatternInvokeList?  // cam pattern invocation by laser slam notes
 }
 ```
 - Note: This is a specification with the possibility of defining `camera.cam.pattern.laser.def` as a future extension.
@@ -667,9 +667,9 @@ dictionary CamPatternLaserInfo {
 ##### `camera.cam.pattern.laser.slam_event`
 ```
 dictionary CamPatternInvokeList {
-    ByPulseWithDirection<CamPatternInvokeSpin>[]? spin;
-    ByPulseWithDirection<CamPatternInvokeSpin>[]? half_spin;
-    ByPulseWithDirection<CamPatternInvokeSwing>[]? swing;     // (OPTIONAL SUPPORT)
+    spin:      ByPulseWithDirection<CamPatternInvokeSpin>[]?
+    half_spin: ByPulseWithDirection<CamPatternInvokeSpin>[]?
+    swing:     ByPulseWithDirection<CamPatternInvokeSwing>[]?     // (OPTIONAL SUPPORT)
 }
 ```
 - Note: `camera.cam.pattern.laser.slam_event.xxx[].y` & `camera.cam.pattern.laser.slam_event.xxx[].d` should be the same as `y` & sign(`vf` - `v`) of an existing laser slam note; otherwise, the event is ignored.
@@ -677,20 +677,20 @@ dictionary CamPatternInvokeList {
 ##### `camera.cam.pattern.laser.slam_event.spin[].v`/`camera.cam.pattern.laser.slam_event.half_spin[].v`
 ```
 dictionary CamPatternInvokeSpin {
-    unsigned int l = 960;           // duration
+    l: uint = 960  // duration
 }
 ```
 
 ##### `camera.cam.pattern.laser.slam_event.swing[].v` (OPTIONAL SUPPORT)
 ```
 dictionary CamPatternInvokeSwing {
-    unsigned int l = 960;           // duration
-    double scale = 1.0;             // scale
-    unsigned int repeat = 1;        // number of repetitions
-    int decay_order = 0;            // order of the decay that scales camera values (0-2)
-                                    // (note that this decay is applied even if repeat=1)
-                                    // - equation: `value * (1.0 - ((l - ry) / l))^decay_order`
-                                    // - 0: no decay, 1: linear decay, 2: squared decay
+    l:      uint = 960     // duration
+    scale:  double = 1.0   // scale
+    repeat: uint           // number of repetitions
+    decay_order: int = 0   // order of the decay that scales camera values (0-2)
+                           // (note that this decay is applied even if repeat=1)
+                           // - equation: `value * (1.0 - ((l - ry) / l))^decay_order`
+                           // - 0: no decay, 1: linear decay, 2: squared decay
 }
 ```
 
@@ -702,16 +702,16 @@ Since the BG specification is still under discussion, the legacy KSH background 
 
 ```
 dictionary BGInfo {
-    LegacyBGInfo? legacy;  // (OPTIONAL SUPPORT)
+    legacy: LegacyBGInfo?  // (OPTIONAL SUPPORT)
 }
 ```
 
 ### `bg.legacy` (OPTIONAL SUPPORT)
 ```
 dictionary LegacyBGInfo {
-    KSHBGInfo[2]? bg;        // first element: when gauge < 70%, second element: when gauge >= 70%
-    KSHLayerInfo? layer;
-    KSHMovieInfo? movie;
+    bg:    KSHBGInfo[2]?  // first element: when gauge < 70%, second element: when gauge >= 70%
+    layer: KSHLayerInfo?
+    movie: KSHMovieInfo?
 }
 ```
 - If `bg` has only a single element, that bg is always used, regardless of the percentage of the gauge.
@@ -719,34 +719,34 @@ dictionary LegacyBGInfo {
 #### `bg.legacy.bg[xxx]` (OPTIONAL SUPPORT)
 ```
 dictionary KSHBGInfo {
-    string? filename;        // self-explanatory (can be KSM default BG image such as "desert")
+    filename: string?  // self-explanatory (can be KSM default BG image such as "desert")
 }
 ```
 
 #### `bg.legacy.layer` (OPTIONAL SUPPORT)
 ```
 dictionary KSHLayerInfo {
-    string? filename;                // self-explanatory (can be KSM default animation layer such as "arrow")
-    int duration = 0;                // one-loop duration in milliseconds
+    filename: string?                // self-explanatory (can be KSM default animation layer such as "arrow")
+    duration: int = 0                // one-loop duration in milliseconds
                                      //   If the value is negative, the animation is played backwards.
                                      //   If the value is zero, the play speed is tempo-synced and set to 1 frame per 0.035 measure (= 28.571... frames/measure).
-    KSHLayerRotationInfo? rotation;  // rotation conditions
+    rotation: KSHLayerRotationInfo?  // rotation conditions
 }
 ```
 
 ##### `bg.legacy.layer[xxx].rotation` (OPTIONAL SUPPORT)
 ```
 dictionary KSHLayerRotationInfo {
-    bool tilt = true;  // whether lane tilts affect rotation of BG/layer
-    bool spin = true;  // whether lane spins affect rotation of BG/layer
+    tilt: bool = true  // whether lane tilts affect rotation of BG/layer
+    spin: bool = true  // whether lane spins affect rotation of BG/layer
 }
 ```
 
 #### `bg.legacy.movie` (OPTIONAL SUPPORT)
 ```
 dictionary KSHMovieInfo {
-    string? filename;     // self-explanatory
-    int offset = 0;       // movie offset in millisecond
+    filename: string?  // self-explanatory
+    offset:   int = 0  // movie offset in millisecond
 }
 ```
 
@@ -755,7 +755,7 @@ dictionary KSHMovieInfo {
 ### `editor` (OPTIONAL SUPPORT)
 ```
 dictionary EditorInfo {
-    ByPulse<string>? comment;     // (OPTIONAL SUPPORT) comments that can be written in the editor
+    comment: ByPulse<string>?  // (OPTIONAL SUPPORT) comments that can be written in the editor
 }
 ```
 
@@ -764,8 +764,8 @@ dictionary EditorInfo {
 ### `compat` (OPTIONAL SUPPORT)
 ```
 dictionary CompatInfo {
-    string? ksh_version;          // (OPTIONAL SUPPORT) "ver" field of KSH file (specified only if converted from KSH)
-    KSHUnknownInfo? ksh_unknown;  // (OPTIONAL SUPPORT) unrecognized data in ksh-to-kson conversion
+    ksh_version: string?          // (OPTIONAL SUPPORT) "ver" field of KSH file (specified only if converted from KSH)
+    ksh_unknown: KSHUnknownInfo?  // (OPTIONAL SUPPORT) unrecognized data in ksh-to-kson conversion
 }
 ```
 - Note: If the "`ver`" field is not present in the KSH file, `ksh_version` is set to "`100`".
@@ -773,9 +773,9 @@ dictionary CompatInfo {
 ### `compat.ksh_unknown` (OPTIONAL SUPPORT)
 ```
 dictionary KSHUnknownInfo {
-    dictionary<string>? meta;                  // (OPTIONAL SUPPORT) unrecognized option lines before the first bar line
-    dictionary<ByPulse<string>[]>? option;     // (OPTIONAL SUPPORT) unrecognized option lines after the first bar line
-    ByPulse<string>[]? line;                   // (OPTIONAL SUPPORT) unrecognized non-option lines
+    meta:   dictionary<string>?             // (OPTIONAL SUPPORT) unrecognized option lines before the first bar line
+    option: dictionary<ByPulse<string>[]>?  // (OPTIONAL SUPPORT) unrecognized option lines after the first bar line
+    line:   ByPulse<string>[]?              // (OPTIONAL SUPPORT) unrecognized non-option lines
 }
 ```
 - Note: In KSH format, a line with at least one "`=`" is recognized as an option line. The second or later "`=`" is recognized as part of the value.
@@ -848,41 +848,41 @@ dictionary ImplInfo {
 ### interval
 ```
 dictionary Interval {
-    unsigned int y;         // pulse number
-    unsigned int l = 0;     // length
+    y: uint      // pulse number
+    l: uint = 0  // length
 }
 ```
 
 ### event triggered by pulse
 ```
 dictionary ByPulse {
-    unsigned int y;         // pulse number
+    y: uint  // pulse number
 }
 ```
 ```
 dictionary ByPulse<T> {
-    unsigned int y;         // pulse number
-    T? v;                   // body
+    y: uint  // pulse number
+    v: T?    // body
 }
 ```
 
 ### event triggered by pulse (with laser slam direction)
 ```
 dictionary ByPulseWithDirection<T> {
-    unsigned int y;         // pulse number
-    int d;                  // laser slam direction, -1 (left) or 1 (right)
-    T? v;                   // body
+    y: uint  // pulse number
+    d: int   // laser slam direction, -1 (left) or 1 (right)
+    v: T?    // body
 }
 ```
 
 ### graph (whole chart)
 ```
 dictionary GraphPoint {
-    unsigned int y;         // absolute pulse number
-    double? v;              // value
-    double? vf;             // second value (for an immediate change)
-    double a = 0.0;         // x-coordinate of the curve control point (0.0-1.0)
-    double b = 0.0;         // y-coordinate of the curve control point (0.0-1.0)
+    y:  uint          // absolute pulse number
+    v:  double?       // value
+    vf: double?       // second value (for an immediate change)
+    a:  double = 0.0  // x-coordinate of the curve control point (0.0-1.0)
+    b:  double = 0.0  // y-coordinate of the curve control point (0.0-1.0)
 }
 ```
 - If `v` is undefined, it inherits the `vf` value of the previous element. Note that the first element must not have an undefined `v` value.
@@ -891,11 +891,11 @@ dictionary GraphPoint {
 ### graph point (for graph sections = `ByPulse<GraphSectionPoint[]>`)
 ```
 dictionary GraphSectionPoint {
-    unsigned int ry;        // relative pulse number
-    double? v;              // value
-    double? vf;             // second value (for an immediate change)
-    double a = 0.0;         // x-coordinate of the curve control point (0.0-1.0)
-    double b = 0.0;         // y-coordinate of the curve control point (0.0-1.0)
+    ry: uint          // relative pulse number
+    v:  double?       // value
+    vf: double?       // second value (for an immediate change)
+    a:  double = 0.0  // x-coordinate of the curve control point (0.0-1.0)
+    b:  double = 0.0  // y-coordinate of the curve control point (0.0-1.0)
 }
 ```
 - If `v` is undefined, it inherits the `vf` value of the previous element. Note that the first element must not have an undefined `v` value.
