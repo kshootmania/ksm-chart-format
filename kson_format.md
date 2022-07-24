@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.5.0-beta2`)
+# KSON Format Specification (version: `0.5.0-beta3`)
 - JSON format
 - File extension: `.kson`
 - Encoding: UTF-8 (without BOM), LF
@@ -40,16 +40,18 @@ dictionary MetaInfo {
     artist_translit:     string?         // (OPTIONAL SUPPORT) transliterated artist name
     artist_img_filename: string?         // (OPTIONAL SUPPORT) use an image instead of song artist text
     chart_author:        string          // self-explanatory
-    difficulty:          uint            // 0-3 (0:light, 1:challenge, 2:extended, 3:infinite)
+    difficulty:          uint|string     // difficulty index 0-3 (0:light, 1:challenge, 2:extended, 3:infinite) or difficulty name (e.g. "gravity"/"maximum")
     level:               uint            // self-explanatory, 1-20
-    disp_bpm:            string = ""     // displayed bpm (allowed characters: 0-9, "-", ".")
-    std_bpm:             double          // (OPTIONAL SUPPORT) standard bpm for hi-speed values (should be between minimum bpm and maximum bpm in the chart); automatically set if zero
+    disp_bpm:            string          // displayed bpm (allowed characters: 0-9, "-", ".")
+    std_bpm:             double?         // (OPTIONAL SUPPORT) standard bpm for hi-speed values (should be between minimum bpm and maximum bpm in the chart); automatically set if undefined
     jacket_filename:     string?         // self-explanatory (preset images without file extensions are also acceptable; in KSM, either "nowprinting1"/"nowprinting2"/"nowprinting3")
     jacket_author:       string?         // self-explanatory
     icon_filename:       string?         // (OPTIONAL SUPPORT) icon image displayed on the music selection (preset images without file extensions are also acceptable; in KSM, files in "imgs/icon")
     information:         string?         // (OPTIONAL SUPPORT) optional information shown in song selection
 }
 ```
+- Note: If `meta.difficulty` is a string, the difficulty index is automatically set by the kson client. It is allowed for kson clients to ignore the difficulty name and fall back to the difficulty index `3`.
+    - In KSM, the string value of `meta.difficulty` is always ignored (even if the value is set to "`light`"/"`challenge`"/"`extended`") and falls back to the difficulty index `3`.
 
 -----------------------------------------------------------------------------------
 
@@ -99,15 +101,17 @@ array ButtonNote {
     [1]: uint  // length (0: chip note, >0: long note)
 }
 ```
+- The array size of `ButtonNote` MUST be 2.
 
 ### `note.laser[lane][idx]`
 ```
-array LaserSection : ByPulse<GraphSectionPoint[]> {
+array LaserSection {
     [0]: uint                 // y: pulse number
     [1]: GraphSectionPoint[]  // v: laser points (0.0-1.0)
     [2]: uint = 1             // w: x-axis scale (1-2), sets whether this laser section is 2x-widen or not
 }
 ```
+- The array size of `LaserSection` MUST be 2 or 3.
 
 -----------------------------------------------------------------------------------
 
@@ -123,7 +127,7 @@ dictionary AudioInfo {
 ### `audio.bgm`
 ```
 dictionary BGMInfo {
-    filename:  string = ""       // self-explanatory
+    filename:  string?           // self-explanatory
     vol:       double = 1.0      // bgm volume
     offset:    int = 0           // offset in milliseconds (starting point of the audio file)
     preview:   BGMPreviewInfo?   // preview information
@@ -252,7 +256,7 @@ dictionary AudioEffectLaserInfo {
     def: dictionary<AudioEffectDef>?                         // audio effect definitions
     param_change: dictionary<dictionary<ByPulse<string>[]>>? // audio effect parameter changes by pulse
     pulse_event: dictionary<ByPulse[]>?                      // audio effect invocation by pulse
-    peaking_filter_delay: int = 0                            // (OPTIONAL SUPPORT) peaking filter delay time in milliseconds (0-160)
+    peaking_filter_delay: uint = 0                           // (OPTIONAL SUPPORT) peaking filter delay time in milliseconds (0-160)
 }
 ```
 - Note: `audio.audio_effect.laser.pulse_event` cannot contain parameter changes. Use `audio.audio_effect.laser.param_change` instead.
@@ -651,35 +655,48 @@ dictionary CamPatternInfo {
 ##### `camera.cam.pattern.laser`
 ```
 dictionary CamPatternLaserInfo {
-    slam_event: CamPatternInvokeList?  // cam pattern invocation by laser slam notes
+    slam_event: CamPatternLaserInvokeList?  // cam pattern invocation by laser slam notes
 }
 ```
 - Note: This is a specification with the possibility of defining `camera.cam.pattern.laser.def` as a future extension.
 
 ##### `camera.cam.pattern.laser.slam_event`
 ```
-dictionary CamPatternInvokeList {
-    spin:      ByPulseWithDirection<CamPatternInvokeSpin>[]?
-    half_spin: ByPulseWithDirection<CamPatternInvokeSpin>[]?
-    swing:     ByPulseWithDirection<CamPatternInvokeSwing>[]?     // (OPTIONAL SUPPORT)
+dictionary CamPatternLaserInvokeList {
+    spin:      CamPatternInvokeSpin[]?
+    half_spin: CamPatternInvokeSpin[]?
+    swing:     CamPatternInvokeSwing[]?  // (OPTIONAL SUPPORT)
 }
 ```
 - Note: `y` (pulse number) & `d` (laser slam direction) should be the same as `y` & sign(`vf` - `v`) of an existing laser slam note; otherwise, the event is ignored.
 
-##### `camera.cam.pattern.laser.slam_event.spin[].v`/`camera.cam.pattern.laser.slam_event.half_spin[].v`
+##### `camera.cam.pattern.laser.slam_event.spin[]`/`camera.cam.pattern.laser.slam_event.half_spin[]`
 ```
-dictionary CamPatternInvokeSpin {
-    l: uint = 960  // duration
+array CamPatternInvokeSpin {
+    [0]: uint  // y: pulse number
+    [1]: int   // d: laser slam direction, -1 (left) or 1 (right)
+    [2]: uint  // l: duration
 }
 ```
+- The array size of `CamPatternInvokeSpin` MUST be 3.
 
-##### `camera.cam.pattern.laser.slam_event.swing[].v` (OPTIONAL SUPPORT)
+##### `camera.cam.pattern.laser.slam_event.swing[]` (OPTIONAL SUPPORT)
 ```
-dictionary CamPatternInvokeSwing {
-    l:      uint = 960     // duration
+array CamPatternInvokeSwing {
+    [0]: uint  // y: pulse number
+    [1]: int   // d: laser slam direction, -1 (left) or 1 (right)
+    [2]: uint  // l: duration
+    [3]: CamPatternInvokeSwingValue? // v: value
+}
+```
+- The array size of `CamPatternInvokeSwing` MUST be 3 or 4.
+
+##### `camera.cam.pattern.laser.slam_event.swing[][3]` (OPTIONAL SUPPORT)
+```
+dictionary CamPatternInvokeSwingValue {
     scale:  double = 1.0   // scale
-    repeat: uint           // number of repetitions
-    decay_order: int = 0   // order of the decay that scales camera values (0-2)
+    repeat: uint = 1       // number of repetitions
+    decay_order: uint = 0  // order of the decay that scales camera values (0-2)
                            // (note that this decay is applied even if repeat=1)
                            // - equation: `value * (1.0 - ((l - ry) / l))^decay_order`
                            // - 0: no decay, 1: linear decay, 2: squared decay
@@ -845,16 +862,6 @@ array ByPulse<T> {
 ```
 - The array size of `ByPulse<T>` MUST be 2.
 
-### event triggered by pulse (with laser slam direction)
-```
-array ByPulseWithDirection<T> {
-    [0]: uint  // y: pulse number
-    [1]: int   // d: laser slam direction, -1 (left) or 1 (right)
-    [2]: T?    // v: value
-}
-```
-- The array size of `ByPulseWithDirection<T>` MUST be 2 or 3.
-
 ### event triggered by measure index
 ```
 array ByMeasureIdx<T> {
@@ -890,7 +897,7 @@ array GraphPoint {
     [2]: GraphCurveValue = [0.0, 0.0]  // curve: graph curve value
 }
 ```
-- The array size of `ByPulseWithDirection<T>` MUST be 2 or 3.
+- The array size of `GraphPoint<T>` MUST be 2 or 3.
 
 ### graph point (for graph sections = `ByPulse<GraphSectionPoint[]>`)
 ```
@@ -900,13 +907,13 @@ array GraphSectionPoint {
     [2]: GraphCurveValue = [0.0, 0.0]  // curve: graph curve value
 }
 ```
-- The array size of `ByPulseWithDirection<T>` MUST be 2 or 3.
+- The array size of `GraphSectionPoint<T>` MUST be 2 or 3.
 
 -----------------------------------------------------------------------------------
 
 # Requirements
 
-- All arrays that have `[0]` (a.k.a. `y`, `ry`, `idx`) must be ordered by `[0]`.
+- Arrays of arrays that have `[0]` (a.k.a. `y`, `ry`, `idx`) must be ordered by `[0]`.
 
 - The first point of arrays that have `ry` (e.g. the first point of `GraphSectionPoint[]`) must not have nonzero `ry`.
 
