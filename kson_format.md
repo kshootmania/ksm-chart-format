@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.5.0-beta5`)
+# KSON Format Specification (version: `0.5.0`)
 - JSON format
 - File extension: `.kson`
 - Encoding: UTF-8 (without BOM), LF
