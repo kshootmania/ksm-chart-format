@@ -921,7 +921,9 @@ array GraphSectionPoint {
 
 # Change Log
 
-- `0.4.0` (07/02/2022)
+- `0.5.0` (07/26/2022)
+    - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/6/files
+- [`0.4.0`](https://github.com/m4saka/ksm-chart-format-spec/blob/ece34cb84b55453fcda9e5b9b204194537344a12/kson_format.md) (07/02/2022)
     - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/5/files
 - [`0.3.0`](https://github.com/m4saka/ksm-chart-format-spec/commit/c64b2e4613c8db8a458c53b7bb5dc7e1e4711fa2) (05/21/2022)
     - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/4/files
