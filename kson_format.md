@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.5.0-beta3`)
+# KSON Format Specification (version: `0.5.0-beta4`)
 - JSON format
 - File extension: `.kson`
 - Encoding: UTF-8 (without BOM), LF
@@ -60,7 +60,7 @@ dictionary MetaInfo {
 dictionary BeatInfo {
     bpm:          ByPulse<double>[]                     // bpm changes
     time_sig:     ByMeasureIdx<TimeSig>[] = [0, [4, 4]] // time signature changes
-    scroll_speed: GraphPoint[]?                         // scroll speed changes (default: 1.0)
+    scroll_speed: GraphPoint[] = [0, 1.0]               // scroll speed changes
 }
 ```
 
@@ -191,7 +191,7 @@ dictionary KeySoundInvokeFX {
 #### `audio.key_sound.laser`
 ```
 dictionary KeySoundLaserInfo {
-    vol:        ByPulse<double>[]?           // laser slam volume (default: 0.5)
+    vol:        ByPulse<double>[] = [0, 0.5] // laser slam volume
     slam_event: KeySoundInvokeListLaser?     // (OPTIONAL SUPPORT) key sound invocation by laser slam notes
     legacy:     KeySoundLaserLegacyInfo?     // (OPTIONAL SUPPORT) legacy information
 }
@@ -610,12 +610,12 @@ dictionary CameraInfo {
 ### `camera.tilt`
 ```
 dictionary TiltInfo {
-    scale:  ByPulse<double>[]?                // tilt scale (default: 1.0)
+    scale:  ByPulse<double>[] = [0, 1.0]      // tilt scale
     manual: ByPulse<GraphSectionPoint[]>[]?   // manual tilt
                                               // Note: The left laser being on the right edge is equal to a manual value of 1.0, and the right laser being on the left edge is equal to a manual value of -1.0.
                                               // Note: Two or more graph sections cannot be overlapped.
                                               // Note: "camera.tilt.scale" does not affect the scale of manual tilt. Manual tilt is always evaluated with a scale of 1.0.
-    keep:   ByPulse<bool>[]?                  // whether tilt is kept or not
+    keep:   ByPulse<bool>[] = [0, false]      // whether tilt is kept or not
                                               // (while tilt is kept, the tilt amount value is updated only to a larger absolute value with the same sign)
 }
 ```
@@ -674,8 +674,8 @@ dictionary CamPatternLaserInvokeList {
 ```
 array CamPatternInvokeSpin {
     [0]: uint  // y: pulse number
-    [1]: int   // d: laser slam direction, -1 (left) or 1 (right)
-    [2]: uint  // l: duration
+    [1]: int   // direction: laser slam direction, -1 (left) or 1 (right)
+    [2]: uint  // length: spin duration
 }
 ```
 - The array size of `CamPatternInvokeSpin` MUST be 3.
@@ -684,8 +684,8 @@ array CamPatternInvokeSpin {
 ```
 array CamPatternInvokeSwing {
     [0]: uint  // y: pulse number
-    [1]: int   // d: laser slam direction, -1 (left) or 1 (right)
-    [2]: uint  // l: duration
+    [1]: int   // direction: laser slam direction, -1 (left) or 1 (right)
+    [2]: uint  // length: swing duration
     [3]: CamPatternInvokeSwingValue? // v: value
 }
 ```
