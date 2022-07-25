@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.5.0-beta4`)
+# KSON Format Specification (version: `0.5.0-beta5`)
 - JSON format
 - File extension: `.kson`
 - Encoding: UTF-8 (without BOM), LF
@@ -58,9 +58,9 @@ dictionary MetaInfo {
 ## `beat`
 ```
 dictionary BeatInfo {
-    bpm:          ByPulse<double>[]                     // bpm changes
-    time_sig:     ByMeasureIdx<TimeSig>[] = [0, [4, 4]] // time signature changes
-    scroll_speed: GraphPoint[] = [0, 1.0]               // scroll speed changes
+    bpm:          ByPulse<double>[]                       // bpm changes
+    time_sig:     ByMeasureIdx<TimeSig>[] = [[0, [4, 4]]] // time signature changes
+    scroll_speed: GraphPoint[] = [[0, 1.0]]               // scroll speed changes
 }
 ```
 
@@ -191,9 +191,9 @@ dictionary KeySoundInvokeFX {
 #### `audio.key_sound.laser`
 ```
 dictionary KeySoundLaserInfo {
-    vol:        ByPulse<double>[] = [0, 0.5] // laser slam volume
-    slam_event: KeySoundInvokeListLaser?     // (OPTIONAL SUPPORT) key sound invocation by laser slam notes
-    legacy:     KeySoundLaserLegacyInfo?     // (OPTIONAL SUPPORT) legacy information
+    vol:        ByPulse<double>[] = [[0, 0.5]] // laser slam volume
+    slam_event: KeySoundInvokeListLaser?       // (OPTIONAL SUPPORT) key sound invocation by laser slam notes
+    legacy:     KeySoundLaserLegacyInfo?       // (OPTIONAL SUPPORT) legacy information
 }
 ```
 - Note: The `vol` value changes do not affect key sounds currently being played.
@@ -610,12 +610,12 @@ dictionary CameraInfo {
 ### `camera.tilt`
 ```
 dictionary TiltInfo {
-    scale:  ByPulse<double>[] = [0, 1.0]      // tilt scale
+    scale:  ByPulse<double>[] = [[0, 1.0]]    // tilt scale
     manual: ByPulse<GraphSectionPoint[]>[]?   // manual tilt
                                               // Note: The left laser being on the right edge is equal to a manual value of 1.0, and the right laser being on the left edge is equal to a manual value of -1.0.
                                               // Note: Two or more graph sections cannot be overlapped.
                                               // Note: "camera.tilt.scale" does not affect the scale of manual tilt. Manual tilt is always evaluated with a scale of 1.0.
-    keep:   ByPulse<bool>[] = [0, false]      // whether tilt is kept or not
+    keep:   ByPulse<bool>[] = [[0, false]]    // whether tilt is kept or not
                                               // (while tilt is kept, the tilt amount value is updated only to a larger absolute value with the same sign)
 }
 ```
