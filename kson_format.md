@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.5.0`)
+# KSON Format Specification (version: `0.5.1`)
 - JSON format
 - File extension: `.kson`
 - Encoding: UTF-8 (without BOM), LF
@@ -231,7 +231,7 @@ dictionary AudioEffectInfo {
 dictionary AudioEffectFXInfo {
     def:          dictionary<AudioEffectDef>?                // audio effect definitions
     param_change: dictionary<dictionary<ByPulse<string>[]>>? // audio effect parameter changes by pulse
-    long_event:   dictionary<ByPulse<AudioEffect>[2][]>?     // audio effect invocation (and parameter changes) by long notes
+    long_event:   dictionary<(uint|ByPulse<dictionary<string>>)[2][]>? // audio effect invocation (and parameter changes) by long notes
 }
 ```
 - Note: `y` (pulse number) of `long_event` should be in the range `[y, y + length)` of an existing long FX note on the corresponding lane; otherwise, the event is ignored.
@@ -255,7 +255,7 @@ dictionary AudioEffectFXInfo {
 dictionary AudioEffectLaserInfo {
     def: dictionary<AudioEffectDef>?                         // audio effect definitions
     param_change: dictionary<dictionary<ByPulse<string>[]>>? // audio effect parameter changes by pulse
-    pulse_event: dictionary<ByPulse[]>?                      // audio effect invocation by pulse
+    pulse_event: dictionary<uint[]>?                         // audio effect invocation by pulse
     peaking_filter_delay: uint = 0                           // (OPTIONAL SUPPORT) peaking filter delay time in milliseconds (0-160)
 }
 ```
