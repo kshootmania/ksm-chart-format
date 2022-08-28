@@ -921,11 +921,13 @@ array GraphSectionPoint {
 
 # Change Log
 
-- `0.5.0` (07/26/2022)
+- `0.5.1` (08/29/2022)
+    - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/7/files
+- [`0.5.0`](https://github.com/m4saka/ksm-chart-format-spec/blob/4a38a535d725f7a12d240cdbbad63de9421b9aa0/kson_format.md) (07/26/2022)
     - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/6/files
 - [`0.4.0`](https://github.com/m4saka/ksm-chart-format-spec/blob/ece34cb84b55453fcda9e5b9b204194537344a12/kson_format.md) (07/02/2022)
     - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/5/files
-- [`0.3.0`](https://github.com/m4saka/ksm-chart-format-spec/commit/c64b2e4613c8db8a458c53b7bb5dc7e1e4711fa2) (05/21/2022)
+- [`0.3.0`](https://github.com/m4saka/ksm-chart-format-spec/blob/c64b2e4613c8db8a458c53b7bb5dc7e1e4711fa2/kson_format.md) (05/21/2022)
     - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/4/files
 - [`0.2.0`](https://github.com/m4saka/ksm-chart-format-spec/blob/bb88522d923a9051a71c1cd127f2db0d1fe20d0c/kson_format.md) (05/06/2022)
     - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/3/files
