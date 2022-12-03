@@ -2,13 +2,13 @@ KSH Chart File Format Specification
 ====================================
 
 ## Encoding
-- UTF-8 with BOM is recommended.
-- Legacy charts (before v1.32) use ASCII, but wide chars are garbled depending on the OS locale.
-- Note: Although using the BOM for UTF-8 is NOT recommended in the Unicode standard, currently KSM USES IT for detecting UTF-8 charts (actually it is not a good choice). Make sure to save in UTF-8 **with BOM** when you edit KSH files with a text editor.
+- The recommended character encoding is UTF-8 with BOM.
+- Legacy charts created with the editor before v1.32 use ANSI encoding. In that case, character corruption may occur depending on the OS locale.
+- KSM determines the character encoding based on the BOM. Therefore, if the encoding is UTF-8, it is necessary to save it with BOM.
 
 
 ## Line types
-There are five types of lines in a KSH file: the option line, the chart line, the bar line, the definition line, and the comment line. Empty lines are ignored.
+A KSH file contains five types of lines: option lines, chart lines, bar lines, definition lines, and comment lines. Empty lines are ignored.
 
 - Option Line
     - Examples
@@ -16,12 +16,10 @@ There are five types of lines in a KSH file: the option line, the chart line, th
         - "`m=colorfulsky.ogg;colorfulsky_in_f.ogg`"
     - Format
         - "`<param-name>=<value>`"
-        - Not ignoring white spaces around "`=`"
-        - No extra quotes are allowed
-            - These quote are also regarded as a part of `<value>`.
-            - e.g. You won't get desirable results for "`title="Colorful Sky"`" or "`"title"="Colorful Sky"`".
-        - After the first "`=`", "`=`" is regarded as a part of `<value>`.
-            - For example, "`title`" is treated as `<param-name>` and "`1+1=2`" is treated as `<value>` in "`title=1+1=2`".
+        - White spaces around the "`=`" sign are not ignored.
+        - Extra quotes are not allowed. For example, `title="Colorful Sky"` or `"title"="Colorful Sky"` will not be parsed as intended.
+        - After the first "`=`", any subsequent = signs are considered part of the `<value>`.
+            - For example, in "`title=1+1=2`", the `<param-name>` is "`title`" and the `<value>` is "`1+1=2`".
     - Parameters
         - `<param-name>`: The parameter name
         - `<value>`: The value
@@ -38,22 +36,22 @@ There are five types of lines in a KSH file: the option line, the chart line, th
         - "`<bt-lanes x 4>|<fx-lanes x 2>|<laser-lanes x 2><lane-spin (optional)>`"
     - Parameters
         - `<bt-lanes x 4>`
-            - The number of character must be 4 (no separator required).
-            - Each character stands for a BT lane, and can have any value of:
+            - The number of characters must be 4 (no separator is required).
+            - Each character represents a BT lane and can have one of the following values:
                 - "`0`": Empty
                 - "`1`": Chip BT note
                 - "`2`": Long BT note
-            - If the previous character of the same lane is `2`, `2` denotes continuation of the previous note.
+            - If the previous character in the same lane is `2`, `2` denotes a continuation of the previous note.
         - `<fx-lanes x 2>`
-            - The number of character must be 2 (no separator required).
-            - Each character stands for an FX lane, and can have any value of:
+            - The number of characters must be 2 (no separator is required).
+            - Each character represents an FX lane and can have one of the following values:
                 - "`0`": Empty
                 - "`2`": Chip FX note
                 - "`1`" (or any other character): Long FX note
-            - If the previous character of the same lane is "`1`" (or any), "`1`" (or any) denotes continuation of the previous note.
-            - Note that "`1`" and "`2`" are the reverse of those of BT lanes.
-                - This is due to historical reasons; initial (unreleased) versions of KSM expected only chip notes for BT lanes and long notes for FX lanes. Long BT notes and chip FX notes are added just before the first release of KSM.
-            - Legacy KSH charts (before v1.60) use these characters for a long FX note:
+            - If the previous character in the same lane is "`1`" (or any), "`1`" (or any) denotes a continuation of the previous note.
+            - Note that "`1`" and "`2`" are the opposite of those in BT lanes.
+                - This is due to historical reasons; initial (unreleased) versions of KSM expected only chip notes for BT lanes and long notes for FX lanes. Long BT notes and chip FX notes were added just before the first release of KSM.
+            - Legacy KSH charts (created before v1.60) use these characters for a long FX note:
                 - "`S`": `Retrigger;8`
                 - "`V`": `Retrigger;12`
                 - "`T`": `Retrigger;16`
@@ -72,16 +70,16 @@ There are five types of lines in a KSH file: the option line, the chart line, th
                 - "`X`": `Wobble;12`
                 - "`A`": `TapeStop`
                 - "`D`": `SideChain`
-            - Current KSH charts (v1.60 or newer) use "`1`" for a long FX note.
-                - Audio effects are specified by using "`fx-l`" or "`fx-r`" options, which will be described later.
+            - In current KSH charts (v1.60 or newer), "`1`" is used for a long FX note.
+                - Audio effects are specified by using the "`fx-l`" or "`fx-r`" options, which will be described later.
         - `<laser-lanes x 2>`
-            - The number of character must be 2 (no separator required).
-            - The first character stands for the left (blue) laser knob, and the second stands for the right (red) laser knob.
-                - "`-`" stands for no laser.
-                - "`:`" stands for linear connection of two laser positions.
-                - A character of the laser position can be one of the following 51 steps (from left to right):  
+            - The number of characters must be 2 (no separator is required).
+            - The first character represents the left (blue) laser knob and the second represents the right (red) laser knob.
+                - "`-`" represents no laser.
+                - "`:`" represents a linear connection of two laser positions.
+                - A character representing the laser position can be one of the following 51 steps (from left to right):  
                 Left <-  `0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmno`  -> Right
-            - 1/32th or shorter laser notes are recognized as laser slams. (There's no way to create 1/32th ordinary laser notes in the current specification.)
+            - Laser notes that are 1/32 or shorter are recognized as laser slams. (It is currently not possible to create 1/32 ordinary laser notes according to the current specification.)
         - `<lane-spin (optional)>`
             - Examples: `@(192`, `@<192`, `S<192`
             - The first two characters denote the effect type
@@ -105,22 +103,21 @@ There are five types of lines in a KSH file: the option line, the chart line, th
     - Format
         - "`#define_<definition-type> <name> <value>`"
         - A series of white spaces is regarded as one separator.
-    - Definition lines should be placed at the end of KSH chart file (possibly can be read even if placed anywhere, but DON'T DO THAT).
+    - Definition lines should be placed at the end of KSH chart file (although they can be read if placed anywhere, it is NOT recommended to do so).
 - Comment Line
-    - Comment Lines are ignored but shown in Editor as comments.
+    - Comment Lines are ignored but shown in the editor as comments.
     - Format
         - "`//<comment>`"
-    - Note: The "`;`" comments are not officially supported although some unofficial tools use them as comments which are not shown in Editor. Actually, they are fortunately ignored in MOST CASES, by not being detected as the other line types or being detected as option lines with an unknown parameter name.
+    - Note: The "`;`" comments are not officially supported, although some unofficial tools use them as comments which are not shown in the editor. Actually, they are fortunately ignored in MOST CASES, either because they are not detected as the other line types or because they are detected as option lines with an unknown parameter name.
 
 
 ## Header
-The lines before the first bar line are described as the header of a KSH chart file. The header can have only option lines (or comment lines).
+The lines before the first bar line are described as the header of a KSH chart file. The header can contain only option lines (or comment lines).
 
 The list of header options is as follows:
 - "`title`" (default:"")
     - The song title (string)
-    - This option must be placed at the beginning of a KSH chart file. No comments allowed before this.
-        - Actually it works currently, but DON'T DO THAT. This restriction may improve the performance for searching charts (but this is not necessarily needed if a chart database is created in the initial loading).
+    - This option must be placed at the beginning of a KSH chart file. No comments are allowed before this option.
 - "`title_img`" (default:"")
     - The image filename for the song title (string)
 - "`artist`" (default:"")
@@ -131,7 +128,7 @@ The list of header options is as follows:
     - The chart author name (string)
 - "`jacket`" (default:"")
     - The filename of the jacket image (string)
-    - This option can have a value of these preset jacket images:
+    - This option can have the following values for preset jacket images:
         - "`nowprinting1`"
         - "`nowprinting2`"
         - "`nowprinting3`"
@@ -158,31 +155,31 @@ The list of header options is as follows:
 - "`to`" (default:"`0`")
     - The standard tempo for the Hi-speed values (float, min BPM - max BPM in the chart)
     - A value of "`0`" means the value is set automatically.
-- "`beat`" (default: "`4/4`")
+- "`beat`" (default:"`4/4`")
     - The time signature (int + "`/`" + int)
     - This can be placed after the first bar line for time signature changes.
         - In the current version of Editor, the "`beat`" option is placed after the first bar line even if it is placed in the first measure.
 - "`m`" (default:"")
     - The song filename(s) (string)
-    - There can be multiple filenames separated by "`;`" in the charts using legacy audio effect methods.
+    - There can be multiple filenames separated by "`;`".
         - If there are 4 filenames (e.g. "`song.ogg;song_f.ogg;song_p.ogg;song_fp.ogg`"),
-            - The first is used in default.
+            - The first is used by default.
             - The second is used while all the long FX notes shown are activated.
             - The third is used while all the laser notes shown are activated.
             - The fourth is used while all the long FX and laser notes are activated if they are shown at the same time.
         - If there are 2 filenames (e.g. "`song.ogg;song_f.ogg`"),
-            - The first is used in default.
+            - The first is used by default.
             - The second is used while all the long FX notes shown are activated.
             - The audio effects implemented in the software are applied to laser notes.
         - If there is only 1 filename (e.g. "`song.ogg`"),
             - The audio effects implemented in the software are applied to both FX notes and laser notes.
 - "`mvol`" (default:"`50`")
-    - The song volume (%) (int, 0-)
+    - The song volume (percentage, 0-)
     - The value can exceed 100.
     - For historical reasons, the value is multiplied by 0.6 if the value of "`ver`" is not specified.
 - "`o`" (default:"`0`")
     - The song offset in milliseconds (int)
-    - Since this value denotes the starting point of the song audio, note judgments will be later by setting a larger value.
+    - This value denotes the starting point of the song audio, so setting a larger value will make note judgments later.
     - The value can be negative.
 - "`bg`" (default:"`desert`")
     - The background image name (string)
@@ -201,7 +198,7 @@ The list of header options is as follows:
         - "`cloudy`"
         - "`fantasy`"
     - This option can have one or two filename(s) separated by "`;`".
-        - If there are 1 filename (e.g. "`bg1.jpg`")
+        - If there is only 1 filename (e.g. "`bg1.jpg`")
             - The single image is always used for the background.
         - If there are 2 filenames (e.g. "`bg1.jpg;bg2.jpg`")
             - The first is used while the gauge percentage is under 70%.
@@ -266,7 +263,7 @@ The list of header options is as follows:
     - The value can be negative.
 - "`ver`" (default:"")
     - The version of the KSH file format (string)
-    - Since this value is the version of the format, the value is not always the same as the version of Editor.
+    - Since this value is the version of the format, the value is not always the same as the version of the editor.
     - History and implementation guides:
         - ""
             - The value of "`mvol`" is multiplied by 0.6.
@@ -274,11 +271,11 @@ The list of header options is as follows:
             - The separator of "`layer`" is "`/`".
             - The "`t`" value can be set higher than 65535.0
             - The relaxation time of lane tilts is 2/3 times as large as that of the current version.
-            - If the lane is tilted to the opposite side, the tilt is updated even when the lane tilt type is "keep".
+            - If the lane is tilted to the opposite side, the tilt is updated even when the lane tilt type is "`keep`".
         - "`120`"
             - The value of "`mvol`" is the same as that of the current version.
         - "`120b`"
-            - Even if the lane is tilted to the opposite side, the tilt is not updated when the lane tilt type is "keep".
+            - Even if the lane is tilted to the opposite side, the tilt is not updated when the lane tilt type is "`keep`".
         - "`121`"
             - The relaxation time of lane tilts is the same as that of the current version.
         - "`130`"
@@ -288,7 +285,7 @@ The list of header options is as follows:
         - "`166`"
             - The separator of "`layer`" is changed to "`;`".
                 - "`/`" is no longer treated as a separator.
-                - This change enables to use a relative path for "`layer`".
+                - This change enables the use of a relative path for "`layer`".
         - "`167`"
             - The top lane zoom behavior is updated (from a simple move to a 3D rotation).
             - The lane zoom values are not restricted between -300 and 300.
@@ -411,12 +408,12 @@ The list of body options is as follows:
         - "`2x`": The weight is multiplied by 2 for gauge ascension, and 1.5 for descension
         - "`3x`": The weight is multiplied by 3 for gauge ascension, and 2 for descension
     - There's a bug even in the latest version: the "`3x`" option is not enabled only for "`laserrate`".
-    - Considering the internet ranking plans and complication of the specification, these options will be deleted at least in KSM V2.
+    - These options will be removed in a future version.
 
 
 ## Footer
 
-The lines after the first bar line are described as the footer of a KSH chart file. The footer can only have definition lines (or comment lines).
+The lines after the first bar line are described as a footer in the KSH chart file. A footer can only have definition lines (or comment lines).
 
 The list of definition types is as follows:
 
