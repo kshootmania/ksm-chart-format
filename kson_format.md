@@ -558,6 +558,21 @@ Parameter values are written in one of the following formats:
             - 1.0 <= float <= 100.0
 - `switch_audio`: This effect switches the playback to another audio file.
     - `filename` (filename)
+- `peaking_filter`: Peaking filter.
+    - `v` (rate, default:`0%-100%`)
+        - Envelope value of the cutoff frequency
+        - Note: This parameter is provided to make the frequency transition on a log (or log-like) scale rather than a linear scale.
+    - `freq` (freq, default:implementation-dependent)
+        - Cutoff frequency when `v` is 0.0
+    - `freq_max` (freq, default:implementation-dependent)
+        - Cutoff frequency when `v` is 1.0
+    - (OPTIONAL SUPPORT) `bandwidth` (float, default:implementation-dependent)
+        - Bandwidth around the cutoff frequency [oct]
+    - `gain` (rate, default:`50%`)
+        - Gain scale
+    - `mix` (rate, default:`0%>100%`)
+        - Blending ratio of the original audio and the effect audio
+    - Note: `freq` value may exceed the `freq_max` value.
 - `high_pass_filter`: High-pass filter.
     - `v` (rate, default:`0%-100%`)
         - Envelope value of the cutoff frequency
@@ -585,21 +600,6 @@ Parameter values are written in one of the following formats:
         - Q value of the biquad filter
         - Additional requirement:
             - 0.1 <= float <= 5.0
-    - `mix` (rate, default:`0%>100%`)
-        - Blending ratio of the original audio and the effect audio
-    - Note: `freq` value may exceed the `freq_max` value.
-- `peaking_filter`: Peaking filter.
-    - `v` (rate, default:`0%-100%`)
-        - Envelope value of the cutoff frequency
-        - Note: This parameter is provided to make the frequency transition on a log (or log-like) scale rather than a linear scale.
-    - `freq` (freq, default:implementation-dependent)
-        - Cutoff frequency when `v` is 0.0
-    - `freq_max` (freq, default:implementation-dependent)
-        - Cutoff frequency when `v` is 1.0
-    - (OPTIONAL SUPPORT) `bandwidth` (float, default:implementation-dependent)
-        - Bandwidth around the cutoff frequency [oct]
-    - `gain` (rate, default:`50%`)
-        - Gain scale
     - `mix` (rate, default:`0%>100%`)
         - Blending ratio of the original audio and the effect audio
     - Note: `freq` value may exceed the `freq_max` value.
