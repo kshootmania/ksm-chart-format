@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.6.0-beta1`)
+# KSON Format Specification (version: `0.6.0-beta2`)
 - JSON format
 - File extension: `.kson`
 - Encoding: UTF-8 (without BOM), LF
@@ -481,9 +481,9 @@ Parameter values are written in one of the following formats:
         - Number of all-pass filters. Usually an even number.
         - Additional requirement:
             - 0 <= int <= 12
-    - `freq` (freq, default:`1500Hz`)
+    - `freq_1` (freq, default:`1500Hz`)
         - First frequency of LFO
-    - `freq_max` (freq, default:`20000Hz`)
+    - `freq_2` (freq, default:`20000Hz`)
         - Second frequency of LFO
     - `q` (float, default:`0.707`)
         - Q value of all-pass filters
@@ -496,16 +496,16 @@ Parameter values are written in one of the following formats:
     - `mix` (rate, default:`0%>50%`)
         - Blending ratio of the original audio and the effect audio
         - Note: For phaser effects, the mix value is doubled when used. A typical phaser effect is usually most effective at a mix value of 50%, but this makes it most effective at a mix value of `100%`. Note that the default value `50%` is actually a mix value of 25%.
-    - Note: `freq` value may exceed the `freq_max` value.
+    - Note: `freq_1` value may exceed the `freq_2` value.
     - Note: `hiCutGain` parameter in KSH format has been removed in kson format because it is not a parameter of the phaser itself.
 - `wobble`: This effect oscillates the cutoff frequency of the low-pass filter with an LFO.
     - `period` (length, default:`0`)
         - LFO period
         - `0`: Not specified. (In KSM, the effect is bypassed if the value is `0`.)
         - Note: `wave_length` interval count is reset at the beginning of each measure if `update_period` has a non-zero value.
-    - `freq` (freq, default:`500Hz`)
+    - `freq_1` (freq, default:`500Hz`)
         - First frequency of LFO
-    - `freq_max` (freq, default:`20000Hz`)
+    - `freq_2` (freq, default:`20000Hz`)
         - Second frequency of LFO
     - `q` (float, default:`1.414`)
         - Q value of the low-pass filter
@@ -513,7 +513,7 @@ Parameter values are written in one of the following formats:
             - 0.1 <= float <= 50.0
     - `mix` (rate, default:`0%>50%`)
         - Blending ratio of the original audio and the effect audio
-    - Note: `freq` value may exceed the `freq_max` value.
+    - Note: `freq_1` value may exceed the `freq_2` value.
 - `tapestop`: This effect slows down the playback speed of audio like a turntable.
     - `speed` (rate, default:`50%`)
         - Speed of slowdown
