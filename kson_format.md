@@ -930,7 +930,9 @@ array GraphSectionPoint {
 
 # Change Log
 
-- `0.5.1` (08/29/2022)
+- `0.6.0` (12/10/2022)
+    - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/8/files
+- [`0.5.1`](https://github.com/m4saka/ksm-chart-format-spec/blob/47f4d942cedbf12bfc7fd5c26a61e081a98be24b/kson_format.md) (08/29/2022)
     - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/7/files
 - [`0.5.0`](https://github.com/m4saka/ksm-chart-format-spec/blob/4a38a535d725f7a12d240cdbbad63de9421b9aa0/kson_format.md) (07/26/2022)
     - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/6/files
@@ -947,3 +949,6 @@ array GraphSectionPoint {
 
 # Acknowledgements
 This format is inspired by the BMSON format (https://bmson-spec.readthedocs.io/en/master/doc/index.html) and albshin's idea of kshon format (https://gist.github.com/albshin/cf535afc3f94f7d7f7c7e3d1d9ff41cf).
+
+Thank you to all contributors and participants in the formatting discussions:  
+@m4saka, @Drewol, @123jimin, @nashiora, @albshin, @TsFreddie
