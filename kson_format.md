@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.5.1`)
+# KSON Format Specification (version: `0.6.0`)
 - JSON format
 - File extension: `.kson`
 - Encoding: UTF-8 (without BOM), LF
@@ -211,10 +211,11 @@ dictionary KeySoundInvokeListLaser {
 ```
 - Note: `y` (pulse number) should be the same as `y` of an existing laser slam note; otherwise, the event is ignored.
 
-##### `audio.key_sound.laser.legacy`
+##### `audio.key_sound.laser.legacy` (OPTIONAL SUPPORT)
 ```
 dictionary KeySoundLaserLegacyInfo {
-    auto_vol: bool = false  // "chokkakuautovol" in KSH format
+    vol_auto: bool = false  // Whether to automatically reduce the key sound volume
+                            // based on the width of laser slams; "chokkakuautovol" in KSH format
 }
 ```
 
@@ -465,15 +466,9 @@ Parameter values are written in one of the following formats:
 - `pitch_shift`: This effect changes the pitch (key) of the audio.
     - `pitch` (pitch, default:`0`)
         - Pitch (key)
-    - (OPTIONAL SUPPORT) `chunk_size` (sample, default:`700samples`)
-        - Size of the waveform section. The larger the value, the better the sound quality, but the sound will be delayed.
-    - (OPTIONAL SUPPORT) `overlap` (rate, default:`40%`)
-        - Crossfade time ratio between waveform sections
-        - Additional requirement:
-            - 0.0 <= float <= 0.5
-        - Note: This parameter was described as `overWrap` in KSH format, but it was a spelling mistake.
     - `mix` (rate, default:`0%>100%`)
         - Blending ratio of the original audio and the effect audio
+    - Note: `chunkSize` and `overWrap` (properly "overlap") parameters in KSH format has been removed in kson format because they assume that the audio waveform is processed in the time domain.
 - `bitcrusher`: This effect reduces the quality of the audio wave. Also known as "Sample & Hold".
     - `reduction` (sample, default:`0samples-30samples`)
         - Number of samples to hold. A larger value results in lower sound quality.
@@ -486,10 +481,10 @@ Parameter values are written in one of the following formats:
         - Number of all-pass filters. Usually an even number.
         - Additional requirement:
             - 0 <= int <= 12
-    - `lo_freq` (freq, default:`1500Hz`)
-        - Minimum frequency of LFO
-    - `hi_freq` (freq, default:`20000Hz`)
-        - Maximum frequency of LFO
+    - `freq_1` (freq, default:`1500Hz`)
+        - First frequency of LFO
+    - `freq_2` (freq, default:`20000Hz`)
+        - Second frequency of LFO
     - `q` (float, default:`0.707`)
         - Q value of all-pass filters
         - Additional requirement:
@@ -501,19 +496,24 @@ Parameter values are written in one of the following formats:
     - `mix` (rate, default:`0%>50%`)
         - Blending ratio of the original audio and the effect audio
         - Note: For phaser effects, the mix value is doubled when used. A typical phaser effect is usually most effective at a mix value of 50%, but this makes it most effective at a mix value of `100%`. Note that the default value `50%` is actually a mix value of 25%.
+    - Note: `freq_1` value may exceed the `freq_2` value.
     - Note: `hiCutGain` parameter in KSH format has been removed in kson format because it is not a parameter of the phaser itself.
 - `wobble`: This effect oscillates the cutoff frequency of the low-pass filter with an LFO.
     - `period` (length, default:`0`)
         - LFO period
         - `0`: Not specified. (In KSM, the effect is bypassed if the value is `0`.)
         - Note: `wave_length` interval count is reset at the beginning of each measure if `update_period` has a non-zero value.
-    - `lo_freq` (freq, default:`500Hz`)
-        - Minimum frequency of LFO
-    - `hi_freq` (freq, default:`20000Hz`)
-        - Maximum frequency of LFO
+    - `freq_1` (freq, default:`500Hz`)
+        - First frequency of LFO
+    - `freq_2` (freq, default:`20000Hz`)
+        - Second frequency of LFO
     - `q` (float, default:`1.414`)
         - Q value of the low-pass filter
+        - Additional requirement:
+            - 0.1 <= float <= 50.0
     - `mix` (rate, default:`0%>50%`)
+        - Blending ratio of the original audio and the effect audio
+    - Note: `freq_1` value may exceed the `freq_2` value.
 - `tapestop`: This effect slows down the playback speed of audio like a turntable.
     - `speed` (rate, default:`50%`)
         - Speed of slowdown
@@ -551,50 +551,57 @@ Parameter values are written in one of the following formats:
         - Attack time
     - `release_time` (length, default:`1/16`)
         - Release time
-    - `ratio` (int, default:`1>5`)
+    - `ratio` (float, default:`1.0>5.0`)
         - Compression ratio
-            - A value of `1` compresses the audio by a factor of 1/1 (i.e., the original audio), and a value of `5` compresses the audio by a factor of 1/5.
+            - A value of `1.0` compresses the audio by a factor of 1/1 (i.e., the original audio), and a value of `5.0` compresses the audio by a factor of 1/5.
         - Additional requirement:
-            - 1 <= int <= 100
+            - 1.0 <= float <= 100.0
 - `switch_audio`: This effect switches the playback to another audio file.
     - `filename` (filename)
-- `high_pass_filter`: Bi-quad high-pass filter.
+- `high_pass_filter`: High-pass filter.
     - `v` (rate, default:`0%-100%`)
         - Envelope value of the cutoff frequency
-        - Note: This parameter is provided to make the frequency transition on a log scale rather than a linear scale.
-    - `freq` (freq, default:`100Hz`)
+        - Note: This parameter is provided to make the frequency transition on a log (or log-like) scale rather than a linear scale.
+    - `freq` (freq, default:implementation-dependent)
         - Cutoff frequency when `v` is 0.0
-    - `freq_max` (freq, default:`2200Hz`)
+    - `freq_max` (freq, default:implementation-dependent)
         - Cutoff frequency when `v` is 1.0
-    - `q` (float, default:??? `/*FIXME*/`)
+    - (OPTIONAL SUPPORT) `q` (float, default:implementation-dependent)
         - Q value of the biquad filter
+        - Additional requirement:
+            - 0.1 <= float <= 50.0
     - `mix` (rate, default:`0%>100%`)
+        - Blending ratio of the original audio and the effect audio
     - Note: `freq` value may exceed the `freq_max` value.
-- `low_pass_filter`: Bi-quad low-pass filter.
+- `low_pass_filter`: Low-pass filter.
     - `v` (rate, default:`0%-100%`)
         - Envelope value of the cutoff frequency
-        - Note: This parameter is provided to make the frequency transition on a log scale rather than a linear scale.
-    - `freq` (freq, default:`15000Hz`)
+        - Note: This parameter is provided to make the frequency transition on a log (or log-like) scale rather than a linear scale.
+    - `freq` (freq, default:implementation-dependent)
         - Cutoff frequency when `v` is 0.0
-    - `freq_max` (freq, default:`800Hz`)
+    - `freq_max` (freq, default:implementation-dependent)
         - Cutoff frequency when `v` is 1.0
-    - `q` (float, default:??? `/*FIXME*/`)
+    - (OPTIONAL SUPPORT) `q` (float, default:implementation-dependent)
         - Q value of the biquad filter
+        - Additional requirement:
+            - 0.1 <= float <= 5.0
     - `mix` (rate, default:`0%>100%`)
+        - Blending ratio of the original audio and the effect audio
     - Note: `freq` value may exceed the `freq_max` value.
-- `peaking_filter`: Bi-quad peaking filter.
+- `peaking_filter`: Peaking filter.
     - `v` (rate, default:`0%-100%`)
         - Envelope value of the cutoff frequency
-        - Note: This parameter is provided to make the frequency transition on a log scale rather than a linear scale.
-    - `freq` (freq, default:`50Hz`)
+        - Note: This parameter is provided to make the frequency transition on a log (or log-like) scale rather than a linear scale.
+    - `freq` (freq, default:implementation-dependent)
         - Cutoff frequency when `v` is 0.0
-    - `freq_max` (freq, default:`9000Hz`)
+    - `freq_max` (freq, default:implementation-dependent)
         - Cutoff frequency when `v` is 1.0
+    - (OPTIONAL SUPPORT) `bandwidth` (float, default:implementation-dependent)
+        - Bandwidth around the cutoff frequency [oct]
     - `gain` (rate, default:`50%`)
         - Gain scale
-    - `q` (float, default:`1.2`)
-        - Q value of the biquad filter
     - `mix` (rate, default:`0%>100%`)
+        - Blending ratio of the original audio and the effect audio
     - Note: `freq` value may exceed the `freq_max` value.
 
 -----------------------------------------------------------------------------------
@@ -709,10 +716,12 @@ dictionary CamPatternInvokeSwingValue {
 ```
 dictionary BGInfo {
     filename: string?      // (OPTIONAL SUPPORT) filename of background graphics file
+    offset:   int = 0      // (OPTIONAL SUPPORT) movie offset in millisecond
     legacy: LegacyBGInfo?  // (OPTIONAL SUPPORT)
 }
 ```
 - Note: The file format of `bg.filename` is not speficied. If the format of the file specified in `bg.filename` is supported by the kson client, `bg.filename` is used; otherwise, it falls back to other built-in background graphics (which MAY be specified in `legacy`).
+- Note: `bg.offset` is used only if supported by the BG file format and its player, the kson client.
 
 ### `bg.legacy` (OPTIONAL SUPPORT)
 ```
