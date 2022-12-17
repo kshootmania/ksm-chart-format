@@ -173,7 +173,7 @@ The list of header options is as follows:
             - The audio effects implemented in the software are applied to laser notes.
         - If there is only 1 filename (e.g. "`song.ogg`"),
             - The audio effects implemented in the software are applied to both FX notes and laser notes.
-- "`mvol`" (default:"`50`")
+- "`mvol`" (default:"`100`")
     - The song volume (percentage, 0-)
     - The value can exceed 100.
     - For historical reasons, the value is multiplied by 0.6 if the value of "`ver`" is not specified.
