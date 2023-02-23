@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.6.1-beta1`)
+# KSON Format Specification (version: `0.6.1-beta2`)
 - JSON format
 - File extension: `.kson`
 - Encoding: UTF-8 (without BOM), LF
@@ -232,7 +232,7 @@ dictionary AudioEffectInfo {
 dictionary AudioEffectFXInfo {
     def:          dictionary<AudioEffectDef>?                // audio effect definitions
     param_change: dictionary<dictionary<ByPulse<string>[]>>? // audio effect parameter changes by pulse
-    long_event:   dictionary<(uint|ByPulse<dictionary<string>>)[2][]>? // audio effect invocation (and parameter changes) by long notes
+    long_event:   dictionary<(uint|ByPulse<dictionary<string>>)[][2]>? // audio effect invocation (and parameter changes) by long notes
 }
 ```
 - Note: `y` (pulse number) of `long_event` should be in the range `[y, y + length)` of an existing long FX note on the corresponding lane; otherwise, the event is ignored.
