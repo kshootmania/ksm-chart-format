@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.6.0`)
+# KSON Format Specification (version: `0.6.1`)
 - JSON format
 - File extension: `.kson`
 - Encoding: UTF-8 (without BOM), LF
@@ -87,9 +87,9 @@ dictionary GaugeInfo {
 ## `note`
 ```
 dictionary NoteInfo {
-    bt: (uint|ButtonNote)[4][]?  // BT notes (first index: lane); uint represents y (pulse number) of chip note
-    fx: (uint|ButtonNote)[2][]?  // FX notes (first index: lane); uint represents y (pulse number) of chip note
-    laser: LaserSection[2][]?    // laser notes (first index: lane (0: left knob, 1: right knob))
+    bt: (uint|ButtonNote)[][4]?  // BT notes (first index: lane); uint represents y (pulse number) of chip note
+    fx: (uint|ButtonNote)[][2]?  // FX notes (first index: lane); uint represents y (pulse number) of chip note
+    laser: LaserSection[][2]?    // laser notes (first index: lane (0: left knob, 1: right knob))
 }
 ```
 - Two or more notes cannot be overlapped on a single lane.
@@ -170,13 +170,13 @@ dictionary KeySoundFXInfo {
 ##### `audio.key_sound.fx.chip_event`
 ```
 dictionary KeySoundInvokeListFX {
-    clap:        (uint|ByPulse<KeySoundInvokeFX>)[2][]?  // (OPTIONAL SUPPORT) uint represents y (pulse number) of an invocation with default volume
-    clap_impact: (uint|ByPulse<KeySoundInvokeFX>)[2][]?  // (OPTIONAL SUPPORT)
-    clap_punchy: (uint|ByPulse<KeySoundInvokeFX>)[2][]?  // (OPTIONAL SUPPORT)
-    snare:       (uint|ByPulse<KeySoundInvokeFX>)[2][]?  // (OPTIONAL SUPPORT)
-    snare_lo:    (uint|ByPulse<KeySoundInvokeFX>)[2][]?  // (OPTIONAL SUPPORT)
+    clap:        (uint|ByPulse<KeySoundInvokeFX>)[][2]?  // (OPTIONAL SUPPORT) uint represents y (pulse number) of an invocation with default volume
+    clap_impact: (uint|ByPulse<KeySoundInvokeFX>)[][2]?  // (OPTIONAL SUPPORT)
+    clap_punchy: (uint|ByPulse<KeySoundInvokeFX>)[][2]?  // (OPTIONAL SUPPORT)
+    snare:       (uint|ByPulse<KeySoundInvokeFX>)[][2]?  // (OPTIONAL SUPPORT)
+    snare_lo:    (uint|ByPulse<KeySoundInvokeFX>)[][2]?  // (OPTIONAL SUPPORT)
 
-    ...:         (uint|ByPulse<KeySoundInvokeFX>)[2][]?  // Custom key sounds can be inserted here by using the filename of a WAVE file (.wav) as a key
+    ...:         (uint|ByPulse<KeySoundInvokeFX>)[][2]?  // Custom key sounds can be inserted here by using the filename of a WAVE file (.wav) as a key
 }
 ```
 - Note: `y` (pulse number) should be the same as `y` of an existing laser slam note; otherwise, the event is ignored.
@@ -232,7 +232,7 @@ dictionary AudioEffectInfo {
 dictionary AudioEffectFXInfo {
     def:          dictionary<AudioEffectDef>?                // audio effect definitions
     param_change: dictionary<dictionary<ByPulse<string>[]>>? // audio effect parameter changes by pulse
-    long_event:   dictionary<(uint|ByPulse<dictionary<string>>)[2][]>? // audio effect invocation (and parameter changes) by long notes
+    long_event:   dictionary<(uint|ByPulse<dictionary<string>>)[][2]>? // audio effect invocation (and parameter changes) by long notes
 }
 ```
 - Note: `y` (pulse number) of `long_event` should be in the range `[y, y + length)` of an existing long FX note on the corresponding lane; otherwise, the event is ignored.
@@ -426,11 +426,11 @@ Parameter values are written in one of the following formats:
         - `0`: Automatic trigger update is disabled.
         - This parameter allows kson clients to use only the OnMin value and ignore the Off and OnMax values.
         - This parameter allows kson clients to ignore values specified in `audio.audio_effect.fx.long_event`.
-        - Note: `update_period` interval count is reset at the beginning of each measure if `update_period` has a non-zero value.
+        - Note: `update_period` interval count is reset at the beginning of each measure.
     - `wave_length` (length, default:`0`)
         - Length of repetition
         - `0`: Not specified. (In KSM, the effect is bypassed if the value is `0`.)
-        - Note: `wave_length` interval count is reset at the beginning of each measure if `update_period` has a non-zero value.
+        - Note: `wave_length` interval count is reset at the beginning of each measure.
     - `rate` (rate, default:`70%`)
         - Length of the repeat audio
             - A value of 100% repeats the audio sample completely, and a smaller value gives a larger percentage of mute time in each period.
@@ -499,10 +499,10 @@ Parameter values are written in one of the following formats:
     - Note: `freq_1` value may exceed the `freq_2` value.
     - Note: `hiCutGain` parameter in KSH format has been removed in kson format because it is not a parameter of the phaser itself.
 - `wobble`: This effect oscillates the cutoff frequency of the low-pass filter with an LFO.
-    - `period` (length, default:`0`)
+    - `wave_length` (length, default:`0`)
         - LFO period
         - `0`: Not specified. (In KSM, the effect is bypassed if the value is `0`.)
-        - Note: `wave_length` interval count is reset at the beginning of each measure if `update_period` has a non-zero value.
+        - Note: `wave_length` interval count is reset at the beginning of each measure.
     - `freq_1` (freq, default:`500Hz`)
         - First frequency of LFO
     - `freq_2` (freq, default:`20000Hz`)
@@ -529,11 +529,11 @@ Parameter values are written in one of the following formats:
         - `0`: Automatic trigger update is disabled.
         - This parameter allows kson clients to use only the OnMin value and just ignore the Off and OnMax values.
         - This parameter allows kson clients to ignore values specified in `audio.audio_effect.fx.long_event`.
-        - Note: `update_period` interval count is reset at the beginning of each measure if `update_period` has a non-zero value.
+        - Note: `update_period` interval count is reset at the beginning of each measure.
     - `wave_length` (length, default:`0`)
         - Length of repetition
         - `0`: Not specified. (In KSM, the effect is bypassed if the value is `0`.)
-        - Note: `wave_length` interval count is reset at the beginning of each measure if `update_period` has a non-zero value.
+        - Note: `wave_length` interval count is reset at the beginning of each measure.
     - `update_trigger` (switch, default:`off>on`)
         - `on`: Updates the repeat source (the value is automatically set back to `off`)
     - `feedback_level` (rate, default:`100%`)
@@ -930,7 +930,9 @@ array GraphSectionPoint {
 
 # Change Log
 
-- `0.6.0` (12/10/2022)
+- `0.6.1` (03/12/2023)
+    - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/9/files
+- [`0.6.0`](https://github.com/m4saka/ksm-chart-format-spec/blob/4df13dcb7114fefe05895556036dea6d20e617c1/kson_format.md) (12/10/2022)
     - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/8/files
 - [`0.5.1`](https://github.com/m4saka/ksm-chart-format-spec/blob/47f4d942cedbf12bfc7fd5c26a61e081a98be24b/kson_format.md) (08/29/2022)
     - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/7/files
