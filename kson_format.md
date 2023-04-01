@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.6.1`)
+# KSON Format Specification (version: `0.6.2-beta1`)
 - JSON format
 - File extension: `.kson`
 - Encoding: UTF-8 (without BOM), LF
@@ -562,9 +562,9 @@ Parameter values are written in one of the following formats:
     - `v` (rate, default:`0%-100%`)
         - Envelope value of the cutoff frequency
         - Note: This parameter is provided to make the frequency transition on a log (or log-like) scale rather than a linear scale.
-    - `freq` (freq, default:implementation-dependent)
+    - (OPTIONAL SUPPORT) `freq` (freq, default:implementation-dependent)
         - Cutoff frequency when `v` is 0.0
-    - `freq_max` (freq, default:implementation-dependent)
+    - (OPTIONAL SUPPORT) `freq_max` (freq, default:implementation-dependent)
         - Cutoff frequency when `v` is 1.0
     - (OPTIONAL SUPPORT) `bandwidth` (float, default:implementation-dependent)
         - Bandwidth around the cutoff frequency [oct]
@@ -577,9 +577,9 @@ Parameter values are written in one of the following formats:
     - `v` (rate, default:`0%-100%`)
         - Envelope value of the cutoff frequency
         - Note: This parameter is provided to make the frequency transition on a log (or log-like) scale rather than a linear scale.
-    - `freq` (freq, default:implementation-dependent)
+    - (OPTIONAL SUPPORT) `freq` (freq, default:implementation-dependent)
         - Cutoff frequency when `v` is 0.0
-    - `freq_max` (freq, default:implementation-dependent)
+    - (OPTIONAL SUPPORT) `freq_max` (freq, default:implementation-dependent)
         - Cutoff frequency when `v` is 1.0
     - (OPTIONAL SUPPORT) `q` (float, default:implementation-dependent)
         - Q value of the biquad filter
@@ -592,9 +592,9 @@ Parameter values are written in one of the following formats:
     - `v` (rate, default:`0%-100%`)
         - Envelope value of the cutoff frequency
         - Note: This parameter is provided to make the frequency transition on a log (or log-like) scale rather than a linear scale.
-    - `freq` (freq, default:implementation-dependent)
+    - (OPTIONAL SUPPORT) `freq` (freq, default:implementation-dependent)
         - Cutoff frequency when `v` is 0.0
-    - `freq_max` (freq, default:implementation-dependent)
+    - (OPTIONAL SUPPORT) `freq_max` (freq, default:implementation-dependent)
         - Cutoff frequency when `v` is 1.0
     - (OPTIONAL SUPPORT) `q` (float, default:implementation-dependent)
         - Q value of the biquad filter
