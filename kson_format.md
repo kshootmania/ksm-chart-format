@@ -1,13 +1,16 @@
-# KSON Format Specification (version: `0.6.2-beta2`)
-- JSON format
-- File extension: `.kson`
-- Encoding: UTF-8 (without BOM), LF
-- If a default value is specified in this document, undefined values are overwritten by the default value.
-- `null` value is not allowed in the entire kson file.
-- Support for parameters/options marked "(OPTIONAL SUPPORT)" is optional, but must be ignored if not supported.
-- `xxx` and `...` denote placeholders.
-- The resolution of `y` (pulse number) is 240 per beat (i.e., 960 per measure).
-- The behavior for illegal values is undefined, and kson clients do not necessarily need to report an error even if there is an illegal value.
+# KSON Format Specification (version: `0.6.2-beta3`)
+## Basic Specifications
+- **JSON format**: KSON files MUST use the JSON format.
+- **File extension**: KSON files MUST use the `.kson` file extension.
+- **Encoding**: KSON files MUST use UTF-8 (without BOM) with LF line endings.
+- **Default values**: Undefined values are overwritten by specified defaults.
+- **Null values not allowed**: `null` values MUST NOT be used in the entire KSON files.
+- **Pulse number resolution**: `y` (pulse number) has a resolution of 240 per beat (960 per measure).
+
+## Other Information and Guidelines
+- **Placeholders**: `xxx` and `...` represent placeholders in this document.
+- **Behavior for illegal values**: The behavior for illegal values is undefined, and KSON clients are not required to report them.
+- **Optional support**: Parameters or options marked with "(OPTIONAL SUPPORT)" do not need to be supported by all KSON clients. However, unsupported parameters or options must be ignored.
 
 -----------------------------------------------------------------------------------
 
@@ -179,7 +182,7 @@ dictionary KeySoundInvokeListFX {
     ...:         (uint|ByPulse<KeySoundInvokeFX>)[][2]?  // Custom key sounds can be inserted here by using the filename of a WAVE file (.wav) as a key
 }
 ```
-- Note: `y` (pulse number) should be the same as `y` of an existing laser slam note; otherwise, the event is ignored.
+- Note: `y` (pulse number) should be the same as `y` of an existing chip FX note; otherwise, the event is ignored.
 
 ##### `audio.key_sound.fx.chip_event.xxx[lane][][1]`
 ```
@@ -720,7 +723,7 @@ dictionary BGInfo {
     legacy: LegacyBGInfo?  // (OPTIONAL SUPPORT)
 }
 ```
-- Note: The file format of `bg.filename` is not speficied. If the format of the file specified in `bg.filename` is supported by the kson client, `bg.filename` is used; otherwise, it falls back to other built-in background graphics (which MAY be specified in `legacy`).
+- Note: The file format of `bg.filename` is not specified. If the format of the file specified in `bg.filename` is supported by the kson client, `bg.filename` is used; otherwise, it falls back to other built-in background graphics (which MAY be specified in `legacy`).
 - Note: `bg.offset` is used only if supported by the BG file format and its player, the kson client.
 
 ### `bg.legacy` (OPTIONAL SUPPORT)
@@ -746,7 +749,7 @@ dictionary KSHLayerInfo {
     filename: string?                // self-explanatory (can be KSM default animation layer such as "arrow")
     duration: int = 0                // one-loop duration in milliseconds
                                      //   If the value is negative, the animation is played backwards.
-                                     //   If the value is zero, the play speed is tempo-synced and set to 1 frame per 0.035 measure (= 28.571... frames/measure).
+                                     //   If the value is zero, the play speed is tempo-synchronized and set to 1 frame per 0.035 measure (= 28.571... frames/measure).
     rotation: KSHLayerRotationInfo?  // rotation conditions
 }
 ```
@@ -854,7 +857,7 @@ dictionary KSHUnknownInfo {
 ```
 dictionary ImplInfo {
     // Not specified. This area is free for use by kson clients and kson editors.
-    // To avoid conflicts with other clients, it is highly recommended to have a top object whose key is the client name.
+    // To avoid conflicts with other clients, it is highly recommended to use a top-level object with a key that corresponds to the client name.
 }
 ```
 
