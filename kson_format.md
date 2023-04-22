@@ -1,13 +1,16 @@
-# KSON Format Specification (version: `0.6.1`)
-- JSON format
-- File extension: `.kson`
-- Encoding: UTF-8 (without BOM), LF
-- If a default value is specified in this document, undefined values are overwritten by the default value.
-- `null` value is not allowed in the entire kson file.
-- Support for parameters/options marked "(OPTIONAL SUPPORT)" is optional, but must be ignored if not supported.
-- `xxx` and `...` denote placeholders.
-- The resolution of `y` (pulse number) is 240 per beat (i.e., 960 per measure).
-- The behavior for illegal values is undefined, and kson clients do not necessarily need to report an error even if there is an illegal value.
+# KSON Format Specification (version: `0.6.2`)
+## Basic Specifications
+- **JSON format**: KSON files MUST use the JSON format.
+- **File extension**: KSON files MUST use the `.kson` file extension.
+- **Encoding**: KSON files MUST use UTF-8 (without BOM) with LF line endings.
+- **Default values**: Undefined values are overwritten by specified defaults.
+- **Null values not allowed**: `null` values MUST NOT be used in the entire KSON files.
+- **Pulse number resolution**: `y` (pulse number) has a resolution of 240 per beat (960 per measure).
+
+## Other Information and Guidelines
+- **Placeholders**: `xxx` and `...` represent placeholders in this document.
+- **Behavior for illegal values**: The behavior for illegal values is undefined, and KSON clients are not required to report them.
+- **Optional support**: Parameters or options marked with "(OPTIONAL SUPPORT)" do not need to be supported by all KSON clients. However, unsupported parameters or options must be ignored.
 
 -----------------------------------------------------------------------------------
 
@@ -179,7 +182,7 @@ dictionary KeySoundInvokeListFX {
     ...:         (uint|ByPulse<KeySoundInvokeFX>)[][2]?  // Custom key sounds can be inserted here by using the filename of a WAVE file (.wav) as a key
 }
 ```
-- Note: `y` (pulse number) should be the same as `y` of an existing laser slam note; otherwise, the event is ignored.
+- Note: `y` (pulse number) should be the same as `y` of an existing chip FX note; otherwise, the event is ignored.
 
 ##### `audio.key_sound.fx.chip_event.xxx[lane][][1]`
 ```
@@ -562,9 +565,9 @@ Parameter values are written in one of the following formats:
     - `v` (rate, default:`0%-100%`)
         - Envelope value of the cutoff frequency
         - Note: This parameter is provided to make the frequency transition on a log (or log-like) scale rather than a linear scale.
-    - `freq` (freq, default:implementation-dependent)
+    - (OPTIONAL SUPPORT) `freq` (freq, default:implementation-dependent)
         - Cutoff frequency when `v` is 0.0
-    - `freq_max` (freq, default:implementation-dependent)
+    - (OPTIONAL SUPPORT) `freq_max` (freq, default:implementation-dependent)
         - Cutoff frequency when `v` is 1.0
     - (OPTIONAL SUPPORT) `bandwidth` (float, default:implementation-dependent)
         - Bandwidth around the cutoff frequency [oct]
@@ -577,9 +580,9 @@ Parameter values are written in one of the following formats:
     - `v` (rate, default:`0%-100%`)
         - Envelope value of the cutoff frequency
         - Note: This parameter is provided to make the frequency transition on a log (or log-like) scale rather than a linear scale.
-    - `freq` (freq, default:implementation-dependent)
+    - (OPTIONAL SUPPORT) `freq` (freq, default:implementation-dependent)
         - Cutoff frequency when `v` is 0.0
-    - `freq_max` (freq, default:implementation-dependent)
+    - (OPTIONAL SUPPORT) `freq_max` (freq, default:implementation-dependent)
         - Cutoff frequency when `v` is 1.0
     - (OPTIONAL SUPPORT) `q` (float, default:implementation-dependent)
         - Q value of the biquad filter
@@ -592,9 +595,9 @@ Parameter values are written in one of the following formats:
     - `v` (rate, default:`0%-100%`)
         - Envelope value of the cutoff frequency
         - Note: This parameter is provided to make the frequency transition on a log (or log-like) scale rather than a linear scale.
-    - `freq` (freq, default:implementation-dependent)
+    - (OPTIONAL SUPPORT) `freq` (freq, default:implementation-dependent)
         - Cutoff frequency when `v` is 0.0
-    - `freq_max` (freq, default:implementation-dependent)
+    - (OPTIONAL SUPPORT) `freq_max` (freq, default:implementation-dependent)
         - Cutoff frequency when `v` is 1.0
     - (OPTIONAL SUPPORT) `q` (float, default:implementation-dependent)
         - Q value of the biquad filter
@@ -720,7 +723,7 @@ dictionary BGInfo {
     legacy: LegacyBGInfo?  // (OPTIONAL SUPPORT)
 }
 ```
-- Note: The file format of `bg.filename` is not speficied. If the format of the file specified in `bg.filename` is supported by the kson client, `bg.filename` is used; otherwise, it falls back to other built-in background graphics (which MAY be specified in `legacy`).
+- Note: The file format of `bg.filename` is not specified. If the format of the file specified in `bg.filename` is supported by the kson client, `bg.filename` is used; otherwise, it falls back to other built-in background graphics (which MAY be specified in `legacy`).
 - Note: `bg.offset` is used only if supported by the BG file format and its player, the kson client.
 
 ### `bg.legacy` (OPTIONAL SUPPORT)
@@ -746,7 +749,7 @@ dictionary KSHLayerInfo {
     filename: string?                // self-explanatory (can be KSM default animation layer such as "arrow")
     duration: int = 0                // one-loop duration in milliseconds
                                      //   If the value is negative, the animation is played backwards.
-                                     //   If the value is zero, the play speed is tempo-synced and set to 1 frame per 0.035 measure (= 28.571... frames/measure).
+                                     //   If the value is zero, the play speed is tempo-synchronized and set to 1 frame per 0.035 measure (= 28.571... frames/measure).
     rotation: KSHLayerRotationInfo?  // rotation conditions
 }
 ```
@@ -854,7 +857,7 @@ dictionary KSHUnknownInfo {
 ```
 dictionary ImplInfo {
     // Not specified. This area is free for use by kson clients and kson editors.
-    // To avoid conflicts with other clients, it is highly recommended to have a top object whose key is the client name.
+    // To avoid conflicts with other clients, it is highly recommended to use a top-level object with a key that corresponds to the client name.
 }
 ```
 
@@ -889,7 +892,7 @@ array GraphValue {
 ```
 - The array size of `GraphValue` MUST be 2.
 
-### graph curve value
+### graph curve value (OPTIONAL SUPPORT)
 ```
 array GraphCurveValue {
     [0]: double  // a: x-coordinate of the curve control point (0.0-1.0)
@@ -903,7 +906,7 @@ array GraphCurveValue {
 array GraphPoint {
     [0]: uint                          // y: absolute pulse number
     [1]: double|GraphValue             // v: graph value; if double is used, v and vf are set to the same value
-    [2]: GraphCurveValue = [0.0, 0.0]  // curve: graph curve value
+    [2]: GraphCurveValue = [0.0, 0.0]  // (OPTIONAL SUPPORT) curve: graph curve value
 }
 ```
 - The array size of `GraphPoint<T>` MUST be 2 or 3.
@@ -913,7 +916,7 @@ array GraphPoint {
 array GraphSectionPoint {
     [0]: uint                          // ry: relative pulse number
     [1]: double|GraphValue             // v: graph value; if double is used, v and vf are set to the same value
-    [2]: GraphCurveValue = [0.0, 0.0]  // curve: graph curve value
+    [2]: GraphCurveValue = [0.0, 0.0]  // (OPTIONAL SUPPORT) curve: graph curve value
 }
 ```
 - The array size of `GraphSectionPoint<T>` MUST be 2 or 3.
@@ -930,7 +933,9 @@ array GraphSectionPoint {
 
 # Change Log
 
-- `0.6.1` (03/12/2023)
+- `0.6.2` (04/22/2023)
+    - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/10/files
+- [`0.6.1`](https://github.com/m4saka/ksm-chart-format-spec/blob/abca6466f1a5f429d024a82bf7cf96c5752702b5/kson_format.md) (03/12/2023)
     - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/9/files
 - [`0.6.0`](https://github.com/m4saka/ksm-chart-format-spec/blob/4df13dcb7114fefe05895556036dea6d20e617c1/kson_format.md) (12/10/2022)
     - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/8/files
