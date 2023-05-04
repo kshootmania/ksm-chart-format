@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.7.0-beta1`)
+# KSON Format Specification (version: `0.7.0`)
 ## Basic Specifications
 - **JSON format**: KSON files MUST use the JSON format.
 - **File extension**: KSON files MUST use the `.kson` file extension.
@@ -934,7 +934,9 @@ array GraphSectionPoint {
 
 # Change Log
 
-- `0.6.2` (04/22/2023)
+- `0.7.0` (05/05/2023)
+    - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/11/files
+- [`0.6.2`](https://github.com/m4saka/ksm-chart-format-spec/blob/baca7166c43bd6bbd20e5c580eed7af495d16da9/kson_format.md) (04/22/2023)
     - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/10/files
 - [`0.6.1`](https://github.com/m4saka/ksm-chart-format-spec/blob/abca6466f1a5f429d024a82bf7cf96c5752702b5/kson_format.md) (03/12/2023)
     - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/9/files
