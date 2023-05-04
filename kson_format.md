@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.6.2`)
+# KSON Format Specification (version: `0.7.0-beta1`)
 ## Basic Specifications
 - **JSON format**: KSON files MUST use the JSON format.
 - **File extension**: KSON files MUST use the `.kson` file extension.
@@ -641,19 +641,20 @@ dictionary CamInfo {
 #### `camera.cam.body`
 ```
 dictionary CamGraphs {
-    zoom:               GraphPoint[]?  // zoom_bottom
-    shift_x:            GraphPoint[]?  // zoom_side
-    rotation_x:         GraphPoint[]?  // zoom_top
+    zoom:               GraphPoint[]?  // move the bottom edge closer to the camera (zoom_bottom in KSH format)
+    shift_x:            GraphPoint[]?  // move the highway horizontally (zoom_side in KSH format)
+    rotation_x:         GraphPoint[]?  // rotate the upper edge around the judgment line (zoom_top in KSH format)
     rotation_z:         GraphPoint[]?  // rotation degree (affects both highway & jdgline relatively)
     rotation_z.highway: GraphPoint[]?  // (OPTIONAL SUPPORT) rotation degree (highway only)
     rotation_z.jdgline: GraphPoint[]?  // (OPTIONAL SUPPORT) rotation degree (judgment line only)
-    center_split:       GraphPoint[]?  // center_split
+    center_split:       GraphPoint[]?  // split the highway at the center (center_split in KSH format)
 }
 ```
-- KSH: -300 - 300 => kson: -3.0 - 3.0
-- Subparameters (`rotation_z.highway`/`rotation_z.jdgline`) affect the value relatively.
-    - For example, the actual value of `rotation_z.highway` will be `rotation_z + rotation_z.highway`.
-        - `rotation_z:1.0, rotation_z.highway:0.5` is equivalent to `rotation_z:0.0, rotation_z.highway:1.5, rotation_z.jdgline:1.0`
+- The value scale used for `zoom`/`shift_x`/`rotation_x`/`center_split` is identical to the scale used for `zoom_bottom`/`zoom_side`/`zoom_top`/`center_split` in KSH format.
+- The units used for the `rotation_x` value are not degrees, but instead represent one full rotation every +2400 units.
+- Subparameters such as `rotation_z.highway` and `rotation_z.jdgline` affect the value in relation to the base parameter.
+    - For example, the actual value of `rotation_z.highway` will be the sum of `rotation_z` and `rotation_z.highway`.
+        - The values `rotation_z:60.0, rotation_z.highway:30.0, rotation_z.jdgline:0.0` are equivalent to `rotation_z:0.0, rotation_z.highway:90.0, rotation_z.jdgline:60.0`.
 
 #### `camera.cam.pattern`
 ```
