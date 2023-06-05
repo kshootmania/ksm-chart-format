@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.7.0`)
+# KSON Format Specification (version: `0.7.1-beta1`)
 ## Basic Specifications
 - **JSON format**: KSON files MUST use the JSON format.
 - **File extension**: KSON files MUST use the `.kson` file extension.
@@ -645,16 +645,11 @@ dictionary CamGraphs {
     shift_x:            GraphPoint[]?  // move the highway horizontally (zoom_side in KSH format)
     rotation_x:         GraphPoint[]?  // rotate the upper edge around the judgment line (zoom_top in KSH format)
     rotation_z:         GraphPoint[]?  // rotation degree (affects both highway & jdgline relatively)
-    rotation_z.highway: GraphPoint[]?  // (OPTIONAL SUPPORT) rotation degree (highway only)
-    rotation_z.jdgline: GraphPoint[]?  // (OPTIONAL SUPPORT) rotation degree (judgment line only)
     center_split:       GraphPoint[]?  // split the highway at the center (center_split in KSH format)
 }
 ```
 - The value scale used for `zoom`/`shift_x`/`rotation_x`/`center_split` is identical to the scale used for `zoom_bottom`/`zoom_side`/`zoom_top`/`center_split` in KSH format.
 - The units used for the `rotation_x` value are not degrees, but instead represent one full rotation every +2400 units.
-- Subparameters such as `rotation_z.highway` and `rotation_z.jdgline` affect the value in relation to the base parameter.
-    - For example, the actual value of `rotation_z.highway` will be the sum of `rotation_z` and `rotation_z.highway`.
-        - The values `rotation_z:60.0, rotation_z.highway:30.0, rotation_z.jdgline:0.0` are equivalent to `rotation_z:0.0, rotation_z.highway:90.0, rotation_z.jdgline:60.0`.
 
 #### `camera.cam.pattern`
 ```
@@ -776,6 +771,8 @@ dictionary KSHMovieInfo {
 ### `editor` (OPTIONAL SUPPORT)
 ```
 dictionary EditorInfo {
+    app_name: string?     // (OPTIONAL SUPPORT) editor software name
+    app_version: string?  // (OPTIONAL SUPPORT) editor software version
     comment: ByPulse<string>[]?  // (OPTIONAL SUPPORT) comments that can be written in the editor
 }
 ```
