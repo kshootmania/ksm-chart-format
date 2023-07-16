@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.7.1-beta1`)
+# KSON Format Specification (version: `0.7.1-beta2`)
 ## Basic Specifications
 - **JSON format**: KSON files MUST use the JSON format.
 - **File extension**: KSON files MUST use the `.kson` file extension.
@@ -432,7 +432,7 @@ Parameter values are written in one of the following formats:
         - Note: `update_period` interval count is reset at the beginning of each measure.
     - `wave_length` (length, default:`0`)
         - Length of repetition
-        - `0`: Not specified. (In KSM, the effect is bypassed if the value is `0`.)
+        - `0`: The effect is bypassed.
         - Note: `wave_length` interval count is reset at the beginning of each measure.
     - `rate` (rate, default:`70%`)
         - Length of the repeat audio
@@ -444,7 +444,7 @@ Parameter values are written in one of the following formats:
 - `gate`: This effect periodically switches the volume between 100% and 0%.
     - `wave_length` (length, default:`0`)
         - Interval
-        - `0`: Not specified. (In KSM, the effect is bypassed if the value is `0`.)
+        - `0`: The effect is bypassed.
         - Note: `wave_length` interval count is reset at the beginning of each measure.
     - `rate` (rate, default:`60%`)
         - Length of the audio
@@ -454,6 +454,7 @@ Parameter values are written in one of the following formats:
 - `flanger`: This effect layers the delayed audio and the original audio. The delay time is oscillated by an LFO, which generates a sweeping comb filter.
     - `period` (length, default:`2.0`)
         - LFO period
+        - `0`: LFO phase remains at its current value.
     - `delay` (sample, default:`30samples`)
         - Minimum value of delay time
     - `depth` (sample, default:`45samples`)
@@ -480,6 +481,7 @@ Parameter values are written in one of the following formats:
 - `phaser`: This effect applies multiple all-pass filters that shift the phase of the waveform and layers the effect audio and the original audio.
     - `period` (length, default:`1/2`)
         - LFO period
+        - `0`: LFO phase remains at its current value.
     - `stage` (int, default:`6`)
         - Number of all-pass filters. Usually an even number.
         - Additional requirement:
@@ -504,7 +506,7 @@ Parameter values are written in one of the following formats:
 - `wobble`: This effect oscillates the cutoff frequency of the low-pass filter with an LFO.
     - `wave_length` (length, default:`0`)
         - LFO period
-        - `0`: Not specified. (In KSM, the effect is bypassed if the value is `0`.)
+        - `0`: The effect is bypassed.
         - Note: `wave_length` interval count is reset at the beginning of each measure.
     - `freq_1` (freq, default:`500Hz`)
         - First frequency of LFO
@@ -535,7 +537,7 @@ Parameter values are written in one of the following formats:
         - Note: `update_period` interval count is reset at the beginning of each measure.
     - `wave_length` (length, default:`0`)
         - Length of repetition
-        - `0`: Not specified. (In KSM, the effect is bypassed if the value is `0`.)
+        - `0`: The effect is bypassed.
         - Note: `wave_length` interval count is reset at the beginning of each measure.
     - `update_trigger` (switch, default:`off>on`)
         - `on`: Updates the repeat source (the value is automatically set back to `off`)
