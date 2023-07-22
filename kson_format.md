@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.7.1-beta2`)
+# KSON Format Specification (version: `0.7.1`)
 ## Basic Specifications
 - **JSON format**: KSON files MUST use the JSON format.
 - **File extension**: KSON files MUST use the `.kson` file extension.
@@ -933,24 +933,26 @@ array GraphSectionPoint {
 
 # Change Log
 
-- `0.7.0` (05/05/2023)
-    - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/11/files
-- [`0.6.2`](https://github.com/m4saka/ksm-chart-format-spec/blob/baca7166c43bd6bbd20e5c580eed7af495d16da9/kson_format.md) (04/22/2023)
-    - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/10/files
-- [`0.6.1`](https://github.com/m4saka/ksm-chart-format-spec/blob/abca6466f1a5f429d024a82bf7cf96c5752702b5/kson_format.md) (03/12/2023)
-    - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/9/files
-- [`0.6.0`](https://github.com/m4saka/ksm-chart-format-spec/blob/4df13dcb7114fefe05895556036dea6d20e617c1/kson_format.md) (12/10/2022)
-    - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/8/files
-- [`0.5.1`](https://github.com/m4saka/ksm-chart-format-spec/blob/47f4d942cedbf12bfc7fd5c26a61e081a98be24b/kson_format.md) (08/29/2022)
-    - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/7/files
-- [`0.5.0`](https://github.com/m4saka/ksm-chart-format-spec/blob/4a38a535d725f7a12d240cdbbad63de9421b9aa0/kson_format.md) (07/26/2022)
-    - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/6/files
-- [`0.4.0`](https://github.com/m4saka/ksm-chart-format-spec/blob/ece34cb84b55453fcda9e5b9b204194537344a12/kson_format.md) (07/02/2022)
-    - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/5/files
-- [`0.3.0`](https://github.com/m4saka/ksm-chart-format-spec/blob/c64b2e4613c8db8a458c53b7bb5dc7e1e4711fa2/kson_format.md) (05/21/2022)
-    - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/4/files
-- [`0.2.0`](https://github.com/m4saka/ksm-chart-format-spec/blob/bb88522d923a9051a71c1cd127f2db0d1fe20d0c/kson_format.md) (05/06/2022)
-    - Changes: https://github.com/m4saka/ksm-chart-format-spec/pull/3/files
+- `0.7.1` (07/22/2023)
+    - Changes: https://github.com/kshootmania/ksm-chart-format/pull/12/files
+- [`0.7.0`](https://github.com/kshootmania/ksm-chart-format/blob/2bb4360b075b2892f50837d33de312d6c208ae8c/kson_format.md) (05/05/2023)
+    - Changes: https://github.com/kshootmania/ksm-chart-format/pull/11/files
+- [`0.6.2`](https://github.com/kshootmania/ksm-chart-format/blob/baca7166c43bd6bbd20e5c580eed7af495d16da9/kson_format.md) (04/22/2023)
+    - Changes: https://github.com/kshootmania/ksm-chart-format/pull/10/files
+- [`0.6.1`](https://github.com/kshootmania/ksm-chart-format/blob/abca6466f1a5f429d024a82bf7cf96c5752702b5/kson_format.md) (03/12/2023)
+    - Changes: https://github.com/kshootmania/ksm-chart-format/pull/9/files
+- [`0.6.0`](https://github.com/kshootmania/ksm-chart-format/blob/4df13dcb7114fefe05895556036dea6d20e617c1/kson_format.md) (12/10/2022)
+    - Changes: https://github.com/kshootmania/ksm-chart-format/pull/8/files
+- [`0.5.1`](https://github.com/kshootmania/ksm-chart-format/blob/47f4d942cedbf12bfc7fd5c26a61e081a98be24b/kson_format.md) (08/29/2022)
+    - Changes: https://github.com/kshootmania/ksm-chart-format/pull/7/files
+- [`0.5.0`](https://github.com/kshootmania/ksm-chart-format/blob/4a38a535d725f7a12d240cdbbad63de9421b9aa0/kson_format.md) (07/26/2022)
+    - Changes: https://github.com/kshootmania/ksm-chart-format/pull/6/files
+- [`0.4.0`](https://github.com/kshootmania/ksm-chart-format/blob/ece34cb84b55453fcda9e5b9b204194537344a12/kson_format.md) (07/02/2022)
+    - Changes: https://github.com/kshootmania/ksm-chart-format/pull/5/files
+- [`0.3.0`](https://github.com/kshootmania/ksm-chart-format/blob/c64b2e4613c8db8a458c53b7bb5dc7e1e4711fa2/kson_format.md) (05/21/2022)
+    - Changes: https://github.com/kshootmania/ksm-chart-format/pull/4/files
+- [`0.2.0`](https://github.com/kshootmania/ksm-chart-format/blob/bb88522d923a9051a71c1cd127f2db0d1fe20d0c/kson_format.md) (05/06/2022)
+    - Changes: https://github.com/kshootmania/ksm-chart-format/pull/3/files
 - [`0.1.0`](https://github.com/m4saka/ksh2kson/blob/8e9f39d5e93178dd306feaa890bcb43a6c4c9083/kson_format.md) (06/14/2020)
 - [First draft](https://gist.github.com/m4saka/a89594a17dc9422d75e01998bcfd2722/e65ae6b6b1d424a14fa050c3825990fde494c688) (02/02/2019)
 
