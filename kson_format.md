@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.7.0`)
+# KSON Format Specification (version: `0.7.1-beta2`)
 ## Basic Specifications
 - **JSON format**: KSON files MUST use the JSON format.
 - **File extension**: KSON files MUST use the `.kson` file extension.
@@ -432,7 +432,7 @@ Parameter values are written in one of the following formats:
         - Note: `update_period` interval count is reset at the beginning of each measure.
     - `wave_length` (length, default:`0`)
         - Length of repetition
-        - `0`: Not specified. (In KSM, the effect is bypassed if the value is `0`.)
+        - `0`: The effect is bypassed.
         - Note: `wave_length` interval count is reset at the beginning of each measure.
     - `rate` (rate, default:`70%`)
         - Length of the repeat audio
@@ -444,7 +444,7 @@ Parameter values are written in one of the following formats:
 - `gate`: This effect periodically switches the volume between 100% and 0%.
     - `wave_length` (length, default:`0`)
         - Interval
-        - `0`: Not specified. (In KSM, the effect is bypassed if the value is `0`.)
+        - `0`: The effect is bypassed.
         - Note: `wave_length` interval count is reset at the beginning of each measure.
     - `rate` (rate, default:`60%`)
         - Length of the audio
@@ -454,6 +454,7 @@ Parameter values are written in one of the following formats:
 - `flanger`: This effect layers the delayed audio and the original audio. The delay time is oscillated by an LFO, which generates a sweeping comb filter.
     - `period` (length, default:`2.0`)
         - LFO period
+        - `0`: LFO phase remains at its current value.
     - `delay` (sample, default:`30samples`)
         - Minimum value of delay time
     - `depth` (sample, default:`45samples`)
@@ -480,6 +481,7 @@ Parameter values are written in one of the following formats:
 - `phaser`: This effect applies multiple all-pass filters that shift the phase of the waveform and layers the effect audio and the original audio.
     - `period` (length, default:`1/2`)
         - LFO period
+        - `0`: LFO phase remains at its current value.
     - `stage` (int, default:`6`)
         - Number of all-pass filters. Usually an even number.
         - Additional requirement:
@@ -504,7 +506,7 @@ Parameter values are written in one of the following formats:
 - `wobble`: This effect oscillates the cutoff frequency of the low-pass filter with an LFO.
     - `wave_length` (length, default:`0`)
         - LFO period
-        - `0`: Not specified. (In KSM, the effect is bypassed if the value is `0`.)
+        - `0`: The effect is bypassed.
         - Note: `wave_length` interval count is reset at the beginning of each measure.
     - `freq_1` (freq, default:`500Hz`)
         - First frequency of LFO
@@ -535,7 +537,7 @@ Parameter values are written in one of the following formats:
         - Note: `update_period` interval count is reset at the beginning of each measure.
     - `wave_length` (length, default:`0`)
         - Length of repetition
-        - `0`: Not specified. (In KSM, the effect is bypassed if the value is `0`.)
+        - `0`: The effect is bypassed.
         - Note: `wave_length` interval count is reset at the beginning of each measure.
     - `update_trigger` (switch, default:`off>on`)
         - `on`: Updates the repeat source (the value is automatically set back to `off`)
@@ -645,16 +647,11 @@ dictionary CamGraphs {
     shift_x:            GraphPoint[]?  // move the highway horizontally (zoom_side in KSH format)
     rotation_x:         GraphPoint[]?  // rotate the upper edge around the judgment line (zoom_top in KSH format)
     rotation_z:         GraphPoint[]?  // rotation degree (affects both highway & jdgline relatively)
-    rotation_z.highway: GraphPoint[]?  // (OPTIONAL SUPPORT) rotation degree (highway only)
-    rotation_z.jdgline: GraphPoint[]?  // (OPTIONAL SUPPORT) rotation degree (judgment line only)
     center_split:       GraphPoint[]?  // split the highway at the center (center_split in KSH format)
 }
 ```
 - The value scale used for `zoom`/`shift_x`/`rotation_x`/`center_split` is identical to the scale used for `zoom_bottom`/`zoom_side`/`zoom_top`/`center_split` in KSH format.
 - The units used for the `rotation_x` value are not degrees, but instead represent one full rotation every +2400 units.
-- Subparameters such as `rotation_z.highway` and `rotation_z.jdgline` affect the value in relation to the base parameter.
-    - For example, the actual value of `rotation_z.highway` will be the sum of `rotation_z` and `rotation_z.highway`.
-        - The values `rotation_z:60.0, rotation_z.highway:30.0, rotation_z.jdgline:0.0` are equivalent to `rotation_z:0.0, rotation_z.highway:90.0, rotation_z.jdgline:60.0`.
 
 #### `camera.cam.pattern`
 ```
@@ -776,6 +773,8 @@ dictionary KSHMovieInfo {
 ### `editor` (OPTIONAL SUPPORT)
 ```
 dictionary EditorInfo {
+    app_name: string?     // (OPTIONAL SUPPORT) editor software name
+    app_version: string?  // (OPTIONAL SUPPORT) editor software version
     comment: ByPulse<string>[]?  // (OPTIONAL SUPPORT) comments that can be written in the editor
 }
 ```
