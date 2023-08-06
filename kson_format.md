@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.7.1`)
+# KSON Format Specification (version: `0.8.0-beta1`)
 ## Basic Specifications
 - **JSON format**: KSON files MUST use the JSON format.
 - **File extension**: KSON files MUST use the `.kson` file extension.
@@ -233,7 +233,7 @@ dictionary AudioEffectInfo {
 #### `audio.audio_effect.fx`
 ```
 dictionary AudioEffectFXInfo {
-    def:          dictionary<AudioEffectDef>?                // audio effect definitions
+    def:          DefKeyValuePair<AudioEffectDef>[]?         // audio effect definitions
     param_change: dictionary<dictionary<ByPulse<string>[]>>? // audio effect parameter changes by pulse
     long_event:   dictionary<(uint|ByPulse<dictionary<string>>)[][2]>? // audio effect invocation (and parameter changes) by long notes
 }
@@ -882,6 +882,16 @@ array ByMeasureIdx<T> {
 }
 ```
 - The array size of `ByMeasureIdx<T>` MUST be 2.
+
+### definition array item
+```
+array DefKeyValuePair<T> {
+    [0]: string  // name: key
+    [1]: T       // v: value
+}
+```
+- The array size of `DefKeyValuePair<T>` MUST be 2.
+- Note: `def` is an array of key-value pairs, while `xxx_event` is a dictionary. This is to preserve the order in which the user created the definitions, ensuring a stable order during editing and processing.
 
 ### graph value
 ```
