@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.7.1`)
+# KSON Format Specification (version: `0.8.0`)
 ## Basic Specifications
 - **JSON format**: KSON files MUST use the JSON format.
 - **File extension**: KSON files MUST use the `.kson` file extension.
@@ -233,7 +233,7 @@ dictionary AudioEffectInfo {
 #### `audio.audio_effect.fx`
 ```
 dictionary AudioEffectFXInfo {
-    def:          dictionary<AudioEffectDef>?                // audio effect definitions
+    def:          DefKeyValuePair<AudioEffectDef>[]?         // audio effect definitions
     param_change: dictionary<dictionary<ByPulse<string>[]>>? // audio effect parameter changes by pulse
     long_event:   dictionary<(uint|ByPulse<dictionary<string>>)[][2]>? // audio effect invocation (and parameter changes) by long notes
 }
@@ -883,6 +883,16 @@ array ByMeasureIdx<T> {
 ```
 - The array size of `ByMeasureIdx<T>` MUST be 2.
 
+### definition array item
+```
+array DefKeyValuePair<T> {
+    [0]: string  // name: key
+    [1]: T       // v: value
+}
+```
+- The array size of `DefKeyValuePair<T>` MUST be 2.
+- Note: `def` is an array of key-value pairs, while `xxx_event` is a dictionary. This is to preserve the order in which the user created the definitions, ensuring a stable order during editing and processing.
+
 ### graph value
 ```
 array GraphValue {
@@ -933,7 +943,9 @@ array GraphSectionPoint {
 
 # Change Log
 
-- `0.7.1` (07/22/2023)
+- `0.8.0` (08/13/2023)
+    - Changes: https://github.com/kshootmania/ksm-chart-format/pull/13/files
+- [`0.7.1`](https://github.com/kshootmania/ksm-chart-format/blob/51c260bb16fe47afd2366fd04abddfbc36ca34ff/kson_format.md) (07/22/2023)
     - Changes: https://github.com/kshootmania/ksm-chart-format/pull/12/files
 - [`0.7.0`](https://github.com/kshootmania/ksm-chart-format/blob/2bb4360b075b2892f50837d33de312d6c208ae8c/kson_format.md) (05/05/2023)
     - Changes: https://github.com/kshootmania/ksm-chart-format/pull/11/files
