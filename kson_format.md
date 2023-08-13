@@ -943,7 +943,9 @@ array GraphSectionPoint {
 
 # Change Log
 
-- `0.7.1` (07/22/2023)
+- `0.8.0` (08/13/2023)
+    - Changes: https://github.com/kshootmania/ksm-chart-format/pull/13/files
+- [`0.7.1`](https://github.com/kshootmania/ksm-chart-format/blob/51c260bb16fe47afd2366fd04abddfbc36ca34ff/kson_format.md) (07/22/2023)
     - Changes: https://github.com/kshootmania/ksm-chart-format/pull/12/files
 - [`0.7.0`](https://github.com/kshootmania/ksm-chart-format/blob/2bb4360b075b2892f50837d33de312d6c208ae8c/kson_format.md) (05/05/2023)
     - Changes: https://github.com/kshootmania/ksm-chart-format/pull/11/files
