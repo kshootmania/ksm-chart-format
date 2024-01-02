@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.8.0`)
+# KSON Format Specification (version: `0.8.1-beta1`)
 ## Basic Specifications
 - **JSON format**: KSON files MUST use the JSON format.
 - **File extension**: KSON files MUST use the `.kson` file extension.
@@ -496,7 +496,7 @@ Parameter values are written in one of the following formats:
             - 0.1 <= float <= 50.0
     - `feedback` (rate, default:`35%`)
         - Feedback rate
-    - `stereo_width` (rate, default:`0%`)
+    - `stereo_width` (rate, default:`75%`)
         - LFO phase difference between the L/R channels
     - `mix` (rate, default:`0%>50%`)
         - Blending ratio of the original audio and the effect audio
