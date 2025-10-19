@@ -81,7 +81,7 @@ A KSH file contains five types of lines: option lines, chart lines, bar lines, d
                 Left <-  `0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmno`  -> Right
             - Laser notes that are 1/32 or shorter are recognized as laser slams. (It is currently not possible to create 1/32 ordinary laser notes according to the current specification.)
         - `<lane-spin (optional)>`
-            - Examples: `@(192`, `@<192`, `S<192`
+            - Examples: `@(192`, `@<192`, `S<192`, `S<192;500`
             - The first two characters denote the effect type
                 - `@(`: Normal spin (left, clockwise)
                 - `@)`: Normal spin (right, counterclockwise)
@@ -90,6 +90,10 @@ A KSH file contains five types of lines: option lines, chart lines, bar lines, d
                 - `S<`: Swing effect (left)
                 - `S>`: Swing effect (right)
             - The number is the length (192 per measure).
+            - For swing effects, optional parameters can be specified after the length, separated by "`;`":
+                - Second parameter (int, default:`250`): Scale value
+                - Third parameter (int, default:`3`): Number of repetitions (1 per one-way swing)
+                - Fourth parameter (int, 0-2, default:`2`): Order of the decay (0: no decay, 1: linear decay, 2: squared decay)
 - Bar Line
     - Two measures are separated by one bar line.
     - Format
