@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.8.0`)
+# KSON Format Specification (version: `0.9.0-beta1`)
 ## Basic Specifications
 - **JSON format**: KSON files MUST use the JSON format.
 - **File extension**: KSON files MUST use the `.kson` file extension.
@@ -470,9 +470,14 @@ Parameter values are written in one of the following formats:
 - `pitch_shift`: This effect changes the pitch (key) of the audio.
     - `pitch` (pitch, default:`0`)
         - Pitch (key)
+    - (OPTIONAL SUPPORT) `chunk_size` (sample, default:`700samples`)
+        - Chunk size for pitch shifting
+        - Larger values improve sound quality but increase latency
+    - (OPTIONAL SUPPORT) `overlap` (rate, default:`40%`)
+        - Cross-fade ratio for smoothly connecting samples after chunk stretching/compression (0%-50%)
+        - Larger values produce smoother sound but may cause wave interference
     - `mix` (rate, default:`0%>100%`)
         - Blending ratio of the original audio and the effect audio
-    - Note: `chunkSize` and `overWrap` (properly "overlap") parameters in KSH format has been removed in kson format because they assume that the audio waveform is processed in the time domain.
 - `bitcrusher`: This effect reduces the quality of the audio wave. Also known as "Sample & Hold".
     - `reduction` (sample, default:`0samples-30samples`)
         - Number of samples to hold. A larger value results in lower sound quality.
@@ -498,11 +503,14 @@ Parameter values are written in one of the following formats:
         - Feedback rate
     - `stereo_width` (rate, default:`0%`)
         - LFO phase difference between the L/R channels
+    - (OPTIONAL SUPPORT) `hi_cut_gain` (float, default:`-8.0`)
+        - Gain reduction (in dB) for frequencies above the center of `freq_1` and `freq_2` (≤0.0)
+        - Additional requirement:
+            - float <= 0.0
     - `mix` (rate, default:`0%>50%`)
         - Blending ratio of the original audio and the effect audio
         - Note: For phaser effects, the mix value is doubled when used. A typical phaser effect is usually most effective at a mix value of 50%, but this makes it most effective at a mix value of `100%`. Note that the default value `50%` is actually a mix value of 25%.
     - Note: `freq_1` value may exceed the `freq_2` value.
-    - Note: `hiCutGain` parameter in KSH format has been removed in kson format because it is not a parameter of the phaser itself.
 - `wobble`: This effect oscillates the cutoff frequency of the low-pass filter with an LFO.
     - `wave_length` (length, default:`0`)
         - LFO period
@@ -643,15 +651,15 @@ dictionary CamInfo {
 #### `camera.cam.body`
 ```
 dictionary CamGraphs {
-    zoom:               GraphPoint[]?  // move the bottom edge closer to the camera (zoom_bottom in KSH format)
-    shift_x:            GraphPoint[]?  // move the highway horizontally (zoom_side in KSH format)
-    rotation_x:         GraphPoint[]?  // rotate the upper edge around the judgment line (zoom_top in KSH format)
+    zoom_top:           GraphPoint[]?  // rotate the upper edge around the judgment line (zoom_top in KSH format)
+    zoom_bottom:        GraphPoint[]?  // move the bottom edge closer to the camera (zoom_bottom in KSH format)
+    zoom_side:          GraphPoint[]?  // move the highway horizontally (zoom_side in KSH format)
     rotation_z:         GraphPoint[]?  // rotation degree (affects both highway & jdgline relatively)
     center_split:       GraphPoint[]?  // split the highway at the center (center_split in KSH format)
 }
 ```
-- The value scale used for `zoom`/`shift_x`/`rotation_x`/`center_split` is identical to the scale used for `zoom_bottom`/`zoom_side`/`zoom_top`/`center_split` in KSH format.
-- The units used for the `rotation_x` value are not degrees, but instead represent one full rotation every +2400 units.
+- The value scale used for `zoom_top`/`zoom_bottom`/`zoom_side`/`center_split` is identical to the scale used in KSH format.
+- The units used for the `zoom_top` value are not degrees, but instead represent one full rotation every +2400 units.
 
 #### `camera.cam.pattern`
 ```
@@ -702,7 +710,7 @@ array CamPatternInvokeSwing {
 ##### `camera.cam.pattern.laser.slam_event.swing[][3]` (OPTIONAL SUPPORT)
 ```
 dictionary CamPatternInvokeSwingValue {
-    scale:  double = 1.0   // scale
+    scale:  double = 250.0 // scale
     repeat: uint = 1       // number of repetitions
     decay_order: uint = 0  // order of the decay that scales camera values (0-2)
                            // (note that this decay is applied even if repeat=1)
@@ -943,6 +951,11 @@ array GraphSectionPoint {
 
 # Change Log
 
+- `0.9.0-beta1`
+    - Camera field names changed to match KSH format: `rotation_x` → `zoom_top`, `shift_x` → `zoom_side`, `zoom` → `zoom_bottom`
+    - Camera value scales changed to match KSH format (removed scale conversions)
+    - Swing scale default changed from 1.0 to 250.0 to match KSH format
+    - Re-added parameters as OPTIONAL SUPPORT (previously removed): `pitch_shift.chunk_size`, `pitch_shift.overlap`, `phaser.hi_cut_gain`
 - `0.8.0` (08/13/2023)
     - Changes: https://github.com/kshootmania/ksm-chart-format/pull/13/files
 - [`0.7.1`](https://github.com/kshootmania/ksm-chart-format/blob/51c260bb16fe47afd2366fd04abddfbc36ca34ff/kson_format.md) (07/22/2023)
