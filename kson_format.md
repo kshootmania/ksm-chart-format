@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.9.0-beta2`)
+# KSON Format Specification (version 0.9.0, format_version: `1`)
 ## Basic Specifications
 - **JSON format**: KSON files MUST use the JSON format.
 - **File extension**: KSON files MUST use the `.kson` file extension.
@@ -17,17 +17,17 @@
 ## Top-level object
 ```
 dictionary kson {
-    version: string       // kson version (Semantic Versioning like "x.y.z")
-    meta:    MetaInfo     // meta data, e.g. title, artist, ...
-    beat:    BeatInfo     // beat-related data, e.g. bpm, time signature, ...
-    gauge:   GaugeInfo?   // gauge-related data
-    note:    NoteInfo?    // notes on each lane
-    audio:   AudioInfo?   // audio-related data
-    camera:  CameraInfo?  // camera-related data
-    bg:      BGInfo?      // background-related data
-    editor:  EditorInfo?  // (OPTIONAL SUPPORT) data used only in editors
-    compat:  CompatInfo?  // (OPTIONAL SUPPORT) compatibility data with KSH format
-    impl:    ImplInfo?    // (OPTIONAL SUPPORT) data that is sure to be for a specific client
+    format_version: uint      // kson format version number (1 for kson 0.9.0, incremented by 1 for each format update)
+    meta:    MetaInfo         // meta data, e.g. title, artist, ...
+    beat:    BeatInfo         // beat-related data, e.g. bpm, time signature, ...
+    gauge:   GaugeInfo?       // gauge-related data
+    note:    NoteInfo?        // notes on each lane
+    audio:   AudioInfo?       // audio-related data
+    camera:  CameraInfo?      // camera-related data
+    bg:      BGInfo?          // background-related data
+    editor:  EditorInfo?      // (OPTIONAL SUPPORT) data used only in editors
+    compat:  CompatInfo?      // (OPTIONAL SUPPORT) compatibility data with KSH format
+    impl:    ImplInfo?        // (OPTIONAL SUPPORT) data that is sure to be for a specific client
 }
 ```
 
@@ -664,7 +664,7 @@ dictionary CamGraphs {
     zoom_top:           GraphPoint[]?  // rotate the upper edge around the judgment line (zoom_top in KSH format)
     zoom_bottom:        GraphPoint[]?  // move the bottom edge closer to the camera (zoom_bottom in KSH format)
     zoom_side:          GraphPoint[]?  // move the highway horizontally (zoom_side in KSH format)
-    rotation_z:         GraphPoint[]?  // rotation degree (affects both highway & jdgline relatively)
+    rotation_deg:       GraphPoint[]?  // rotation degree (affects both highway & jdgline relatively)
     center_split:       GraphPoint[]?  // split the highway at the center (center_split in KSH format)
 }
 ```
@@ -961,15 +961,9 @@ array GraphSectionPoint {
 
 # Change Log
 
-- `0.9.0-beta2`
-    - Added `beat.stop` parameter to represent chart stops separately from `scroll_speed`
-- `0.9.0-beta1`
-    - Camera field names changed to match KSH format: `rotation_x` → `zoom_top`, `shift_x` → `zoom_side`, `zoom` → `zoom_bottom`
-    - Camera value scales changed to match KSH format (removed scale conversions)
-    - Swing scale default changed from 1.0 to 250.0 to match KSH format
-    - Re-added parameters as OPTIONAL SUPPORT (previously removed): `pitch_shift.chunk_size`, `pitch_shift.overlap`, `phaser.hi_cut_gain`
-    - Fix default value for `phaser.stereo_width`
-- `0.8.0` (08/13/2023)
+- `0.9.0` (10/25/2025)
+    - Changes: https://github.com/kshootmania/ksm-chart-format/pull/14/files
+- [`0.8.0`](https://github.com/kshootmania/ksm-chart-format/blob/2b917d8876e4cb2cce4a39cfdb1b714a0a8df0ea/kson_format.md) (08/13/2023)
     - Changes: https://github.com/kshootmania/ksm-chart-format/pull/13/files
 - [`0.7.1`](https://github.com/kshootmania/ksm-chart-format/blob/51c260bb16fe47afd2366fd04abddfbc36ca34ff/kson_format.md) (07/22/2023)
     - Changes: https://github.com/kshootmania/ksm-chart-format/pull/12/files
