@@ -17,17 +17,17 @@
 ## Top-level object
 ```
 dictionary kson {
-    version: string       // kson version (Semantic Versioning like "x.y.z")
-    meta:    MetaInfo     // meta data, e.g. title, artist, ...
-    beat:    BeatInfo     // beat-related data, e.g. bpm, time signature, ...
-    gauge:   GaugeInfo?   // gauge-related data
-    note:    NoteInfo?    // notes on each lane
-    audio:   AudioInfo?   // audio-related data
-    camera:  CameraInfo?  // camera-related data
-    bg:      BGInfo?      // background-related data
-    editor:  EditorInfo?  // (OPTIONAL SUPPORT) data used only in editors
-    compat:  CompatInfo?  // (OPTIONAL SUPPORT) compatibility data with KSH format
-    impl:    ImplInfo?    // (OPTIONAL SUPPORT) data that is sure to be for a specific client
+    format_version: uint      // kson format version number (1 for kson 0.9.0, incremented by 1 for each format update)
+    meta:    MetaInfo         // meta data, e.g. title, artist, ...
+    beat:    BeatInfo         // beat-related data, e.g. bpm, time signature, ...
+    gauge:   GaugeInfo?       // gauge-related data
+    note:    NoteInfo?        // notes on each lane
+    audio:   AudioInfo?       // audio-related data
+    camera:  CameraInfo?      // camera-related data
+    bg:      BGInfo?          // background-related data
+    editor:  EditorInfo?      // (OPTIONAL SUPPORT) data used only in editors
+    compat:  CompatInfo?      // (OPTIONAL SUPPORT) compatibility data with KSH format
+    impl:    ImplInfo?        // (OPTIONAL SUPPORT) data that is sure to be for a specific client
 }
 ```
 
@@ -664,7 +664,7 @@ dictionary CamGraphs {
     zoom_top:           GraphPoint[]?  // rotate the upper edge around the judgment line (zoom_top in KSH format)
     zoom_bottom:        GraphPoint[]?  // move the bottom edge closer to the camera (zoom_bottom in KSH format)
     zoom_side:          GraphPoint[]?  // move the highway horizontally (zoom_side in KSH format)
-    rotation_z:         GraphPoint[]?  // rotation degree (affects both highway & jdgline relatively)
+    rotation_deg:       GraphPoint[]?  // rotation degree (affects both highway & jdgline relatively)
     center_split:       GraphPoint[]?  // split the highway at the center (center_split in KSH format)
 }
 ```
