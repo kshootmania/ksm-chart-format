@@ -357,7 +357,7 @@ Leading plus signs (e.g., "`+1`") and scientific notation (e.g., "`1e-3`", "`1E+
         - For example, `44100samples` means 1.0s
     - Allowed formats:
         - `[int]samples`
-            - Requirement: 1 <= int <= 44100
+            - Requirement: 0 <= int <= 44100
             - Example: `40samples`
     - The trailing "s" cannot be omitted even if the value is 1 (i.e., "`1sample`" is illegal, use "`1samples`" instead).
 - switch
@@ -490,6 +490,8 @@ Parameter values are written in one of the following formats:
         - Larger values improve sound quality but increase latency
     - (OPTIONAL SUPPORT) `overlap` (rate, default:`40%`)
         - Cross-fade ratio for smoothly connecting samples after chunk stretching/compression (0%-50%)
+        - Additional requirement:
+            - 0.0 <= float <= 0.5
         - Larger values produce smoother sound but may cause wave interference
     - `mix` (rate, default:`0%>100%`)
         - Blending ratio of the original audio and the effect audio
@@ -596,6 +598,8 @@ Parameter values are written in one of the following formats:
         - Cutoff frequency when `v` is 1.0
     - (OPTIONAL SUPPORT) `bandwidth` (float, default:implementation-dependent)
         - Bandwidth around the cutoff frequency [oct]
+        - Additional requirement:
+            - 0.1 <= float <= 10.0
     - `gain` (rate, default:`50%`)
         - Gain scale
     - `mix` (rate, default:`0%>100%`)
@@ -627,7 +631,7 @@ Parameter values are written in one of the following formats:
     - (OPTIONAL SUPPORT) `q` (float, default:implementation-dependent)
         - Q value of the biquad filter
         - Additional requirement:
-            - 0.1 <= float <= 5.0
+            - 0.1 <= float <= 50.0
     - `mix` (rate, default:`0%>100%`)
         - Blending ratio of the original audio and the effect audio
     - Note: `freq` value may exceed the `freq_max` value.
