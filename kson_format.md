@@ -402,6 +402,11 @@ Leading plus signs (e.g., "`+1`") and scientific notation (e.g., "`1e-3`", "`1E+
     - Allowed formats:
         - `[float]`
             - Example: `2.5`, `-10`
+- dB
+    - Decibel value
+    - Allowed formats:
+        - `[float]dB`
+            - Example: `-8.0dB`, `0dB`, `3.5dB`
 - filename
     - Filename string
     - Parameter values of this type can only be specified in `audio.audio_effect.xxx.def` and cannot be changed via `param_change`/`long_event`.
@@ -513,8 +518,8 @@ Parameter values are written in one of the following formats:
         - Feedback rate
     - `stereo_width` (rate, default:`75%`)
         - LFO phase difference between the L/R channels
-    - (OPTIONAL SUPPORT) `hi_cut_gain` (float, default:`-8.0`)
-        - Gain reduction (in dB) for frequencies above the center of `freq_1` and `freq_2` (≤0.0)
+    - (OPTIONAL SUPPORT) `hi_cut_gain` (dB, default:`-8.0dB`)
+        - Gain reduction for frequencies above the center of `freq_1` and `freq_2`
         - Additional requirement:
             - float <= 0.0
     - `mix` (rate, default:`0%>50%`)
