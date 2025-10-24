@@ -327,9 +327,16 @@ The list of body options is as follows:
     - Audio filenames cannot be used.
 - "`pfiltergain`" (default:"`50`")
     - The gain of the peaking filter for laser audio effects (int, 0-100)
+- "`scroll_speed`" (Not supported in KSM v1.xx)
+    - A scroll speed change (float)
+    - The value behaves as a linear graph (the same as manual tilts and lane zooms)
+        - An immediate change can be created by successive two lines of the "`scroll_speed`" option.
+    - The value is a multiplier (e.g. 1.0 for normal speed, 2.0 for double speed, 0.5 for half speed).
 - "`stop`"
     - A pause (int)
     - The value is the length of the pause (192 per measure).
+    - Equivalent to setting "`scroll_speed`" to 0 for a duration.
+    - If both "`stop`" and "`scroll_speed`" are specified at the same position, "`stop`" has higher priority.
 - "`tilt`"
     - A type change of lane tilts (string or float)
         - "`normal`": The default tilt
@@ -350,6 +357,10 @@ The list of body options is as follows:
     - The values behave as a linear graph (the same as manual tilts)
         - An immediate change can be created by successive two lines of the same options.
     - If "`ver`" is earlier than "`167`", the value is restricted between -300 and 300.
+- "`scroll_speed_curve`", "`zoom_top_curve`", "`zoom_bottom_curve`", "`zoom_side_curve`", "`center_split_curve`", "`tilt_curve`" (Not supported in KSM v1.xx)
+    - Curve interpolation for scroll speed, camera, and tilt parameters
+    - Format: "`<a>;<b>`" (both values are float in range [0.0, 1.0])
+    - Applied to the parameter at the same pulse in the same measure
     - Camera behaviors:
         - "`zoom_top`"
             - If "`ver`" is earlier than "`167`", the "zoom_top" simply moves the upper side of the lane upward; otherwise, "zoom_top" rotates the upper side of the lane with the judgment line as an axis.
@@ -366,6 +377,10 @@ The list of body options is as follows:
         - Cannot make a normal laser a wide-range one midway through the note.
     - The value must be "`2x`".
         - "`1x`" is allowed but it is meaningless.
+- "`laser_l_curve`", "`laser_r_curve`" (Not supported in KSM v1.xx)
+    - Curve interpolation for laser positions
+    - Format: "`<a>;<b>`" (both values are float in range [0.0, 1.0])
+    - Applied to the laser point at the same pulse in the same measure
 - "`fx-l`", "`fx-r`"
     - The type of audio effects for a long FX note (string)
         - "`Retrigger;<n>`": Retrigger with a `n`-th length of the wave
