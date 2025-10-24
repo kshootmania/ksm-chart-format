@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.9.0-beta1`)
+# KSON Format Specification (version: `0.9.0-beta2`)
 ## Basic Specifications
 - **JSON format**: KSON files MUST use the JSON format.
 - **File extension**: KSON files MUST use the `.kson` file extension.
@@ -64,6 +64,7 @@ dictionary BeatInfo {
     bpm:          ByPulse<double>[]                       // bpm changes
     time_sig:     ByMeasureIdx<TimeSig>[] = [[0, [4, 4]]] // time signature changes
     scroll_speed: GraphPoint[] = [[0, 1.0]]               // scroll speed changes
+    stop:         ByPulse<RelPulse>[]?                    // stops (equivalent to setting scroll_speed to 0 for a duration)
 }
 ```
 
@@ -74,6 +75,15 @@ array TimeSig {
     [1]: uint  // denominator
 }
 ```
+
+### `beat.stop[xxx]`
+```
+array ByPulse<RelPulse> {
+    [0]: uint  // y: pulse number
+    [1]: uint  // v: stop duration (relative pulse)
+}
+```
+- Note: If both `stop` and `scroll_speed` are specified at the same position, `stop` has higher priority.
 
 -----------------------------------------------------------------------------------
 
@@ -501,7 +511,7 @@ Parameter values are written in one of the following formats:
             - 0.1 <= float <= 50.0
     - `feedback` (rate, default:`35%`)
         - Feedback rate
-    - `stereo_width` (rate, default:`0%`)
+    - `stereo_width` (rate, default:`75%`)
         - LFO phase difference between the L/R channels
     - (OPTIONAL SUPPORT) `hi_cut_gain` (float, default:`-8.0`)
         - Gain reduction (in dB) for frequencies above the center of `freq_1` and `freq_2` (≤0.0)
@@ -951,11 +961,14 @@ array GraphSectionPoint {
 
 # Change Log
 
+- `0.9.0-beta2`
+    - Added `beat.stop` parameter to represent chart stops separately from `scroll_speed`
 - `0.9.0-beta1`
     - Camera field names changed to match KSH format: `rotation_x` → `zoom_top`, `shift_x` → `zoom_side`, `zoom` → `zoom_bottom`
     - Camera value scales changed to match KSH format (removed scale conversions)
     - Swing scale default changed from 1.0 to 250.0 to match KSH format
     - Re-added parameters as OPTIONAL SUPPORT (previously removed): `pitch_shift.chunk_size`, `pitch_shift.overlap`, `phaser.hi_cut_gain`
+    - Fix default value for `phaser.stereo_width`
 - `0.8.0` (08/13/2023)
     - Changes: https://github.com/kshootmania/ksm-chart-format/pull/13/files
 - [`0.7.1`](https://github.com/kshootmania/ksm-chart-format/blob/51c260bb16fe47afd2366fd04abddfbc36ca34ff/kson_format.md) (07/22/2023)
