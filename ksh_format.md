@@ -386,6 +386,8 @@ The list of body options is as follows:
     - Curve interpolation for laser positions
     - Format: "`<a>;<b>`" (both values are float in range [0.0, 1.0])
     - Applied to the laser point at the same pulse in the same measure
+    - To apply a curve to the line laser after a laser slam (1/32 or shorter laser segment), should be placed just before the slam (at the starting line laser of the slam)
+        - Note: Should not be placed at the line just before the line laser after the slam
 - "`fx-l`", "`fx-r`"
     - The type of audio effects for a long FX note (string)
         - "`Retrigger;<n>`": Retrigger with a `n`-th length of the wave
