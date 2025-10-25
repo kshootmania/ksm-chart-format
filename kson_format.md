@@ -744,12 +744,11 @@ dictionary CamPatternInvokeSwingValue {
 ```
 dictionary BGInfo {
     filename: string?      // (OPTIONAL SUPPORT) filename of background graphics file
-    offset:   int = 0      // (OPTIONAL SUPPORT) movie offset in millisecond
     legacy: LegacyBGInfo?  // (OPTIONAL SUPPORT)
 }
 ```
 - Note: The file format of `bg.filename` is not specified. If the format of the file specified in `bg.filename` is supported by the kson client, `bg.filename` is used; otherwise, it falls back to other built-in background graphics (which MAY be specified in `legacy`).
-- Note: `bg.offset` is used only if supported by the BG file format and its player, the kson client.
+- Note: `bg.filename` is reserved for future extension and is currently not used by KSM v2.
 
 ### `bg.legacy` (OPTIONAL SUPPORT)
 ```
