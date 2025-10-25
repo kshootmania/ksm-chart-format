@@ -189,7 +189,7 @@ dictionary KeySoundInvokeListFX {
     snare:       (uint|ByPulse<KeySoundInvokeFX>)[][2]?  // (OPTIONAL SUPPORT)
     snare_lo:    (uint|ByPulse<KeySoundInvokeFX>)[][2]?  // (OPTIONAL SUPPORT)
 
-    ...:         (uint|ByPulse<KeySoundInvokeFX>)[][2]?  // Custom key sounds can be inserted here by using the filename of a WAVE file (.wav) as a key
+    ...:         (uint|ByPulse<KeySoundInvokeFX>)[][2]?  // Custom key sounds can be inserted here by using an audio filename (with extension) as a key
 }
 ```
 - Note: `y` (pulse number) should be the same as `y` of an existing chip FX note; otherwise, the event is ignored.
@@ -219,7 +219,7 @@ dictionary KeySoundInvokeListLaser {
     slam_swing: uint[]?  // (OPTIONAL SUPPORT)
     slam_mute:  uint[]?  // (OPTIONAL SUPPORT)
 
-    // Note: Inserting custom key sounds here is not allowed
+    ...:        uint[]?  // Custom key sounds can be inserted here by using an audio filename (with extension) as a key
 }
 ```
 - Note: `y` (pulse number) should be the same as `y` of an existing laser slam note; otherwise, the event is ignored.
