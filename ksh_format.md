@@ -319,12 +319,12 @@ The list of body options is as follows:
 - "`chokkakuse`"
     - A laser slam sound setting (string)
     - Should be placed just before the target laser slam.
-    - The value is chosen from these preset sounds:
+    - The value should be set to an audio filename or one of these preset sounds:
         - "`up`"
         - "`down`"
         - "`swing`"
         - "`mute`"
-    - Audio filenames cannot be used.
+    - Audio filenames are not supported in KSM v1.xx.
 - "`pfiltergain`" (default:"`50`")
     - The gain of the peaking filter for laser audio effects (int, 0-100)
 - "`scroll_speed`" (Not supported in KSM v1.xx)
@@ -410,7 +410,7 @@ The list of body options is as follows:
 - "`fx-l_se`", "`fx-r_se`"
     - Format: "`<name>;<volume>`"
         - `<name>`: Key sound name (string)
-            - Should be set to a filename or one of these preset sounds:
+            - Should be set to an audio filename or one of these preset sounds:
                 - "`clap`"
                 - "`clap_punchy`"
                 - "`clap_impact`"
