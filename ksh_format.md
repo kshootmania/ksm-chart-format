@@ -329,9 +329,14 @@ The list of body options is as follows:
     - The gain of the peaking filter for laser audio effects (int, 0-100)
 - "`scroll_speed`" (Not supported in KSM v1.xx)
     - A scroll speed change (float)
-    - The value behaves as a linear graph (the same as manual tilts and lane zooms)
+    - The value behaves as a linear graph (the same as lane zooms)
         - An immediate change can be created by successive two lines of the "`scroll_speed`" option.
     - The value is a multiplier (e.g. 1.0 for normal speed, 2.0 for double speed, 0.5 for half speed).
+- "`rotation_deg`" (Not supported in KSM v1.xx)
+    - A rotation degree change (float)
+    - The value behaves as a linear graph (the same as lane zooms)
+        - An immediate change can be created by successive two lines of the "`rotation_deg`" option.
+    - The value is the rotation degree in degrees (e.g. 0 for no rotation, 90 for a quarter turn, 360 for a full rotation).
 - "`stop`"
     - A pause (int)
     - The value is the length of the pause (192 per measure).
@@ -357,8 +362,8 @@ The list of body options is as follows:
     - The values behave as a linear graph (the same as manual tilts)
         - An immediate change can be created by successive two lines of the same options.
     - If "`ver`" is earlier than "`167`", the value is restricted between -300 and 300.
-- "`scroll_speed_curve`", "`zoom_top_curve`", "`zoom_bottom_curve`", "`zoom_side_curve`", "`center_split_curve`", "`tilt_curve`" (Not supported in KSM v1.xx)
-    - Curve interpolation for scroll speed, camera, and tilt parameters
+- "`scroll_speed_curve`", "`rotation_deg_curve`", "`zoom_top_curve`", "`zoom_bottom_curve`", "`zoom_side_curve`", "`center_split_curve`", "`tilt_curve`" (Not supported in KSM v1.xx)
+    - Curve interpolation for scroll speed, rotation, camera, and tilt parameters
     - Format: "`<a>;<b>`" (both values are float in range [0.0, 1.0])
     - Applied to the parameter at the same pulse in the same measure
     - Camera behaviors:
