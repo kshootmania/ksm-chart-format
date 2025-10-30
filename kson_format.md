@@ -271,9 +271,17 @@ dictionary AudioEffectLaserInfo {
     param_change: dictionary<dictionary<ByPulse<string>[]>>? // audio effect parameter changes by pulse
     pulse_event: dictionary<uint[]>?                         // audio effect invocation by pulse
     peaking_filter_delay: uint = 0                           // (OPTIONAL SUPPORT) peaking filter delay time in milliseconds (0-160)
+    legacy: AudioEffectLaserLegacyInfo?                      // (OPTIONAL SUPPORT) legacy information
 }
 ```
 - Note: `audio.audio_effect.laser.pulse_event` cannot contain parameter changes. Use `audio.audio_effect.laser.param_change` instead.
+
+##### `audio.audio_effect.laser.legacy` (OPTIONAL SUPPORT)
+```
+dictionary AudioEffectLaserLegacyInfo {
+    filter_gain: ByPulse<double>[] = [[0, 0.5]]  // filter gain (0.0-1.0); "pfiltergain" in KSH format
+}
+```
 
 ##### `audio.audio_effect.fx.def.xxx`/`audio.audio_effect.laser.def.xxx`
 ```
