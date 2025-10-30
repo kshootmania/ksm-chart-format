@@ -248,6 +248,7 @@ dictionary AudioEffectFXInfo {
     long_event:   dictionary<(uint|ByPulse<dictionary<string>>)[][2]>? // audio effect invocation (and parameter changes) by long notes
 }
 ```
+- Note: `def` is an array of key-value pairs to preserve the order in which the user created the definitions, ensuring a stable order during editing and processing.
 - Note: `y` (pulse number) of `long_event` should be in the range `[y, y + length)` of an existing long FX note on the corresponding lane; otherwise, the event is ignored.
 - Example for `audio.audio_effect.fx.param_change`/`audio.audio_effect.laser.param_change`:
     ```
@@ -267,13 +268,14 @@ dictionary AudioEffectFXInfo {
 #### `audio.audio_effect.laser`
 ```
 dictionary AudioEffectLaserInfo {
-    def: dictionary<AudioEffectDef>?                         // audio effect definitions
+    def: DefKeyValuePair<AudioEffectDef>[]?                  // audio effect definitions
     param_change: dictionary<dictionary<ByPulse<string>[]>>? // audio effect parameter changes by pulse
     pulse_event: dictionary<uint[]>?                         // audio effect invocation by pulse
     peaking_filter_delay: uint = 0                           // (OPTIONAL SUPPORT) peaking filter delay time in milliseconds (0-160)
     legacy: AudioEffectLaserLegacyInfo?                      // (OPTIONAL SUPPORT) legacy information
 }
 ```
+- Note: `def` is an array of key-value pairs to preserve the order in which the user created the definitions, ensuring a stable order during editing and processing.
 - Note: `audio.audio_effect.laser.pulse_event` cannot contain parameter changes. Use `audio.audio_effect.laser.param_change` instead.
 
 ##### `audio.audio_effect.laser.legacy` (OPTIONAL SUPPORT)
