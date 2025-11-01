@@ -651,21 +651,63 @@ Parameter values are written in one of the following formats:
 ## `camera`
 ```
 dictionary CameraInfo {
-    tilt: TiltInfo?        // tilt-related data
-    cam:  CamInfo?         // cam-related data
+    tilt: ByPulse<TiltValue>?  = [[0, "normal"]]  // tilt value changes
+    cam:  CamInfo?  // cam-related data
 }
+
+type TiltValue = string|double|[double,double]|[double,[double,double]]|[[double,double],[double,double]]
 ```
 
 ### `camera.tilt`
-```
-dictionary TiltInfo {
-    scale:  ByPulse<double>[] = [[0, 1.0]]    // tilt scale
-    manual: ByPulse<GraphSectionPoint[]>[]?   // manual tilt
-                                              // Note: The left laser being on the right edge is equal to a manual value of 1.0, and the right laser being on the left edge is equal to a manual value of -1.0.
-                                              // Note: Two or more graph sections cannot be overlapped.
-                                              // Note: "camera.tilt.scale" does not affect the scale of manual tilt. Manual tilt is always evaluated with a scale of 1.0.
-    keep:   ByPulse<bool>[] = [[0, false]]    // whether tilt is kept or not
-                                              // (while tilt is kept, the tilt amount value is updated only to a larger absolute value with the same sign)
+
+**Tilt value types:**
+
+- **`string`**: Auto tilt type (KSH tilt type names)
+  - Allowed values:
+    - `"normal"`: Default tilt (scale=1.0)
+    - `"bigger"`: Bigger tilt (scale=1.75)
+    - `"biggest"`: Biggest tilt (scale=2.5)
+    - `"keep_normal"`: Keep normal tilt (scale=1.0)
+    - `"keep_bigger"`: Keep bigger tilt (scale=1.75)
+    - `"keep_biggest"`: Keep biggest tilt (scale=2.5)
+    - `"zero"`: No tilt (scale=0.0)
+  - While auto tilt with `keep_` prefix, the tilt amount value is updated only to a larger absolute value with the same sign
+
+- **`double`**: Manual tilt value (single value)
+  - Format in ByPulse: `[y, value]`
+  - Specifies the tilt amount
+  - Requirement: -100.0 <= value <= 100.0
+  - Note: The left laser being on the right edge is equal to a manual value of 1.0, and the right laser being on the left edge is equal to a manual value of -1.0.
+  - Note: Manual tilt is always evaluated with a scale of 1.0 (independent of auto tilt scale)
+  - Example: `[960, 0.5]` means tilt interpolates to 0.5 with linear interpolation
+
+- **`[double, double]`**: Manual tilt with immediate change
+  - Format in ByPulse: `[y, [v, vf]]`
+  - Immediate change from `v` to `vf` at the same pulse
+  - Example: `[960, [0.5, 0.8]]` means tilt changes from 0.5 to 0.8 instantly at pulse 960
+
+- **`[double, [double, double]]`**: Manual tilt with curve (no immediate change)
+  - Format in ByPulse: `[y, [v, [a, b]]]`
+  - First value `v`: Tilt value
+  - Second array `[a, b]`: Curve control point (both in range [0.0, 1.0]) for interpolation to the next tilt point
+  - Example: `[960, [0.5, [0.3, 0.7]]]` means tilt value is 0.5 at pulse 960, and interpolates to the next point with curve (0.3, 0.7)
+
+- **`[[double, double], [double, double]]`**: Manual tilt with immediate change and curve
+  - Format in ByPulse: `[y, [[v, vf], [a, b]]]`
+  - First array `[v, vf]`: Tilt value with immediate change from v to vf
+  - Second array `[a, b]`: Curve control point (both in range [0.0, 1.0]) for interpolation to the next tilt point
+  - Example: `[960, [[0.5, 0.8], [0.3, 0.7]]]` means tilt changes from 0.5 to 0.8 instantly at pulse 960, then interpolates to the next point with curve (0.3, 0.7)
+
+**Example:**
+```json
+{
+  "tilt": [
+    [0, "normal"],
+    [960, 0.5],
+    [1600, 0.8],
+    [2880, "bigger"],
+    [3840, "keep_bigger"]
+  ]
 }
 ```
 
