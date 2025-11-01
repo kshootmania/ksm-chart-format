@@ -296,6 +296,11 @@ The list of header options is as follows:
         - "`171`"
             - The maximum polyphony of laser slams is changed to 1.
             - The maximum polyphony of keysounds is changed to 1.
+- "`ver_compat`" (default:"")
+    - The compatibility version for chart behavior (string)
+    - When this field is present, it should be used instead of "`ver`" for determining chart behavior.
+    - Note: This field is typically used when a chart needs to maintain the behavior of an older version while using the syntax of a newer version.
+        - Example: A chart with "`ver=160`" and "`ver_compat=130`" uses ver 160 syntax but behaves according to ver 130 specifications.
 - "`information`" (default:"")
     - The optional information shown in song selection
     - Line break is not supported
