@@ -980,7 +980,7 @@ array GraphValue {
 ```
 - The array size of `GraphValue` MUST be 2.
 
-### graph curve value (OPTIONAL SUPPORT)
+### graph curve value
 ```
 array GraphCurveValue {
     [0]: double  // a: x-coordinate of the curve control point (0.0-1.0)
@@ -994,7 +994,7 @@ array GraphCurveValue {
 array GraphPoint {
     [0]: uint                          // y: absolute pulse number
     [1]: double|GraphValue             // v: graph value; if double is used, v and vf are set to the same value
-    [2]: GraphCurveValue = [0.0, 0.0]  // (OPTIONAL SUPPORT) curve: graph curve value
+    [2]: GraphCurveValue = [0.0, 0.0]  // curve: graph curve value
 }
 ```
 - The array size of `GraphPoint<T>` MUST be 2 or 3.
@@ -1004,7 +1004,7 @@ array GraphPoint {
 array GraphSectionPoint {
     [0]: uint                          // ry: relative pulse number
     [1]: double|GraphValue             // v: graph value; if double is used, v and vf are set to the same value
-    [2]: GraphCurveValue = [0.0, 0.0]  // (OPTIONAL SUPPORT) curve: graph curve value
+    [2]: GraphCurveValue = [0.0, 0.0]  // curve: graph curve value
 }
 ```
 - The array size of `GraphSectionPoint<T>` MUST be 2 or 3.
