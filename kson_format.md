@@ -655,7 +655,7 @@ dictionary CameraInfo {
     cam:  CamInfo?  // cam-related data
 }
 
-type TiltValue = string|double|[double,double]|[double,[double,double]]|[[double,double],[double,double]]
+type TiltValue = string|double|[double,double]|[double,string]|[double,[double,double]]|[[double,double],[double,double]]
 ```
 
 ### `camera.tilt`
@@ -685,6 +685,14 @@ type TiltValue = string|double|[double,double]|[double,[double,double]]|[[double
   - Format in ByPulse: `[y, [v, vf]]`
   - Immediate change from `v` to `vf` at the same pulse
   - Example: `[960, [0.5, 0.8]]` means tilt changes from 0.5 to 0.8 instantly at pulse 960
+
+- **`[double, string]`**: Manual tilt to auto tilt with immediate change
+  - Format in ByPulse: `[y, [v, vf]]`
+  - `v`: Manual tilt value (double)
+  - `vf`: Auto tilt type (string)
+  - Requirement: -100.0 <= v <= 100.0
+  - Requirement: vf must be one of: "normal", "bigger", "biggest", "keep_normal", "keep_bigger", "keep_biggest", "zero"
+  - Example: `[960, [0.8, "normal"]]` means tilt changes from manual value 0.8 to auto tilt "normal" instantly at pulse 960
 
 - **`[double, [double, double]]`**: Manual tilt with curve (no immediate change)
   - Format in ByPulse: `[y, [v, [a, b]]]`
