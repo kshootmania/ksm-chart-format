@@ -1,4 +1,4 @@
-# KSON Format Specification (version: `0.8.0`)
+# KSON Format Specification (version 0.9.0, format_version: `1`)
 ## Basic Specifications
 - **JSON format**: KSON files MUST use the JSON format.
 - **File extension**: KSON files MUST use the `.kson` file extension.
@@ -17,17 +17,17 @@
 ## Top-level object
 ```
 dictionary kson {
-    version: string       // kson version (Semantic Versioning like "x.y.z")
-    meta:    MetaInfo     // meta data, e.g. title, artist, ...
-    beat:    BeatInfo     // beat-related data, e.g. bpm, time signature, ...
-    gauge:   GaugeInfo?   // gauge-related data
-    note:    NoteInfo?    // notes on each lane
-    audio:   AudioInfo?   // audio-related data
-    camera:  CameraInfo?  // camera-related data
-    bg:      BGInfo?      // background-related data
-    editor:  EditorInfo?  // (OPTIONAL SUPPORT) data used only in editors
-    compat:  CompatInfo?  // (OPTIONAL SUPPORT) compatibility data with KSH format
-    impl:    ImplInfo?    // (OPTIONAL SUPPORT) data that is sure to be for a specific client
+    format_version: uint      // kson format version number (1 for kson 0.9.0, incremented by 1 for each format update)
+    meta:    MetaInfo         // meta data, e.g. title, artist, ...
+    beat:    BeatInfo         // beat-related data, e.g. bpm, time signature, ...
+    gauge:   GaugeInfo?       // gauge-related data
+    note:    NoteInfo?        // notes on each lane
+    audio:   AudioInfo?       // audio-related data
+    camera:  CameraInfo?      // camera-related data
+    bg:      BGInfo?          // background-related data
+    editor:  EditorInfo?      // (OPTIONAL SUPPORT) data used only in editors
+    compat:  CompatInfo?      // (OPTIONAL SUPPORT) compatibility data with KSH format
+    impl:    ImplInfo?        // (OPTIONAL SUPPORT) data that is sure to be for a specific client
 }
 ```
 
@@ -64,6 +64,7 @@ dictionary BeatInfo {
     bpm:          ByPulse<double>[]                       // bpm changes
     time_sig:     ByMeasureIdx<TimeSig>[] = [[0, [4, 4]]] // time signature changes
     scroll_speed: GraphPoint[] = [[0, 1.0]]               // scroll speed changes
+    stop:         ByPulse<RelPulse>[]?                    // stops (equivalent to setting scroll_speed to 0 for a duration)
 }
 ```
 
@@ -74,6 +75,15 @@ array TimeSig {
     [1]: uint  // denominator
 }
 ```
+
+### `beat.stop[xxx]`
+```
+array ByPulse<RelPulse> {
+    [0]: uint  // y: pulse number
+    [1]: uint  // v: stop duration (relative pulse)
+}
+```
+- Note: If both `stop` and `scroll_speed` are specified at the same position, `stop` has higher priority.
 
 -----------------------------------------------------------------------------------
 
@@ -179,7 +189,7 @@ dictionary KeySoundInvokeListFX {
     snare:       (uint|ByPulse<KeySoundInvokeFX>)[][2]?  // (OPTIONAL SUPPORT)
     snare_lo:    (uint|ByPulse<KeySoundInvokeFX>)[][2]?  // (OPTIONAL SUPPORT)
 
-    ...:         (uint|ByPulse<KeySoundInvokeFX>)[][2]?  // Custom key sounds can be inserted here by using the filename of a WAVE file (.wav) as a key
+    ...:         (uint|ByPulse<KeySoundInvokeFX>)[][2]?  // Custom key sounds can be inserted here by using an audio filename (with extension) as a key
 }
 ```
 - Note: `y` (pulse number) should be the same as `y` of an existing chip FX note; otherwise, the event is ignored.
@@ -209,7 +219,7 @@ dictionary KeySoundInvokeListLaser {
     slam_swing: uint[]?  // (OPTIONAL SUPPORT)
     slam_mute:  uint[]?  // (OPTIONAL SUPPORT)
 
-    // Note: Inserting custom key sounds here is not allowed
+    ...:        uint[]?  // Custom key sounds can be inserted here by using an audio filename (with extension) as a key
 }
 ```
 - Note: `y` (pulse number) should be the same as `y` of an existing laser slam note; otherwise, the event is ignored.
@@ -238,6 +248,7 @@ dictionary AudioEffectFXInfo {
     long_event:   dictionary<(uint|ByPulse<dictionary<string>>)[][2]>? // audio effect invocation (and parameter changes) by long notes
 }
 ```
+- Note: `def` is an array of key-value pairs to preserve the order in which the user created the definitions, ensuring a stable order during editing and processing.
 - Note: `y` (pulse number) of `long_event` should be in the range `[y, y + length)` of an existing long FX note on the corresponding lane; otherwise, the event is ignored.
 - Example for `audio.audio_effect.fx.param_change`/`audio.audio_effect.laser.param_change`:
     ```
@@ -257,13 +268,22 @@ dictionary AudioEffectFXInfo {
 #### `audio.audio_effect.laser`
 ```
 dictionary AudioEffectLaserInfo {
-    def: dictionary<AudioEffectDef>?                         // audio effect definitions
+    def: DefKeyValuePair<AudioEffectDef>[]?                  // audio effect definitions
     param_change: dictionary<dictionary<ByPulse<string>[]>>? // audio effect parameter changes by pulse
     pulse_event: dictionary<uint[]>?                         // audio effect invocation by pulse
     peaking_filter_delay: uint = 0                           // (OPTIONAL SUPPORT) peaking filter delay time in milliseconds (0-160)
+    legacy: AudioEffectLaserLegacyInfo?                      // (OPTIONAL SUPPORT) legacy information
 }
 ```
+- Note: `def` is an array of key-value pairs to preserve the order in which the user created the definitions, ensuring a stable order during editing and processing.
 - Note: `audio.audio_effect.laser.pulse_event` cannot contain parameter changes. Use `audio.audio_effect.laser.param_change` instead.
+
+##### `audio.audio_effect.laser.legacy` (OPTIONAL SUPPORT)
+```
+dictionary AudioEffectLaserLegacyInfo {
+    filter_gain: ByPulse<double>[] = [[0, 0.5]]  // filter gain (0.0-1.0); "pfiltergain" in KSH format
+}
+```
 
 ##### `audio.audio_effect.fx.def.xxx`/`audio.audio_effect.laser.def.xxx`
 ```
@@ -347,7 +367,7 @@ Leading plus signs (e.g., "`+1`") and scientific notation (e.g., "`1e-3`", "`1E+
         - For example, `44100samples` means 1.0s
     - Allowed formats:
         - `[int]samples`
-            - Requirement: 1 <= int <= 44100
+            - Requirement: 0 <= int <= 44100
             - Example: `40samples`
     - The trailing "s" cannot be omitted even if the value is 1 (i.e., "`1sample`" is illegal, use "`1samples`" instead).
 - switch
@@ -392,6 +412,11 @@ Leading plus signs (e.g., "`+1`") and scientific notation (e.g., "`1e-3`", "`1E+
     - Allowed formats:
         - `[float]`
             - Example: `2.5`, `-10`
+- dB
+    - Decibel value
+    - Allowed formats:
+        - `[float]dB`
+            - Example: `-8.0dB`, `0dB`, `3.5dB`
 - filename
     - Filename string
     - Parameter values of this type can only be specified in `audio.audio_effect.xxx.def` and cannot be changed via `param_change`/`long_event`.
@@ -470,9 +495,16 @@ Parameter values are written in one of the following formats:
 - `pitch_shift`: This effect changes the pitch (key) of the audio.
     - `pitch` (pitch, default:`0`)
         - Pitch (key)
+    - (OPTIONAL SUPPORT) `chunk_size` (sample, default:`700samples`)
+        - Chunk size for pitch shifting
+        - Larger values improve sound quality but increase latency
+    - (OPTIONAL SUPPORT) `overlap` (rate, default:`40%`)
+        - Cross-fade ratio for smoothly connecting samples after chunk stretching/compression (0%-50%)
+        - Additional requirement:
+            - 0.0 <= float <= 0.5
+        - Larger values produce smoother sound but may cause wave interference
     - `mix` (rate, default:`0%>100%`)
         - Blending ratio of the original audio and the effect audio
-    - Note: `chunkSize` and `overWrap` (properly "overlap") parameters in KSH format has been removed in kson format because they assume that the audio waveform is processed in the time domain.
 - `bitcrusher`: This effect reduces the quality of the audio wave. Also known as "Sample & Hold".
     - `reduction` (sample, default:`0samples-30samples`)
         - Number of samples to hold. A larger value results in lower sound quality.
@@ -496,13 +528,16 @@ Parameter values are written in one of the following formats:
             - 0.1 <= float <= 50.0
     - `feedback` (rate, default:`35%`)
         - Feedback rate
-    - `stereo_width` (rate, default:`0%`)
+    - `stereo_width` (rate, default:`75%`)
         - LFO phase difference between the L/R channels
+    - (OPTIONAL SUPPORT) `hi_cut_gain` (dB, default:`-8.0dB`)
+        - Gain reduction for frequencies above the center of `freq_1` and `freq_2`
+        - Additional requirement:
+            - float <= 0.0
     - `mix` (rate, default:`0%>50%`)
         - Blending ratio of the original audio and the effect audio
         - Note: For phaser effects, the mix value is doubled when used. A typical phaser effect is usually most effective at a mix value of 50%, but this makes it most effective at a mix value of `100%`. Note that the default value `50%` is actually a mix value of 25%.
     - Note: `freq_1` value may exceed the `freq_2` value.
-    - Note: `hiCutGain` parameter in KSH format has been removed in kson format because it is not a parameter of the phaser itself.
 - `wobble`: This effect oscillates the cutoff frequency of the low-pass filter with an LFO.
     - `wave_length` (length, default:`0`)
         - LFO period
@@ -573,6 +608,8 @@ Parameter values are written in one of the following formats:
         - Cutoff frequency when `v` is 1.0
     - (OPTIONAL SUPPORT) `bandwidth` (float, default:implementation-dependent)
         - Bandwidth around the cutoff frequency [oct]
+        - Additional requirement:
+            - 0.1 <= float <= 10.0
     - `gain` (rate, default:`50%`)
         - Gain scale
     - `mix` (rate, default:`0%>100%`)
@@ -604,7 +641,7 @@ Parameter values are written in one of the following formats:
     - (OPTIONAL SUPPORT) `q` (float, default:implementation-dependent)
         - Q value of the biquad filter
         - Additional requirement:
-            - 0.1 <= float <= 5.0
+            - 0.1 <= float <= 50.0
     - `mix` (rate, default:`0%>100%`)
         - Blending ratio of the original audio and the effect audio
     - Note: `freq` value may exceed the `freq_max` value.
@@ -614,21 +651,71 @@ Parameter values are written in one of the following formats:
 ## `camera`
 ```
 dictionary CameraInfo {
-    tilt: TiltInfo?        // tilt-related data
-    cam:  CamInfo?         // cam-related data
+    tilt: ByPulse<TiltValue>?  = [[0, "normal"]]  // tilt value changes
+    cam:  CamInfo?  // cam-related data
 }
+
+type TiltValue = string|double|[double,double]|[double,string]|[double,[double,double]]|[[double,double],[double,double]]
 ```
 
 ### `camera.tilt`
-```
-dictionary TiltInfo {
-    scale:  ByPulse<double>[] = [[0, 1.0]]    // tilt scale
-    manual: ByPulse<GraphSectionPoint[]>[]?   // manual tilt
-                                              // Note: The left laser being on the right edge is equal to a manual value of 1.0, and the right laser being on the left edge is equal to a manual value of -1.0.
-                                              // Note: Two or more graph sections cannot be overlapped.
-                                              // Note: "camera.tilt.scale" does not affect the scale of manual tilt. Manual tilt is always evaluated with a scale of 1.0.
-    keep:   ByPulse<bool>[] = [[0, false]]    // whether tilt is kept or not
-                                              // (while tilt is kept, the tilt amount value is updated only to a larger absolute value with the same sign)
+
+**Tilt value types:**
+
+- **`string`**: Auto tilt type (KSH tilt type names)
+  - Allowed values:
+    - `"normal"`: Default tilt (scale=1.0)
+    - `"bigger"`: Bigger tilt (scale=1.75)
+    - `"biggest"`: Biggest tilt (scale=2.5)
+    - `"keep_normal"`: Keep normal tilt (scale=1.0)
+    - `"keep_bigger"`: Keep bigger tilt (scale=1.75)
+    - `"keep_biggest"`: Keep biggest tilt (scale=2.5)
+    - `"zero"`: No tilt (scale=0.0)
+  - While auto tilt with `keep_` prefix, the tilt amount value is updated only to a larger absolute value with the same sign
+
+- **`double`**: Manual tilt value (single value)
+  - Format in ByPulse: `[y, value]`
+  - Specifies the tilt amount
+  - Requirement: -100.0 <= value <= 100.0
+  - Note: The left laser being on the right edge is equal to a manual value of 1.0, and the right laser being on the left edge is equal to a manual value of -1.0.
+  - Note: Manual tilt is always evaluated with a scale of 1.0 (independent of auto tilt scale)
+  - Example: `[960, 0.5]` means tilt interpolates to 0.5 with linear interpolation
+
+- **`[double, double]`**: Manual tilt with immediate change
+  - Format in ByPulse: `[y, [v, vf]]`
+  - Immediate change from `v` to `vf` at the same pulse
+  - Example: `[960, [0.5, 0.8]]` means tilt changes from 0.5 to 0.8 instantly at pulse 960
+
+- **`[double, string]`**: Manual tilt to auto tilt with immediate change
+  - Format in ByPulse: `[y, [v, vf]]`
+  - `v`: Manual tilt value (double)
+  - `vf`: Auto tilt type (string)
+  - Requirement: -100.0 <= v <= 100.0
+  - Requirement: vf must be one of: "normal", "bigger", "biggest", "keep_normal", "keep_bigger", "keep_biggest", "zero"
+  - Example: `[960, [0.8, "normal"]]` means tilt changes from manual value 0.8 to auto tilt "normal" instantly at pulse 960
+
+- **`[double, [double, double]]`**: Manual tilt with curve (no immediate change)
+  - Format in ByPulse: `[y, [v, [a, b]]]`
+  - First value `v`: Tilt value
+  - Second array `[a, b]`: Curve control point (both in range [0.0, 1.0]) for interpolation to the next tilt point
+  - Example: `[960, [0.5, [0.3, 0.7]]]` means tilt value is 0.5 at pulse 960, and interpolates to the next point with curve (0.3, 0.7)
+
+- **`[[double, double], [double, double]]`**: Manual tilt with immediate change and curve
+  - Format in ByPulse: `[y, [[v, vf], [a, b]]]`
+  - First array `[v, vf]`: Tilt value with immediate change from v to vf
+  - Second array `[a, b]`: Curve control point (both in range [0.0, 1.0]) for interpolation to the next tilt point
+  - Example: `[960, [[0.5, 0.8], [0.3, 0.7]]]` means tilt changes from 0.5 to 0.8 instantly at pulse 960, then interpolates to the next point with curve (0.3, 0.7)
+
+**Example:**
+```json
+{
+  "tilt": [
+    [0, "normal"],
+    [960, 0.5],
+    [1600, 0.8],
+    [2880, "bigger"],
+    [3840, "keep_bigger"]
+  ]
 }
 ```
 
@@ -643,15 +730,15 @@ dictionary CamInfo {
 #### `camera.cam.body`
 ```
 dictionary CamGraphs {
-    zoom:               GraphPoint[]?  // move the bottom edge closer to the camera (zoom_bottom in KSH format)
-    shift_x:            GraphPoint[]?  // move the highway horizontally (zoom_side in KSH format)
-    rotation_x:         GraphPoint[]?  // rotate the upper edge around the judgment line (zoom_top in KSH format)
-    rotation_z:         GraphPoint[]?  // rotation degree (affects both highway & jdgline relatively)
+    zoom_top:           GraphPoint[]?  // rotate the upper edge around the judgment line (zoom_top in KSH format)
+    zoom_bottom:        GraphPoint[]?  // move the bottom edge closer to the camera (zoom_bottom in KSH format)
+    zoom_side:          GraphPoint[]?  // move the highway horizontally (zoom_side in KSH format)
+    rotation_deg:       GraphPoint[]?  // rotation degree (affects both highway & jdgline relatively)
     center_split:       GraphPoint[]?  // split the highway at the center (center_split in KSH format)
 }
 ```
-- The value scale used for `zoom`/`shift_x`/`rotation_x`/`center_split` is identical to the scale used for `zoom_bottom`/`zoom_side`/`zoom_top`/`center_split` in KSH format.
-- The units used for the `rotation_x` value are not degrees, but instead represent one full rotation every +2400 units.
+- The value scale used for `zoom_top`/`zoom_bottom`/`zoom_side`/`center_split` is identical to the scale used in KSH format.
+- The units used for the `zoom_top` value are not degrees, but instead represent one full rotation every +2400 units.
 
 #### `camera.cam.pattern`
 ```
@@ -702,7 +789,7 @@ array CamPatternInvokeSwing {
 ##### `camera.cam.pattern.laser.slam_event.swing[][3]` (OPTIONAL SUPPORT)
 ```
 dictionary CamPatternInvokeSwingValue {
-    scale:  double = 1.0   // scale
+    scale:  double = 250.0 // scale
     repeat: uint = 1       // number of repetitions
     decay_order: uint = 0  // order of the decay that scales camera values (0-2)
                            // (note that this decay is applied even if repeat=1)
@@ -717,12 +804,11 @@ dictionary CamPatternInvokeSwingValue {
 ```
 dictionary BGInfo {
     filename: string?      // (OPTIONAL SUPPORT) filename of background graphics file
-    offset:   int = 0      // (OPTIONAL SUPPORT) movie offset in millisecond
     legacy: LegacyBGInfo?  // (OPTIONAL SUPPORT)
 }
 ```
 - Note: The file format of `bg.filename` is not specified. If the format of the file specified in `bg.filename` is supported by the kson client, `bg.filename` is used; otherwise, it falls back to other built-in background graphics (which MAY be specified in `legacy`).
-- Note: `bg.offset` is used only if supported by the BG file format and its player, the kson client.
+- Note: `bg.filename` is reserved for future extension and is currently not used by KSM v2.
 
 ### `bg.legacy` (OPTIONAL SUPPORT)
 ```
@@ -902,7 +988,7 @@ array GraphValue {
 ```
 - The array size of `GraphValue` MUST be 2.
 
-### graph curve value (OPTIONAL SUPPORT)
+### graph curve value
 ```
 array GraphCurveValue {
     [0]: double  // a: x-coordinate of the curve control point (0.0-1.0)
@@ -916,7 +1002,7 @@ array GraphCurveValue {
 array GraphPoint {
     [0]: uint                          // y: absolute pulse number
     [1]: double|GraphValue             // v: graph value; if double is used, v and vf are set to the same value
-    [2]: GraphCurveValue = [0.0, 0.0]  // (OPTIONAL SUPPORT) curve: graph curve value
+    [2]: GraphCurveValue = [0.0, 0.0]  // curve: graph curve value
 }
 ```
 - The array size of `GraphPoint<T>` MUST be 2 or 3.
@@ -926,7 +1012,7 @@ array GraphPoint {
 array GraphSectionPoint {
     [0]: uint                          // ry: relative pulse number
     [1]: double|GraphValue             // v: graph value; if double is used, v and vf are set to the same value
-    [2]: GraphCurveValue = [0.0, 0.0]  // (OPTIONAL SUPPORT) curve: graph curve value
+    [2]: GraphCurveValue = [0.0, 0.0]  // curve: graph curve value
 }
 ```
 - The array size of `GraphSectionPoint<T>` MUST be 2 or 3.
@@ -943,7 +1029,9 @@ array GraphSectionPoint {
 
 # Change Log
 
-- `0.8.0` (08/13/2023)
+- `0.9.0` (11/16/2025)
+    - Changes: https://github.com/kshootmania/ksm-chart-format/pull/14/files
+- [`0.8.0`](https://github.com/kshootmania/ksm-chart-format/blob/2b917d8876e4cb2cce4a39cfdb1b714a0a8df0ea/kson_format.md) (08/13/2023)
     - Changes: https://github.com/kshootmania/ksm-chart-format/pull/13/files
 - [`0.7.1`](https://github.com/kshootmania/ksm-chart-format/blob/51c260bb16fe47afd2366fd04abddfbc36ca34ff/kson_format.md) (07/22/2023)
     - Changes: https://github.com/kshootmania/ksm-chart-format/pull/12/files
