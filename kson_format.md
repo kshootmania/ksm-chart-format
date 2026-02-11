@@ -800,8 +800,8 @@ array CamPatternInvokeSwing {
 ```
 dictionary CamPatternInvokeSwingValue {
     scale:  double = 250.0 // scale
-    repeat: uint = 1       // number of repetitions
-    decay_order: uint = 0  // order of the decay that scales camera values (0-2)
+    repeat: uint = 3       // number of repetitions
+    decay_order: uint = 2  // order of the decay that scales camera values (0-2)
                            // (note that this decay is applied even if repeat=1)
                            // - equation: `value * (1.0 - ((l - ry) / l))^decay_order`
                            // - 0: no decay, 1: linear decay, 2: squared decay
