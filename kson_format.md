@@ -284,6 +284,11 @@ dictionary AudioEffectLaserLegacyInfo {
     filter_gain: ByPulse<double>[] = [[0, 0.5]]  // filter gain (0.0-1.0); "pfiltergain" in KSH format
 }
 ```
+- Note: `filter_gain` serves as a shorthand for controlling multiple built-in filter effects' parameters via `audio.audio_effect.laser.param_change`.
+    - In KSM v2, `filter_gain` is converted to the following parameters only when the corresponding built-in effects are not overridden by user-defined effects in `audio.audio_effect.laser.def`:
+        - `peaking_filter.gain`: linear interpolation between `0%` and `100%`
+        - `high_pass_filter.q`: linear interpolation between `2.0` and `8.0`
+        - `low_pass_filter.q`: linear interpolation between `2.0` and `5.2`
 
 ##### `audio.audio_effect.fx.def.xxx`/`audio.audio_effect.laser.def.xxx`
 ```
