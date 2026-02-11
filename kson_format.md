@@ -1016,7 +1016,7 @@ array GraphPoint {
     [2]: GraphCurveValue = [0.0, 0.0]  // curve: graph curve value
 }
 ```
-- The array size of `GraphPoint<T>` MUST be 2 or 3.
+- The array size of `GraphPoint` MUST be 2 or 3.
 
 ### graph point (for graph sections = `ByPulse<GraphSectionPoint[]>`)
 ```
@@ -1026,7 +1026,7 @@ array GraphSectionPoint {
     [2]: GraphCurveValue = [0.0, 0.0]  // curve: graph curve value
 }
 ```
-- The array size of `GraphSectionPoint<T>` MUST be 2 or 3.
+- The array size of `GraphSectionPoint` MUST be 2 or 3.
 
 -----------------------------------------------------------------------------------
 
