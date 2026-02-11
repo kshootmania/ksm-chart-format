@@ -1,4 +1,4 @@
-# KSON Format Specification (version 0.9.0, format_version: `1`)
+# KSON Format Specification (version 1.0.0, format_version: `1`)
 ## Basic Specifications
 - **JSON format**: KSON files MUST use the JSON format.
 - **File extension**: KSON files MUST use the `.kson` file extension.
@@ -17,7 +17,7 @@
 ## Top-level object
 ```
 dictionary kson {
-    format_version: uint      // kson format version number (1 for kson 0.9.0, incremented by 1 for each format update)
+    format_version: uint      // kson format version number (1 for kson 1.0.0, incremented by 1 for each format update)
     meta:    MetaInfo         // meta data, e.g. title, artist, ...
     beat:    BeatInfo         // beat-related data, e.g. bpm, time signature, ...
     gauge:   GaugeInfo?       // gauge-related data
@@ -1040,7 +1040,9 @@ array GraphSectionPoint {
 
 # Change Log
 
-- `0.9.0` (11/16/2025)
+- `1.0.0` (02/11/2026)
+    - Changes: https://github.com/kshootmania/ksm-chart-format/pull/15/files
+- [`0.9.0`](https://github.com/kshootmania/ksm-chart-format/blob/45e2b14141b3f65fe70fe984ef574cb8a0bcb201/kson_format.md) (11/16/2025)
     - Changes: https://github.com/kshootmania/ksm-chart-format/pull/14/files
 - [`0.8.0`](https://github.com/kshootmania/ksm-chart-format/blob/2b917d8876e4cb2cce4a39cfdb1b714a0a8df0ea/kson_format.md) (08/13/2023)
     - Changes: https://github.com/kshootmania/ksm-chart-format/pull/13/files
