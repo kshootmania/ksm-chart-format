@@ -943,7 +943,7 @@ dictionary KSHUnknownInfo {
             "line":[
                 [0, ";some-extension1"],
                 [0, ";some-extension2"],
-                [960, ";some-extension3"],
+                [960, ";some-extension3"]
             ]
         }
         ```
