@@ -366,11 +366,17 @@ The list of body options is as follows:
             - Behave as a linear graph (the same as lane zooms)
                 - An immediate change can be created by successive two lines of the "`tilt`" option.
                 - Note: No "`;`" separator allowed in KSH files although an immediate change is set by using "`;`".
-- "`zoom_top`", "`zoom_bottom`", "`zoom_side`", "`center_split`"
+- "`zoom_top`", "`zoom_bottom`", "`zoom_side`"
     - A value change of camera controls (int)
     - The values behave as a linear graph (the same as manual tilts)
         - An immediate change can be created by successive two lines of the same options.
-    - If "`ver`" is earlier than "`167`", the value is restricted between -300 and 300.
+    - If "`ver`" is earlier than "`167`", the value is restricted to the range [-300, 300]; otherwise, [-65535, 65535].
+- "`center_split`"
+    - A value change of camera controls (float)
+    - The values behave as a linear graph (the same as manual tilts)
+        - An immediate change can be created by successive two lines of the same options.
+    - This creates a margin in the middle of the highway. Every 100 creates a margin of one lane.
+    - Value range: [-65535, 65535] (no version-based restriction)
 - "`scroll_speed_curve`", "`rotation_deg_curve`", "`zoom_top_curve`", "`zoom_bottom_curve`", "`zoom_side_curve`", "`center_split_curve`", "`tilt_curve`" (Not supported in KSM v1.xx)
     - Curve interpolation for scroll speed, rotation, camera, and tilt parameters
     - Format: "`<a>;<b>`" (both values are float in range [0.0, 1.0])
@@ -383,8 +389,6 @@ The list of body options is as follows:
             - The lower side of the lane gets closer with a larger value.
         - "`zoom_side`"
             - The holizontal position of the lane is shifted in the left (-) or right (+) direction.
-        - "`center_split`"
-            - This creates a margin in the middle of the highway. Every 100 creates a margin of one lane.
 - "`laserrange_l`", "`laserrange_r`"
     - A wide-range laser setting (string)
     - Should be placed just before the beginning of the series of laser objects.
