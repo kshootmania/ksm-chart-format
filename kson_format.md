@@ -683,6 +683,7 @@ type TiltValue = string|double|[double,double]|[double,string]|[double,[double,d
   - Specifies the tilt amount
   - Requirement: -100.0 <= value <= 100.0
   - Note: The left laser being on the right edge is equal to a manual value of 1.0, and the right laser being on the left edge is equal to a manual value of -1.0.
+      - The value ±1.0 represents the normal maximum tilt range, and the limit of ±100.0 allows up to 10000% of this range.
   - Note: Manual tilt is always evaluated with a scale of 1.0 (independent of auto tilt scale)
   - Example: `[960, 0.5]` means tilt interpolates to 0.5 with linear interpolation
 
