@@ -1,4 +1,4 @@
-# KSON Format Specification (version 0.9.0, format_version: `1`)
+# KSON Format Specification (version 1.0.0, format_version: `1`)
 ## Basic Specifications
 - **JSON format**: KSON files MUST use the JSON format.
 - **File extension**: KSON files MUST use the `.kson` file extension.
@@ -17,7 +17,7 @@
 ## Top-level object
 ```
 dictionary kson {
-    format_version: uint      // kson format version number (1 for kson 0.9.0, incremented by 1 for each format update)
+    format_version: uint      // kson format version number (1 for kson 1.0.0, incremented by 1 for each format update)
     meta:    MetaInfo         // meta data, e.g. title, artist, ...
     beat:    BeatInfo         // beat-related data, e.g. bpm, time signature, ...
     gauge:   GaugeInfo?       // gauge-related data
@@ -284,6 +284,11 @@ dictionary AudioEffectLaserLegacyInfo {
     filter_gain: ByPulse<double>[] = [[0, 0.5]]  // filter gain (0.0-1.0); "pfiltergain" in KSH format
 }
 ```
+- Note: `filter_gain` serves as a shorthand for controlling multiple built-in filter effects' parameters via `audio.audio_effect.laser.param_change`.
+    - In KSM v2, `filter_gain` is converted to the following parameters only when the corresponding built-in effects are not overridden by user-defined effects in `audio.audio_effect.laser.def`:
+        - `peaking_filter.gain`: linear interpolation between `0%` and `100%`
+        - `high_pass_filter.q`: linear interpolation between `2.0` and `8.0`
+        - `low_pass_filter.q`: linear interpolation between `2.0` and `5.2`
 
 ##### `audio.audio_effect.fx.def.xxx`/`audio.audio_effect.laser.def.xxx`
 ```
@@ -678,6 +683,7 @@ type TiltValue = string|double|[double,double]|[double,string]|[double,[double,d
   - Specifies the tilt amount
   - Requirement: -100.0 <= value <= 100.0
   - Note: The left laser being on the right edge is equal to a manual value of 1.0, and the right laser being on the left edge is equal to a manual value of -1.0.
+      - The value ±1.0 represents the normal maximum tilt range, and the limit of ±100.0 allows up to 10000% of this range.
   - Note: Manual tilt is always evaluated with a scale of 1.0 (independent of auto tilt scale)
   - Example: `[960, 0.5]` means tilt interpolates to 0.5 with linear interpolation
 
@@ -739,6 +745,11 @@ dictionary CamGraphs {
 ```
 - The value scale used for `zoom_top`/`zoom_bottom`/`zoom_side`/`center_split` is identical to the scale used in KSH format.
 - The units used for the `zoom_top` value are not degrees, but instead represent one full rotation every +2400 units.
+- Valid value ranges:
+    - `zoom_top`, `zoom_bottom`, `zoom_side`: [-65535.0, 65535.0]
+    - `center_split`: [-65535.0, 65535.0]
+    - `rotation_deg`: [-65535.0, 65535.0] (in degrees)
+- Values outside these ranges MAY be clamped by KSON clients.
 
 #### `camera.cam.pattern`
 ```
@@ -790,8 +801,8 @@ array CamPatternInvokeSwing {
 ```
 dictionary CamPatternInvokeSwingValue {
     scale:  double = 250.0 // scale
-    repeat: uint = 1       // number of repetitions
-    decay_order: uint = 0  // order of the decay that scales camera values (0-2)
+    repeat: uint = 3       // number of repetitions
+    decay_order: uint = 2  // order of the decay that scales camera values (0-2)
                            // (note that this decay is applied even if repeat=1)
                            // - equation: `value * (1.0 - ((l - ry) / l))^decay_order`
                            // - 0: no decay, 1: linear decay, 2: squared decay
@@ -932,7 +943,7 @@ dictionary KSHUnknownInfo {
             "line":[
                 [0, ";some-extension1"],
                 [0, ";some-extension2"],
-                [960, ";some-extension3"],
+                [960, ";some-extension3"]
             ]
         }
         ```
@@ -1005,7 +1016,7 @@ array GraphPoint {
     [2]: GraphCurveValue = [0.0, 0.0]  // curve: graph curve value
 }
 ```
-- The array size of `GraphPoint<T>` MUST be 2 or 3.
+- The array size of `GraphPoint` MUST be 2 or 3.
 
 ### graph point (for graph sections = `ByPulse<GraphSectionPoint[]>`)
 ```
@@ -1015,7 +1026,7 @@ array GraphSectionPoint {
     [2]: GraphCurveValue = [0.0, 0.0]  // curve: graph curve value
 }
 ```
-- The array size of `GraphSectionPoint<T>` MUST be 2 or 3.
+- The array size of `GraphSectionPoint` MUST be 2 or 3.
 
 -----------------------------------------------------------------------------------
 
@@ -1029,7 +1040,9 @@ array GraphSectionPoint {
 
 # Change Log
 
-- `0.9.0` (11/16/2025)
+- `1.0.0` (02/11/2026)
+    - Changes: https://github.com/kshootmania/ksm-chart-format/pull/15/files
+- [`0.9.0`](https://github.com/kshootmania/ksm-chart-format/blob/45e2b14141b3f65fe70fe984ef574cb8a0bcb201/kson_format.md) (11/16/2025)
     - Changes: https://github.com/kshootmania/ksm-chart-format/pull/14/files
 - [`0.8.0`](https://github.com/kshootmania/ksm-chart-format/blob/2b917d8876e4cb2cce4a39cfdb1b714a0a8df0ea/kson_format.md) (08/13/2023)
     - Changes: https://github.com/kshootmania/ksm-chart-format/pull/13/files
