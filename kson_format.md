@@ -476,7 +476,7 @@ Parameter values are written in one of the following formats:
         - Interval
         - `0`: The effect is bypassed.
         - Note: `wave_length` interval count is reset at the beginning of each measure.
-    - `rate` (rate, default:`60%`)
+    - `rate` (rate, default:`50%`)
         - Length of the audio
             - A value of 100% has no effect, and a smaller value gives a larger percentage of mute time in each period.
     - `mix` (rate, default:`0%>90%`)
@@ -498,7 +498,7 @@ Parameter values are written in one of the following formats:
     - `mix` (rate, default:`0%>80%`)
         - Blending ratio of the original audio and the effect audio
 - `pitch_shift`: This effect changes the pitch (key) of the audio.
-    - `pitch` (pitch, default:`0`)
+    - `pitch` (pitch, default:`0>12`)
         - Pitch (key)
     - (OPTIONAL SUPPORT) `chunk_size` (sample, default:`700samples`)
         - Chunk size for pitch shifting
@@ -556,7 +556,7 @@ Parameter values are written in one of the following formats:
         - Q value of the low-pass filter
         - Additional requirement:
             - 0.1 <= float <= 50.0
-    - `mix` (rate, default:`0%>50%`)
+    - `mix` (rate, default:`0%>80%`)
         - Blending ratio of the original audio and the effect audio
     - Note: `freq_1` value may exceed the `freq_2` value.
 - `tapestop`: This effect slows down the playback speed of audio like a turntable.
@@ -581,7 +581,7 @@ Parameter values are written in one of the following formats:
         - Note: `wave_length` interval count is reset at the beginning of each measure.
     - `update_trigger` (switch, default:`off>on`)
         - `on`: Updates the repeat source (the value is automatically set back to `off`)
-    - `feedback_level` (rate, default:`100%`)
+    - `feedback_level` (rate, default:`60%`)
         - Ratio of the volume to the previous repetition
     - `mix` (rate, default:`0%>100%`)
         - Blending ratio of the original audio and the effect audio
