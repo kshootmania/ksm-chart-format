@@ -1,4 +1,4 @@
-# KSON Format Specification (version 1.0.0, format_version: `1`)
+# KSON Format Specification (version 1.0.1, format_version: `1`)
 ## Basic Specifications
 - **JSON format**: KSON files MUST use the JSON format.
 - **File extension**: KSON files MUST use the `.kson` file extension.
