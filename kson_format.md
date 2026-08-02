@@ -594,8 +594,9 @@ Parameter values are written in one of the following formats:
         - Duration to simulate a condition where the audio level exceeds the compressor threshold
     - `attack_time` (length, default:`10ms`)
         - Attack time
-    - `release_time` (length, default:`1/16`)
+    - `release_time` (length, default:`1/8`)
         - Release time
+        - Note: If `compat.ksh_version` is present and earlier than "`200`", the default value of this parameter is `1/16` for user-defined audio effects (see `compat` for details).
     - `ratio` (float, default:`1.0>5.0`)
         - Compression ratio
             - A value of `1.0` compresses the audio by a factor of 1/1 (i.e., the original audio), and a value of `5.0` compresses the audio by a factor of 1/5.
@@ -886,6 +887,8 @@ dictionary CompatInfo {
 }
 ```
 - Note: If the "`ver`" field is not present in the KSH file, `ksh_version` is set to "`100`".
+- Note: If the "`ver`" field of the KSH file is "`200`" or later, `ksh_version` is not set. Such charts are converted from kson files, so they behave the same as native kson charts.
+- Note: If `ksh_version` is present and earlier than "`200`", the default value of the `release_time` parameter is `1/16` instead of `1/8` for `sidechain` audio effects defined in `audio.audio_effect.fx.def` or `audio.audio_effect.laser.def` (i.e., user-defined effects in the KSH format). This is for compatibility with older KSH charts, where the built-in "`SideChain`" effect used `1/8` while user-defined `SideChain` effects used `1/16` as the default.
 
 ### `compat.ksh_unknown` (OPTIONAL SUPPORT)
 ```
