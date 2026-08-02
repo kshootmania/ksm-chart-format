@@ -1,4 +1,4 @@
-# KSON Format Specification (version 1.0.1, format_version: `1`)
+# KSON Format Specification (version 1.0.2, format_version: `1`)
 ## Basic Specifications
 - **JSON format**: KSON files MUST use the JSON format.
 - **File extension**: KSON files MUST use the `.kson` file extension.
@@ -594,8 +594,9 @@ Parameter values are written in one of the following formats:
         - Duration to simulate a condition where the audio level exceeds the compressor threshold
     - `attack_time` (length, default:`10ms`)
         - Attack time
-    - `release_time` (length, default:`1/16`)
+    - `release_time` (length, default:`1/8`)
         - Release time
+        - Note: If `compat.ksh_version` is present and earlier than "`200`", the default value of this parameter is `1/16` for user-defined audio effects (see `compat` for details).
     - `ratio` (float, default:`1.0>5.0`)
         - Compression ratio
             - A value of `1.0` compresses the audio by a factor of 1/1 (i.e., the original audio), and a value of `5.0` compresses the audio by a factor of 1/5.
@@ -886,6 +887,8 @@ dictionary CompatInfo {
 }
 ```
 - Note: If the "`ver`" field is not present in the KSH file, `ksh_version` is set to "`100`".
+- Note: If the "`ver`" field of the KSH file is "`200`" or later, `ksh_version` is not set. Such charts are converted from kson files, so they behave the same as native kson charts.
+- Note: If `ksh_version` is present and earlier than "`200`", the default value of the `release_time` parameter is `1/16` instead of `1/8` for `sidechain` audio effects defined in `audio.audio_effect.fx.def` or `audio.audio_effect.laser.def` (i.e., user-defined effects in the KSH format). This is for compatibility with older KSH charts, where the built-in "`SideChain`" effect used `1/8` while user-defined `SideChain` effects used `1/16` as the default.
 
 ### `compat.ksh_unknown` (OPTIONAL SUPPORT)
 ```
@@ -1040,7 +1043,11 @@ array GraphSectionPoint {
 
 # Change Log
 
-- `1.0.0` (02/11/2026)
+- `1.0.2` (08/02/2026)
+    - Changes: https://github.com/kshootmania/ksm-chart-format/pull/17/files
+- [`1.0.1`](https://github.com/kshootmania/ksm-chart-format/blob/bd4b9447fbb9e11058a0f5345e0a6a446feb2e3a/kson_format.md) (06/30/2026)
+    - Changes: https://github.com/kshootmania/ksm-chart-format/pull/16/files
+- [`1.0.0`](https://github.com/kshootmania/ksm-chart-format/blob/a186f37a3a2bb782fcada183df7939c65b863d46/kson_format.md) (02/11/2026)
     - Changes: https://github.com/kshootmania/ksm-chart-format/pull/15/files
 - [`0.9.0`](https://github.com/kshootmania/ksm-chart-format/blob/45e2b14141b3f65fe70fe984ef574cb8a0bcb201/kson_format.md) (11/16/2025)
     - Changes: https://github.com/kshootmania/ksm-chart-format/pull/14/files
