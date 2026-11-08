@@ -214,12 +214,12 @@ dictionary KeySoundLaserInfo {
 ##### `audio.key_sound.laser.slam_event` (OPTIONAL SUPPORT)
 ```
 dictionary KeySoundInvokeListLaser {
-    slam_up:    uint[]?  // (OPTIONAL SUPPORT) uint represents y (pulse number)
-    slam_down:  uint[]?  // (OPTIONAL SUPPORT)
-    slam_swing: uint[]?  // (OPTIONAL SUPPORT)
-    slam_mute:  uint[]?  // (OPTIONAL SUPPORT)
+    up:    uint[]?  // (OPTIONAL SUPPORT) uint represents y (pulse number)
+    down:  uint[]?  // (OPTIONAL SUPPORT)
+    swing: uint[]?  // (OPTIONAL SUPPORT)
+    mute:  uint[]?  // (OPTIONAL SUPPORT)
 
-    ...:        uint[]?  // Custom key sounds can be inserted here by using an audio filename (with extension) as a key
+    ...:   uint[]?  // Custom key sounds can be inserted here by using an audio filename (with extension) as a key
 }
 ```
 - Note: `y` (pulse number) should be the same as `y` of an existing laser slam note; otherwise, the event is ignored.
