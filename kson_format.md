@@ -742,15 +742,18 @@ dictionary CamGraphs {
     zoom_side:          GraphPoint[]?  // move the highway horizontally (zoom_side in KSH format)
     rotation_deg:       GraphPoint[]?  // rotation degree (affects both highway & jdgline relatively)
     center_split:       GraphPoint[]?  // split the highway at the center (center_split in KSH format)
+    highway_wipe:       GraphPoint[]?  // hide the highway surface from the lower side (+) or the upper side (-) (highway_wipe in KSH format)
 }
 ```
-- The value scale used for `zoom_top`/`zoom_bottom`/`zoom_side`/`center_split` is identical to the scale used in KSH format.
+- The value scale used for `zoom_top`/`zoom_bottom`/`zoom_side`/`center_split`/`highway_wipe` is identical to the scale used in KSH format.
 - The units used for the `zoom_top` value are not degrees, but instead represent one full rotation every +2400 units.
 - Valid value ranges:
     - `zoom_top`, `zoom_bottom`, `zoom_side`: [-65535.0, 65535.0]
     - `center_split`: [-65535.0, 65535.0]
+    - `highway_wipe`: [-65535.0, 65535.0] (in percent)
     - `rotation_deg`: [-65535.0, 65535.0] (in degrees)
 - Values outside these ranges MAY be clamped by KSON clients.
+- `highway_wipe` does not hide notes and bar lines.
 
 #### `camera.cam.pattern`
 ```
