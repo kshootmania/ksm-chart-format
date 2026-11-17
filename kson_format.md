@@ -774,21 +774,39 @@ dictionary CamPatternLaserInfo {
 ```
 dictionary CamPatternLaserInvokeList {
     spin:      CamPatternInvokeSpin[]?
-    half_spin: CamPatternInvokeSpin[]?
+    half_spin: CamPatternInvokeHalfSpin[]?
     swing:     CamPatternInvokeSwing[]?  // (OPTIONAL SUPPORT)
 }
 ```
 - Note: `y` (pulse number) & `d` (laser slam direction) should be the same as `y` & sign(`vf` - `v`) of an existing laser slam note; otherwise, the event is ignored.
 
-##### `camera.cam.pattern.laser.slam_event.spin[]`/`camera.cam.pattern.laser.slam_event.half_spin[]`
+##### `camera.cam.pattern.laser.slam_event.spin[]`
 ```
 array CamPatternInvokeSpin {
     [0]: uint  // y: pulse number
     [1]: int   // direction: laser slam direction, -1 (left) or 1 (right)
     [2]: uint  // length: spin duration
+    [3]: CamPatternInvokeSpinValue? // v: value
 }
 ```
-- The array size of `CamPatternInvokeSpin` MUST be 3.
+- The array size of `CamPatternInvokeSpin` MUST be 3 or 4.
+
+##### `camera.cam.pattern.laser.slam_event.spin[][3]`
+```
+dictionary CamPatternInvokeSpinValue {
+    count: uint = 1  // number of rotations (0-65535)
+}
+```
+
+##### `camera.cam.pattern.laser.slam_event.half_spin[]`
+```
+array CamPatternInvokeHalfSpin {
+    [0]: uint  // y: pulse number
+    [1]: int   // direction: laser slam direction, -1 (left) or 1 (right)
+    [2]: uint  // length: spin duration
+}
+```
+- The array size of `CamPatternInvokeHalfSpin` MUST be 3.
 
 ##### `camera.cam.pattern.laser.slam_event.swing[]` (OPTIONAL SUPPORT)
 ```
