@@ -804,9 +804,18 @@ array CamPatternInvokeHalfSpin {
     [0]: uint  // y: pulse number
     [1]: int   // direction: laser slam direction, -1 (left) or 1 (right)
     [2]: uint  // length: spin duration
+    [3]: CamPatternInvokeHalfSpinValue? // v: value
 }
 ```
-- The array size of `CamPatternInvokeHalfSpin` MUST be 3.
+- The array size of `CamPatternInvokeHalfSpin` MUST be 3 or 4.
+
+##### `camera.cam.pattern.laser.slam_event.half_spin[][3]`
+```
+dictionary CamPatternInvokeHalfSpinValue {
+    deg: double = 60.0  // maximum rotation degree ([-65535.0, 65535.0])
+}
+```
+- The highway rotates to `deg` and then swings back.
 
 ##### `camera.cam.pattern.laser.slam_event.swing[]` (OPTIONAL SUPPORT)
 ```

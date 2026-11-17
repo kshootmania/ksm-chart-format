@@ -81,7 +81,7 @@ A KSH file contains five types of lines: option lines, chart lines, bar lines, d
                 Left <-  `0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmno`  -> Right
             - Laser notes that are 1/32 or shorter are recognized as laser slams. (It is currently not possible to create 1/32 ordinary laser notes according to the current specification.)
         - `<lane-spin (optional)>`
-            - Examples: `@(192`, `@(192;2`, `@<192`, `S<192`, `S<192;500`
+            - Examples: `@(192`, `@(192;2`, `@<192`, `@<192;90`, `S<192`, `S<192;500`
             - The first two characters denote the effect type
                 - `@(`: Normal spin (left, clockwise)
                 - `@)`: Normal spin (right, counterclockwise)
@@ -92,6 +92,8 @@ A KSH file contains five types of lines: option lines, chart lines, bar lines, d
             - The number is the length (192 per measure).
             - For normal spins, an optional parameter can be specified after the length, separated by "`;`" (Not supported in KSM v1.xx):
                 - Second parameter (int, 0-65535, default:`1`): Number of rotations
+            - For half spins, an optional parameter can be specified after the length, separated by "`;`" (Not supported in KSM v1.xx):
+                - Second parameter (float, -65535 - 65535, default:`60`): Maximum rotation degree (the highway rotates to this degree and then swings back)
             - For swing effects, optional parameters can be specified after the length, separated by "`;`":
                 - Second parameter (int, default:`250`): Scale value
                 - Third parameter (int, default:`3`): Number of repetitions (1 per one-way swing)
