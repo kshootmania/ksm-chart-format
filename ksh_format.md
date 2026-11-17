@@ -96,7 +96,7 @@ A KSH file contains five types of lines: option lines, chart lines, bar lines, d
                 - Second parameter (float, -65535 - 65535, default:`60`): Maximum rotation degree (the highway rotates to this degree and then swings back)
             - For swing effects, optional parameters can be specified after the length, separated by "`;`":
                 - Second parameter (int, default:`250`): Scale value
-                - Third parameter (int, default:`3`): Number of repetitions (1 per one-way swing)
+                - Third parameter (int, 0-65535, default:`3`): Number of repetitions (1 per one-way swing)
                 - Fourth parameter (int, 0-2, default:`2`): Order of the decay (0: no decay, 1: linear decay, 2: squared decay)
 - Bar Line
     - Two measures are separated by one bar line.
