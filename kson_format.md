@@ -742,6 +742,7 @@ dictionary CamGraphs {
     zoom_side:            GraphPoint[]?  // move the highway horizontally (zoom_side in KSH format)
     rotation_deg:         GraphPoint[]?  // rotation degree (affects both highway & jdgline relatively)
     rotation_deg_highway: GraphPoint[]?  // rotation degree added to rotation_deg (affects highway only)
+    rotation_deg_jdgline: GraphPoint[]?  // rotation degree added to rotation_deg (affects jdgline only)
     center_split:         GraphPoint[]?  // split the highway at the center (center_split in KSH format)
     highway_wipe:         GraphPoint[]?  // hide the highway surface from the lower side (+) or the upper side (-) (highway_wipe in KSH format)
 }
@@ -752,7 +753,7 @@ dictionary CamGraphs {
     - `zoom_top`, `zoom_bottom`, `zoom_side`: [-65535.0, 65535.0]
     - `center_split`: [-65535.0, 65535.0]
     - `highway_wipe`: [-65535.0, 65535.0] (in percent)
-    - `rotation_deg`, `rotation_deg_highway`: [-65535.0, 65535.0] (in degrees)
+    - `rotation_deg`, `rotation_deg_highway`, `rotation_deg_jdgline`: [-65535.0, 65535.0] (in degrees)
 - Values outside these ranges MAY be clamped by KSON clients.
 - `highway_wipe` does not hide notes and bar lines.
 
