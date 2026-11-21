@@ -763,9 +763,39 @@ dictionary CamGraphs {
 #### `camera.cam.pattern`
 ```
 dictionary CamPatternInfo {
-    laser: CamPatternLaserInfo?  // cam pattern for laser slams
+    def:   DefKeyValuePair<CamPatternDef>[]?  // cam pattern definitions
+    laser: CamPatternLaserInfo?               // cam pattern for laser slams
 }
 ```
+- Note: `def` is an array of key-value pairs to preserve the order in which the user created the definitions, ensuring a stable order during editing and processing.
+- `spin`, `half_spin`, and `swing` cannot be used as the name of a cam pattern definition.
+- Note: A cam pattern definition whose name is empty or contains white spaces or "`;`" cannot be converted to KSH format.
+
+##### `camera.cam.pattern.def.xxx`
+```
+dictionary CamPatternDef {
+    body: CamPatternGraphs  // cam value changes
+}
+```
+
+##### `camera.cam.pattern.def.xxx.body`
+```
+dictionary CamPatternGraphs {
+    zoom_top:             GraphSectionPoint[]?
+    zoom_bottom:          GraphSectionPoint[]?
+    zoom_side:            GraphSectionPoint[]?
+    rotation_deg:         GraphSectionPoint[]?
+    rotation_deg_highway: GraphSectionPoint[]?
+    rotation_deg_jdgline: GraphSectionPoint[]?
+    rotation_deg_layer:   GraphSectionPoint[]?  // (OPTIONAL SUPPORT)
+    center_split:         GraphSectionPoint[]?
+    highway_wipe:         GraphSectionPoint[]?
+}
+```
+- The largest `ry` of the graph points is the length of the definition. `ry` is scaled so that the length of the definition fits the length specified in the invocation.
+- The values are added to the values of `camera.cam.body` with the same names while the cam pattern is invoked, and are no longer added after the specified length has passed even if the last value is not zero.
+- The values are defined for a laser slam to the right. For a laser slam to the left, the signs of the values of `zoom_side`, `rotation_deg`, `rotation_deg_highway`, `rotation_deg_jdgline`, and `rotation_deg_layer` are inverted.
+- The valid value ranges are the same as those of `camera.cam.body`.
 
 ##### `camera.cam.pattern.laser`
 ```
@@ -773,14 +803,15 @@ dictionary CamPatternLaserInfo {
     slam_event: CamPatternLaserInvokeList?  // cam pattern invocation by laser slam notes
 }
 ```
-- Note: This is a specification with the possibility of defining `camera.cam.pattern.laser.def` as a future extension.
 
 ##### `camera.cam.pattern.laser.slam_event`
 ```
 dictionary CamPatternLaserInvokeList {
     spin:      CamPatternInvokeSpin[]?
     half_spin: CamPatternInvokeHalfSpin[]?
-    swing:     CamPatternInvokeSwing[]?  // (OPTIONAL SUPPORT)
+    swing:     CamPatternInvokeSwing[]?   // (OPTIONAL SUPPORT)
+
+    ...:       CamPatternInvokeCustom[]?  // Custom cam patterns can be invoked here by using a name defined in `camera.cam.pattern.def` as a key
 }
 ```
 - Note: `y` (pulse number) & `d` (laser slam direction) should be the same as `y` & sign(`vf` - `v`) of an existing laser slam note; otherwise, the event is ignored.
@@ -844,6 +875,30 @@ dictionary CamPatternInvokeSwingValue {
                            // - 0: no decay, 1: linear decay, 2: squared decay
 }
 ```
+
+##### `camera.cam.pattern.laser.slam_event.xxx[]`
+```
+array CamPatternInvokeCustom {
+    [0]: uint  // y: pulse number
+    [1]: int   // direction: laser slam direction, -1 (left) or 1 (right)
+    [2]: uint  // length: cam pattern duration
+    [3]: CamPatternInvokeCustomValue? // v: value
+}
+```
+- The array size of `CamPatternInvokeCustom` MUST be 3 or 4.
+- If the name is not defined in `camera.cam.pattern.def`, the invocation is ignored.
+- Only one cam pattern definition can be invoked by a single laser slam (the same `y` and direction).
+- If a cam pattern definition is invoked while the same definition invoked by a previous laser slam is still in progress, the previous one is stopped, regardless of the directions of the laser slams.
+- If the invocations of different cam pattern definitions overlap, the values of all the invocations are added.
+- A cam pattern definition can be used together with `spin`, `half_spin`, or `swing` on the same laser slam.
+
+##### `camera.cam.pattern.laser.slam_event.xxx[][3]`
+```
+dictionary CamPatternInvokeCustomValue {
+    scale: double = 1.0  // scale of the values ([-65535.0, 65535.0])
+}
+```
+- The scaled values outside the valid value ranges of `camera.cam.pattern.def.xxx.body` MAY be clamped by KSON clients.
 
 -----------------------------------------------------------------------------------
 

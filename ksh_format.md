@@ -108,6 +108,7 @@ A KSH file contains five types of lines: option lines, chart lines, bar lines, d
     - Example
         - "`#define_fx LoFl type=Flanger;delay=80samples;depth=60samples`"
         - "`#define_filter TSTP type=TapeStop;trigger=off>on;speed=20%`"
+        - "`#define_cam Shake zoom_side=0:0,48:100,144:-100,192:0`"
     - Format
         - "`#define_<definition-type> <name> <value>`"
         - A series of white spaces is regarded as one separator.
@@ -429,6 +430,20 @@ The list of body options is as follows:
         - Cannot make a normal laser a wide-range one midway through the note.
     - The value must be "`2x`".
         - "`1x`" is allowed but it is meaningless.
+- "`cam_slam_l`", "`cam_slam_r`" (Not supported in KSM v1.xx)
+    - A user-defined camera pattern invoked by a laser slam (string)
+    - "`cam_slam_l`" is for a laser slam to the left, and "`cam_slam_r`" is for a laser slam to the right.
+    - Should be placed just before the target laser slam.
+    - Format: "`<name>;<length>;<scale>`"
+        - `<name>`: The name of a user-defined camera pattern defined by a "`#define_cam`" line in the footer
+        - `<length>`: The length of the camera pattern (int, 192 per measure)
+        - `<scale>`: The scale of the values (float, default:"`1`")
+            - Value range: [-65535, 65535]
+    - The third parameter is optional and set to the default if not specified.
+    - Only one user-defined camera pattern can be invoked by a single laser slam.
+    - If a user-defined camera pattern is invoked while the camera pattern with the same name invoked by a previous laser slam is still in progress, the previous one is stopped, regardless of the directions of the laser slams.
+    - If user-defined camera patterns with different names overlap, the values of all the camera patterns are added.
+    - A user-defined camera pattern can be used together with a normal spin, a half spin, or a swing effect on the same laser slam.
 - "`laser_l_curve`", "`laser_r_curve`" (Not supported in KSM v1.xx)
     - Curve interpolation for laser positions
     - Format: "`<a>;<b>`" (both values are float in range [0.0, 1.0])
@@ -504,3 +519,21 @@ The list of definition types is as follows:
 - "`#define_filter`"
     - User-defined audio effects for laser notes
     - The format is the same as that of "`#define_fx`".
+- "`#define_cam`" (Not supported in KSM v1.xx)
+    - User-defined camera patterns for laser slams
+    - Format: "`#define_cam <name> <param-name>=<graph>;<param-name>=<graph>;...`"
+        - `<name>`: The name of the user-defined camera pattern
+            - "`spin`", "`half_spin`", and "`swing`" cannot be used.
+            - The name cannot contain white spaces or "`;`".
+        - `<param-name>`: "`zoom_top`", "`zoom_bottom`", "`zoom_side`", "`rotation_deg`", "`rotation_deg_highway`", "`rotation_deg_jdgline`", "`rotation_deg_layer`", "`center_split`", or "`highway_wipe`"
+        - `<graph>`: Graph points separated by "`,`"
+            - Format of a graph point: "`<position>:<value>`" or "`<position>:<value>:<a>:<b>`"
+                - `<position>`: The position from the beginning of the camera pattern (int, 192 per measure)
+                - `<value>`: The value (int for "`zoom_top`", "`zoom_bottom`", and "`zoom_side`"; otherwise, float)
+                    - Value range: [-65535, 65535]
+                - `<a>`, `<b>`: Curve interpolation to the next graph point (both values are float in range [0.0, 1.0])
+            - The position of the first graph point must be 0.
+            - An immediate change can be created by successive two graph points at the same position.
+    - The largest position of the graph points is the length of the definition. The positions are scaled so that the length of the definition fits the length specified in "`cam_slam_l`" or "`cam_slam_r`".
+    - The values are added to the values of the body options with the same names while the camera pattern is invoked, and are no longer added after the specified length has passed even if the last value is not zero.
+    - The values are defined for a laser slam to the right. For a laser slam to the left, the signs of the values of "`zoom_side`", "`rotation_deg`", "`rotation_deg_highway`", "`rotation_deg_jdgline`", and "`rotation_deg_layer`" are inverted.
