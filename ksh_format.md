@@ -353,6 +353,12 @@ The list of body options is as follows:
     - The value behaves as a linear graph (the same as lane zooms)
         - An immediate change can be created by successive two lines of the "`rotation_deg`" option.
     - The value is the rotation degree in degrees (e.g. 0 for no rotation, 90 for a quarter turn, 360 for a full rotation).
+- "`rotation_deg_highway`" (Not supported in KSM v1.xx)
+    - A rotation degree change of the highway only (float)
+    - The value behaves as a linear graph (the same as lane zooms)
+        - An immediate change can be created by successive two lines of the "`rotation_deg_highway`" option.
+    - The value is the rotation degree in degrees, added to the "`rotation_deg`" value.
+    - Value range: [-65535, 65535]
 - "`stop`"
     - A pause (int)
     - The value is the length of the pause (192 per measure).
@@ -391,7 +397,7 @@ The list of body options is as follows:
     - This hides the highway surface from the lower side (+) or the upper side (-). The value is the percentage of the hidden part (e.g. 50 for the lower half, -50 for the upper half, 100 or -100 for the whole).
         - Notes and bar lines are not hidden.
     - Value range: [-65535, 65535]
-- "`scroll_speed_curve`", "`rotation_deg_curve`", "`zoom_top_curve`", "`zoom_bottom_curve`", "`zoom_side_curve`", "`center_split_curve`", "`highway_wipe_curve`", "`tilt_curve`" (Not supported in KSM v1.xx)
+- "`scroll_speed_curve`", "`rotation_deg_curve`", "`rotation_deg_highway_curve`", "`zoom_top_curve`", "`zoom_bottom_curve`", "`zoom_side_curve`", "`center_split_curve`", "`highway_wipe_curve`", "`tilt_curve`" (Not supported in KSM v1.xx)
     - Curve interpolation for scroll speed, rotation, camera, and tilt parameters
     - Format: "`<a>;<b>`" (both values are float in range [0.0, 1.0])
     - Applied to the parameter at the same pulse in the same measure
