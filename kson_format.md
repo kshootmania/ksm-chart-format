@@ -774,9 +774,11 @@ dictionary CamPatternInfo {
 ##### `camera.cam.pattern.def.xxx`
 ```
 dictionary CamPatternDef {
-    body: CamPatternGraphs  // cam value changes
+    body:       CamPatternGraphs  // cam value changes
+    slam_shake: bool = true       // whether the default shake of the laser slam is applied
 }
 ```
+- The default shake is the small shake of the highway applied to every laser slam without a swing effect (`camera.cam.pattern.laser.slam_event.swing`).
 
 ##### `camera.cam.pattern.def.xxx.body`
 ```

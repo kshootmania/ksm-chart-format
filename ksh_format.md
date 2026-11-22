@@ -556,7 +556,7 @@ The list of definition types is as follows:
     - The format is the same as that of "`#define_fx`".
 - "`#define_cam`" (Not supported in KSM v1.xx)
     - User-defined camera patterns for laser slams
-    - Format: "`#define_cam <name> <param-name>=<graph>;<param-name>=<graph>;...`"
+    - Format: "`#define_cam <name> <param-name>=<graph>;<param-name>=<graph>;...;slam_shake=<slam-shake>`"
         - `<name>`: The name of the user-defined camera pattern
             - "`spin`", "`half_spin`", and "`swing`" cannot be used.
             - The name cannot contain white spaces or "`;`".
@@ -569,6 +569,9 @@ The list of definition types is as follows:
                 - `<a>`, `<b>`: Curve interpolation to the next graph point (both values are float in range [0.0, 1.0])
             - The position of the first graph point must be 0.
             - An immediate change can be created by successive two graph points at the same position.
+        - `<slam-shake>`: Whether the default shake of the laser slam is applied (int, 0 or 1, default:"`1`")
+            - The default shake is the small shake of the highway applied to every laser slam without a swing effect.
+            - "`slam_shake=<slam-shake>`" is optional and set to the default if not specified.
     - The largest position of the graph points is the length of the definition. The positions are scaled so that the length of the definition fits the length specified in "`cam_slam_l`" or "`cam_slam_r`".
     - The values are added to the values of the body options with the same names while the camera pattern is invoked, and are no longer added after the specified length has passed even if the last value is not zero.
     - The values are defined for a laser slam to the right. For a laser slam to the left, the signs of the values of "`zoom_side`", "`rotation_deg`", "`rotation_deg_highway`", "`rotation_deg_jdgline`", and "`rotation_deg_layer`" are inverted.
