@@ -763,8 +763,9 @@ dictionary CamGraphs {
 #### `camera.cam.pattern`
 ```
 dictionary CamPatternInfo {
-    def:   DefKeyValuePair<CamPatternDef>[]?  // cam pattern definitions
-    laser: CamPatternLaserInfo?               // cam pattern for laser slams
+    def:         DefKeyValuePair<CamPatternDef>[]?     // cam pattern definitions
+    laser:       CamPatternLaserInfo?                  // cam pattern for laser slams
+    pulse_event: dictionary<CamPatternInvokePulse[]>?  // cam pattern invocation by pulse
 }
 ```
 - Note: `def` is an array of key-value pairs to preserve the order in which the user created the definitions, ensuring a stable order during editing and processing.
@@ -902,6 +903,22 @@ dictionary CamPatternInvokeCustomValue {
 }
 ```
 - The scaled values outside the valid value ranges of `camera.cam.pattern.def.xxx.body` MAY be clamped by KSON clients.
+
+##### `camera.cam.pattern.pulse_event.xxx[]`
+```
+array CamPatternInvokePulse {
+    [0]: uint  // y: pulse number
+    [1]: uint  // length: cam pattern duration
+    [2]: CamPatternInvokeCustomValue? // v: value
+}
+```
+- The array size of `CamPatternInvokePulse` MUST be 2 or 3.
+- The key of `camera.cam.pattern.pulse_event` is a name defined in `camera.cam.pattern.def`. If the name is not defined, the invocation is ignored.
+- `spin`, `half_spin`, and `swing` cannot be invoked by `camera.cam.pattern.pulse_event`.
+- The cam pattern is automatically invoked at `y` regardless of note judgments.
+- `slam_shake` and `flip_by_direction` of the cam pattern definition have no effect.
+- If multiple invocations overlap, the values of all the invocations are added, even if they invoke the same definition. The values are also added to those of the invocations by laser slams.
+- The same cam pattern definition cannot be invoked more than once at the same `y`.
 
 -----------------------------------------------------------------------------------
 

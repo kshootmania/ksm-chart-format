@@ -479,6 +479,14 @@ The list of body options is as follows:
     - If a user-defined camera pattern is invoked while the camera pattern with the same name invoked by a previous laser slam is still in progress, the previous one is stopped, regardless of the directions of the laser slams.
     - If user-defined camera patterns with different names overlap, the values of all the camera patterns are added.
     - A user-defined camera pattern can be used together with a normal spin, a half spin, or a swing effect on the same laser slam.
+- "`cam_play`" (Not supported in KSM v1.xx)
+    - A user-defined camera pattern automatically invoked at the position regardless of note judgments (string)
+    - Format: "`<name>;<length>;<scale>`"
+        - The format is the same as that of "`cam_slam_l`" and "`cam_slam_r`".
+    - Normal spins, half spins, and swing effects cannot be invoked by "`cam_play`".
+    - "`slam_shake`" and "`flip_by_direction`" of the camera pattern have no effect.
+    - If multiple camera patterns invoked by "`cam_play`" overlap, the values of all the camera patterns are added, even if they have the same name. The values are also added to those of the camera patterns invoked by laser slams.
+    - The same user-defined camera pattern cannot be invoked more than once at the same position by "`cam_play`".
 - "`laser_l_curve`", "`laser_r_curve`" (Not supported in KSM v1.xx)
     - Curve interpolation for laser positions
     - Format: "`<a>;<b>`" (both values are float in range [0.0, 1.0])
@@ -555,7 +563,7 @@ The list of definition types is as follows:
     - User-defined audio effects for laser notes
     - The format is the same as that of "`#define_fx`".
 - "`#define_cam`" (Not supported in KSM v1.xx)
-    - User-defined camera patterns for laser slams
+    - User-defined camera patterns
     - Format: "`#define_cam <name> <param-name>=<graph>;<param-name>=<graph>;...;slam_shake=<slam-shake>;flip_by_direction=<flip-by-direction>`"
         - `<name>`: The name of the user-defined camera pattern
             - "`spin`", "`half_spin`", and "`swing`" cannot be used.
@@ -574,6 +582,6 @@ The list of definition types is as follows:
             - "`slam_shake=<slam-shake>`" is optional and set to the default if not specified.
         - `<flip-by-direction>`: Whether the values are flipped for a laser slam to the left (int, 0 or 1, default:"`1`")
             - "`flip_by_direction=<flip-by-direction>`" is optional and set to the default if not specified.
-    - The largest position of the graph points is the length of the definition. The positions are scaled so that the length of the definition fits the length specified in "`cam_slam_l`" or "`cam_slam_r`".
+    - The largest position of the graph points is the length of the definition. The positions are scaled so that the length of the definition fits the length specified in "`cam_slam_l`", "`cam_slam_r`", or "`cam_play`".
     - The values are added to the values of the body options with the same names while the camera pattern is invoked, and are no longer added after the specified length has passed even if the last value is not zero.
     - The values are defined for a laser slam to the right. When the values are flipped, the signs of the values of "`zoom_side`", "`rotation_deg`", "`rotation_deg_highway`", "`rotation_deg_jdgline`", and "`rotation_deg_layer`" are inverted.
