@@ -274,6 +274,41 @@ The list of header options is as follows:
 - "`vo`" (default:"`0`")
     - The video offset (int)
     - The value can be negative.
+- "`v_loop`" (default:"`0`") (Not supported in KSM v1.xx)
+    - Whether to play the video repeatedly (int, 0 or 1)
+    - If the value is "`1`", the video is also displayed before its beginning, as if it had been played repeatedly from the past.
+- "`v_placement`" (default:"`panel`") (Not supported in KSM v1.xx)
+    - The placement of the video (string)
+        - "`panel`": A small panel
+        - "`behind_layer`": The whole screen, in front of the background image and behind the animation layer
+        - "`in_front_of_layer`": The whole screen, in front of the background image and the animation layer
+    - If the value is "`behind_layer`" or "`in_front_of_layer`":
+        - The video is not rotated by "`rotation_deg_layer`".
+- "`v_blend_mode`" (default:"`normal`") (Not supported in KSM v1.xx)
+    - The blend mode of the video (string)
+        - "`normal`": Normal blending
+        - "`additive`": Additive blending
+    - This value is ignored if "`v_placement`" is "`panel`".
+- "`v_opacity`" (default:"`100`") (Not supported in KSM v1.xx)
+    - The opacity (%) of the video (int, 0-100)
+    - This value is ignored if "`v_placement`" is "`panel`".
+- "`v_scale`" (default:"`100`") (Not supported in KSM v1.xx)
+    - The scale (%) of the video (int, 0-10000)
+    - The video is scaled around its center.
+    - This value is ignored if "`v_placement`" is "`panel`".
+- "`vx`", "`vy`" (default:"`0`") (Not supported in KSM v1.xx)
+    - The position of the video (int, -10000 - 10000)
+    - The values are the percentage of the height of the screen (e.g. 50 for half the height of the screen).
+        - "`vx`": 0 for the center, positive values for the right
+        - "`vy`": 0 for the center, positive values for the lower side
+    - These values are ignored if "`v_placement`" is "`panel`".
+- "`v_rotation`" (default:"`0`") (Not supported in KSM v1.xx)
+    - The rotation behavior of the video (int, 0-3)
+        -  0: No rotation
+        - +1: the video follows lane tilts
+        - +2: the video follows lane spins
+    - The center of the rotation is the same as that of the animation layer and is not moved by "`v_scale`", "`vx`", and "`vy`".
+    - This value is ignored if "`v_placement`" is "`panel`".
 - "`ver`" (default:"")
     - The version of the KSH file format (string)
     - Since this value is the version of the format, the value is not always the same as the version of the editor.

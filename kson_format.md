@@ -951,8 +951,35 @@ dictionary KSHLayerRotationInfo {
 #### `bg.legacy.movie` (OPTIONAL SUPPORT)
 ```
 dictionary KSHMovieInfo {
-    filename: string?  // self-explanatory
-    offset:   int = 0  // movie offset in millisecond
+    filename:   string?                // self-explanatory
+    offset:     int = 0                // movie offset in millisecond
+    loop:       bool = false           // whether to play the movie repeatedly
+    placement:  string = "panel"       // "panel", "behind_layer", or "in_front_of_layer"
+    blend_mode: string = "normal"      // "normal" or "additive"
+    opacity:    double = 1.0           // movie opacity (0.0-1.0)
+    scale:      double = 1.0           // movie scale (0.0-100.0)
+    x:          double = 0.0           // x-axis position ([-100.0, 100.0], 0.0 = center, positive = right)
+    y:          double = 0.0           // y-axis position ([-100.0, 100.0], 0.0 = center, positive = down)
+    rotation:   KSHMovieRotationInfo?  // rotation conditions
+}
+```
+- If `loop` is `true`, the movie is also displayed before its beginning, as if it had been played repeatedly from the past.
+- `placement` specifies where the movie is displayed:
+    - "`panel`": A small panel
+    - "`behind_layer`": The whole screen, in front of `bg.legacy.bg` and behind `bg.legacy.layer`
+    - "`in_front_of_layer`": The whole screen, in front of `bg.legacy.bg` and `bg.legacy.layer`
+- If `placement` is "`behind_layer`" or "`in_front_of_layer`":
+    - The movie is scaled by `scale` around its center.
+    - `x` and `y` are in units of the height of the screen (e.g. 0.5 for half the height of the screen).
+    - The center of the rotation specified in `rotation` is the same as that of `bg.legacy.layer` and is not moved by `scale`, `x`, and `y`.
+    - The movie is not rotated by `camera.cam.body.rotation_deg_layer`.
+- `blend_mode`, `opacity`, `scale`, `x`, `y`, and `rotation` are ignored if `placement` is "`panel`".
+
+##### `bg.legacy.movie.rotation` (OPTIONAL SUPPORT)
+```
+dictionary KSHMovieRotationInfo {
+    tilt: bool = false  // whether lane tilts affect rotation of the movie
+    spin: bool = false  // whether lane spins affect rotation of the movie
 }
 ```
 
