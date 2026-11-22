@@ -774,8 +774,9 @@ dictionary CamPatternInfo {
 ##### `camera.cam.pattern.def.xxx`
 ```
 dictionary CamPatternDef {
-    body:       CamPatternGraphs  // cam value changes
-    slam_shake: bool = true       // whether the default shake of the laser slam is applied
+    body:              CamPatternGraphs  // cam value changes
+    slam_shake:        bool = true       // whether the default shake of the laser slam is applied
+    flip_by_direction: bool = true       // whether the values are flipped for a laser slam to the left
 }
 ```
 - The default shake is the small shake of the highway applied to every laser slam without a swing effect (`camera.cam.pattern.laser.slam_event.swing`).
@@ -796,7 +797,7 @@ dictionary CamPatternGraphs {
 ```
 - The largest `ry` of the graph points is the length of the definition. `ry` is scaled so that the length of the definition fits the length specified in the invocation.
 - The values are added to the values of `camera.cam.body` with the same names while the cam pattern is invoked, and are no longer added after the specified length has passed even if the last value is not zero.
-- The values are defined for a laser slam to the right. For a laser slam to the left, the signs of the values of `zoom_side`, `rotation_deg`, `rotation_deg_highway`, `rotation_deg_jdgline`, and `rotation_deg_layer` are inverted.
+- The values are defined for a laser slam to the right. When the values are flipped, the signs of the values of `zoom_side`, `rotation_deg`, `rotation_deg_highway`, `rotation_deg_jdgline`, and `rotation_deg_layer` are inverted.
 - The valid value ranges are the same as those of `camera.cam.body`.
 
 ##### `camera.cam.pattern.laser`
