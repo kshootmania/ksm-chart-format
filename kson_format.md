@@ -1,4 +1,4 @@
-# KSON Format Specification (version 1.0.2, format_version: `1`)
+# KSON Format Specification (version 1.1.0, format_version: `2`)
 ## Basic Specifications
 - **JSON format**: KSON files MUST use the JSON format.
 - **File extension**: KSON files MUST use the `.kson` file extension.
@@ -214,12 +214,12 @@ dictionary KeySoundLaserInfo {
 ##### `audio.key_sound.laser.slam_event` (OPTIONAL SUPPORT)
 ```
 dictionary KeySoundInvokeListLaser {
-    slam_up:    uint[]?  // (OPTIONAL SUPPORT) uint represents y (pulse number)
-    slam_down:  uint[]?  // (OPTIONAL SUPPORT)
-    slam_swing: uint[]?  // (OPTIONAL SUPPORT)
-    slam_mute:  uint[]?  // (OPTIONAL SUPPORT)
+    up:    uint[]?  // (OPTIONAL SUPPORT) uint represents y (pulse number)
+    down:  uint[]?  // (OPTIONAL SUPPORT)
+    swing: uint[]?  // (OPTIONAL SUPPORT)
+    mute:  uint[]?  // (OPTIONAL SUPPORT)
 
-    ...:        uint[]?  // Custom key sounds can be inserted here by using an audio filename (with extension) as a key
+    ...:   uint[]?  // Custom key sounds can be inserted here by using an audio filename (with extension) as a key
 }
 ```
 - Note: `y` (pulse number) should be the same as `y` of an existing laser slam note; otherwise, the event is ignored.
@@ -737,27 +737,69 @@ dictionary CamInfo {
 #### `camera.cam.body`
 ```
 dictionary CamGraphs {
-    zoom_top:           GraphPoint[]?  // rotate the upper edge around the judgment line (zoom_top in KSH format)
-    zoom_bottom:        GraphPoint[]?  // move the bottom edge closer to the camera (zoom_bottom in KSH format)
-    zoom_side:          GraphPoint[]?  // move the highway horizontally (zoom_side in KSH format)
-    rotation_deg:       GraphPoint[]?  // rotation degree (affects both highway & jdgline relatively)
-    center_split:       GraphPoint[]?  // split the highway at the center (center_split in KSH format)
+    zoom_top:             GraphPoint[]?  // rotate the upper edge around the judgment line (zoom_top in KSH format)
+    zoom_bottom:          GraphPoint[]?  // move the bottom edge closer to the camera (zoom_bottom in KSH format)
+    zoom_side:            GraphPoint[]?  // move the highway horizontally (zoom_side in KSH format)
+    rotation_deg:         GraphPoint[]?  // rotation degree (affects both highway & jdgline relatively)
+    rotation_deg_highway: GraphPoint[]?  // rotation degree added to rotation_deg (affects highway only)
+    rotation_deg_jdgline: GraphPoint[]?  // (OPTIONAL SUPPORT) rotation degree added to rotation_deg (affects jdgline only)
+    rotation_deg_layer:   GraphPoint[]?  // (OPTIONAL SUPPORT) rotation degree (affects layer only)
+    center_split:         GraphPoint[]?  // split the highway at the center (center_split in KSH format)
+    highway_wipe:         GraphPoint[]?  // hide the highway surface from the lower side (+) or the upper side (-) (highway_wipe in KSH format)
 }
 ```
-- The value scale used for `zoom_top`/`zoom_bottom`/`zoom_side`/`center_split` is identical to the scale used in KSH format.
+- The value scale used for `zoom_top`/`zoom_bottom`/`zoom_side`/`center_split`/`highway_wipe` is identical to the scale used in KSH format.
 - The units used for the `zoom_top` value are not degrees, but instead represent one full rotation every +2400 units.
 - Valid value ranges:
     - `zoom_top`, `zoom_bottom`, `zoom_side`: [-65535.0, 65535.0]
     - `center_split`: [-65535.0, 65535.0]
-    - `rotation_deg`: [-65535.0, 65535.0] (in degrees)
+    - `highway_wipe`: [-65535.0, 65535.0] (in percent)
+    - `rotation_deg`, `rotation_deg_highway`, `rotation_deg_jdgline`, `rotation_deg_layer`: [-65535.0, 65535.0] (in degrees)
 - Values outside these ranges MAY be clamped by KSON clients.
+- `highway_wipe` does not hide notes and bar lines.
+- `bg.legacy.layer` is not rotated by `rotation_deg`.
+- `rotation_deg_layer` rotates `bg.legacy.layer` regardless of `bg.legacy.layer.rotation`.
 
 #### `camera.cam.pattern`
 ```
 dictionary CamPatternInfo {
-    laser: CamPatternLaserInfo?  // cam pattern for laser slams
+    def:         DefKeyValuePair<CamPatternDef>[]?     // cam pattern definitions
+    laser:       CamPatternLaserInfo?                  // cam pattern for laser slams
+    pulse_event: dictionary<CamPatternInvokePulse[]>?  // cam pattern invocation by pulse
 }
 ```
+- Note: `def` is an array of key-value pairs to preserve the order in which the user created the definitions, ensuring a stable order during editing and processing.
+- `spin`, `half_spin`, and `swing` cannot be used as the name of a cam pattern definition.
+- Note: A cam pattern definition whose name is empty or contains white spaces or "`;`" cannot be converted to KSH format.
+
+##### `camera.cam.pattern.def.xxx`
+```
+dictionary CamPatternDef {
+    body:              CamPatternGraphs  // cam value changes
+    slam_shake:        bool = true       // whether the default shake of the laser slam is applied
+    flip_by_direction: bool = true       // whether the values are flipped for a laser slam to the left
+}
+```
+- The default shake is the small shake of the highway applied to every laser slam without a swing effect (`camera.cam.pattern.laser.slam_event.swing`).
+
+##### `camera.cam.pattern.def.xxx.body`
+```
+dictionary CamPatternGraphs {
+    zoom_top:             GraphSectionPoint[]?
+    zoom_bottom:          GraphSectionPoint[]?
+    zoom_side:            GraphSectionPoint[]?
+    rotation_deg:         GraphSectionPoint[]?
+    rotation_deg_highway: GraphSectionPoint[]?
+    rotation_deg_jdgline: GraphSectionPoint[]?  // (OPTIONAL SUPPORT)
+    rotation_deg_layer:   GraphSectionPoint[]?  // (OPTIONAL SUPPORT)
+    center_split:         GraphSectionPoint[]?
+    highway_wipe:         GraphSectionPoint[]?
+}
+```
+- The largest `ry` of the graph points is the length of the definition. `ry` is scaled so that the length of the definition fits the length specified in the invocation.
+- The values are added to the values of `camera.cam.body` with the same names while the cam pattern is invoked, and are no longer added after the specified length has passed even if the last value is not zero.
+- The values are defined for a laser slam to the right. When the values are flipped, the signs of the values of `zoom_side`, `rotation_deg`, `rotation_deg_highway`, `rotation_deg_jdgline`, and `rotation_deg_layer` are inverted.
+- The valid value ranges are the same as those of `camera.cam.body`.
 
 ##### `camera.cam.pattern.laser`
 ```
@@ -765,27 +807,55 @@ dictionary CamPatternLaserInfo {
     slam_event: CamPatternLaserInvokeList?  // cam pattern invocation by laser slam notes
 }
 ```
-- Note: This is a specification with the possibility of defining `camera.cam.pattern.laser.def` as a future extension.
 
 ##### `camera.cam.pattern.laser.slam_event`
 ```
 dictionary CamPatternLaserInvokeList {
     spin:      CamPatternInvokeSpin[]?
-    half_spin: CamPatternInvokeSpin[]?
-    swing:     CamPatternInvokeSwing[]?  // (OPTIONAL SUPPORT)
+    half_spin: CamPatternInvokeHalfSpin[]?
+    swing:     CamPatternInvokeSwing[]?   // (OPTIONAL SUPPORT)
+
+    ...:       CamPatternInvokeCustom[]?  // Custom cam patterns can be invoked here by using a name defined in `camera.cam.pattern.def` as a key
 }
 ```
 - Note: `y` (pulse number) & `d` (laser slam direction) should be the same as `y` & sign(`vf` - `v`) of an existing laser slam note; otherwise, the event is ignored.
 
-##### `camera.cam.pattern.laser.slam_event.spin[]`/`camera.cam.pattern.laser.slam_event.half_spin[]`
+##### `camera.cam.pattern.laser.slam_event.spin[]`
 ```
 array CamPatternInvokeSpin {
     [0]: uint  // y: pulse number
     [1]: int   // direction: laser slam direction, -1 (left) or 1 (right)
     [2]: uint  // length: spin duration
+    [3]: CamPatternInvokeSpinValue? // v: value
 }
 ```
-- The array size of `CamPatternInvokeSpin` MUST be 3.
+- The array size of `CamPatternInvokeSpin` MUST be 3 or 4.
+
+##### `camera.cam.pattern.laser.slam_event.spin[][3]`
+```
+dictionary CamPatternInvokeSpinValue {
+    count: uint = 1  // number of rotations (0-65535)
+}
+```
+
+##### `camera.cam.pattern.laser.slam_event.half_spin[]`
+```
+array CamPatternInvokeHalfSpin {
+    [0]: uint  // y: pulse number
+    [1]: int   // direction: laser slam direction, -1 (left) or 1 (right)
+    [2]: uint  // length: spin duration
+    [3]: CamPatternInvokeHalfSpinValue? // v: value
+}
+```
+- The array size of `CamPatternInvokeHalfSpin` MUST be 3 or 4.
+
+##### `camera.cam.pattern.laser.slam_event.half_spin[][3]`
+```
+dictionary CamPatternInvokeHalfSpinValue {
+    deg: double = 60.0  // maximum rotation degree ([-65535.0, 65535.0])
+}
+```
+- The highway rotates to `deg` and then swings back.
 
 ##### `camera.cam.pattern.laser.slam_event.swing[]` (OPTIONAL SUPPORT)
 ```
@@ -802,13 +872,53 @@ array CamPatternInvokeSwing {
 ```
 dictionary CamPatternInvokeSwingValue {
     scale:  double = 250.0 // scale
-    repeat: uint = 3       // number of repetitions
+    repeat: uint = 3       // number of repetitions (0-65535)
     decay_order: uint = 2  // order of the decay that scales camera values (0-2)
                            // (note that this decay is applied even if repeat=1)
-                           // - equation: `value * (1.0 - ((l - ry) / l))^decay_order`
+                           // - equation: `value * ((length - ry) / length)^decay_order`
                            // - 0: no decay, 1: linear decay, 2: squared decay
 }
 ```
+
+##### `camera.cam.pattern.laser.slam_event.xxx[]`
+```
+array CamPatternInvokeCustom {
+    [0]: uint  // y: pulse number
+    [1]: int   // direction: laser slam direction, -1 (left) or 1 (right)
+    [2]: uint  // length: cam pattern duration
+    [3]: CamPatternInvokeCustomValue? // v: value
+}
+```
+- The array size of `CamPatternInvokeCustom` MUST be 3 or 4.
+- If the name is not defined in `camera.cam.pattern.def`, the invocation is ignored.
+- Only one cam pattern definition can be invoked by a single laser slam (the same `y` and direction).
+- If a cam pattern definition is invoked while the same definition invoked by a previous laser slam is still in progress, the previous one is stopped, regardless of the directions of the laser slams.
+- If the invocations of different cam pattern definitions overlap, the values of all the invocations are added.
+- A cam pattern definition can be used together with `spin`, `half_spin`, or `swing` on the same laser slam.
+
+##### `camera.cam.pattern.laser.slam_event.xxx[][3]`
+```
+dictionary CamPatternInvokeCustomValue {
+    scale: double = 1.0  // scale of the values ([-65535.0, 65535.0])
+}
+```
+- The scaled values outside the valid value ranges of `camera.cam.pattern.def.xxx.body` MAY be clamped by KSON clients.
+
+##### `camera.cam.pattern.pulse_event.xxx[]`
+```
+array CamPatternInvokePulse {
+    [0]: uint  // y: pulse number
+    [1]: uint  // length: cam pattern duration
+    [2]: CamPatternInvokeCustomValue? // v: value
+}
+```
+- The array size of `CamPatternInvokePulse` MUST be 2 or 3.
+- The key of `camera.cam.pattern.pulse_event` is a name defined in `camera.cam.pattern.def`. If the name is not defined, the invocation is ignored.
+- `spin`, `half_spin`, and `swing` cannot be invoked by `camera.cam.pattern.pulse_event`.
+- The cam pattern is automatically invoked at `y` regardless of note judgments.
+- `slam_shake` and `flip_by_direction` of the cam pattern definition have no effect.
+- If multiple invocations overlap, the values of all the invocations are added, even if they invoke the same definition. The values are also added to those of the invocations by laser slams.
+- The same cam pattern definition cannot be invoked more than once at the same `y`.
 
 -----------------------------------------------------------------------------------
 
@@ -861,8 +971,35 @@ dictionary KSHLayerRotationInfo {
 #### `bg.legacy.movie` (OPTIONAL SUPPORT)
 ```
 dictionary KSHMovieInfo {
-    filename: string?  // self-explanatory
-    offset:   int = 0  // movie offset in millisecond
+    filename:   string?                // self-explanatory
+    offset:     int = 0                // movie offset in millisecond
+    loop:       bool = false           // whether to play the movie repeatedly
+    placement:  string = "panel"       // "panel", "behind_layer", or "in_front_of_layer"
+    blend_mode: string = "normal"      // "normal" or "additive"
+    opacity:    double = 1.0           // movie opacity (0.0-1.0)
+    scale:      double = 1.0           // movie scale (0.0-100.0)
+    x:          double = 0.0           // x-axis position ([-100.0, 100.0], 0.0 = center, positive = right)
+    y:          double = 0.0           // y-axis position ([-100.0, 100.0], 0.0 = center, positive = down)
+    rotation:   KSHMovieRotationInfo?  // rotation conditions
+}
+```
+- If `loop` is `true`, the movie is also displayed before its beginning, as if it had been played repeatedly from the past.
+- `placement` specifies where the movie is displayed:
+    - "`panel`": A small panel
+    - "`behind_layer`": The whole screen, in front of `bg.legacy.bg` and behind `bg.legacy.layer`
+    - "`in_front_of_layer`": The whole screen, in front of `bg.legacy.bg` and `bg.legacy.layer`
+- If `placement` is "`behind_layer`" or "`in_front_of_layer`":
+    - The movie is scaled by `scale` around its center.
+    - `x` and `y` are in units of the height of the screen (e.g. 0.5 for half the height of the screen).
+    - The center of the rotation specified in `rotation` is the same as that of `bg.legacy.layer` and is not moved by `scale`, `x`, and `y`.
+    - The movie is not rotated by `camera.cam.body.rotation_deg_layer`.
+- `blend_mode`, `opacity`, `scale`, `x`, `y`, and `rotation` are ignored if `placement` is "`panel`".
+
+##### `bg.legacy.movie.rotation` (OPTIONAL SUPPORT)
+```
+dictionary KSHMovieRotationInfo {
+    tilt: bool = false  // whether lane tilts affect rotation of the movie
+    spin: bool = false  // whether lane spins affect rotation of the movie
 }
 ```
 
@@ -1043,7 +1180,9 @@ array GraphSectionPoint {
 
 # Change Log
 
-- `1.0.2` (08/02/2026)
+- `1.1.0` (11/23/2026)
+    - Changes: https://github.com/kshootmania/ksm-chart-format/pull/18/files
+- [`1.0.2`](https://github.com/kshootmania/ksm-chart-format/blob/b984509ad6b43c208f8a3b4aff51d6a8664b896d/kson_format.md) (08/02/2026)
     - Changes: https://github.com/kshootmania/ksm-chart-format/pull/17/files
 - [`1.0.1`](https://github.com/kshootmania/ksm-chart-format/blob/bd4b9447fbb9e11058a0f5345e0a6a446feb2e3a/kson_format.md) (06/30/2026)
     - Changes: https://github.com/kshootmania/ksm-chart-format/pull/16/files

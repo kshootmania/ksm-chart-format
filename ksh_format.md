@@ -81,7 +81,7 @@ A KSH file contains five types of lines: option lines, chart lines, bar lines, d
                 Left <-  `0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmno`  -> Right
             - Laser notes that are 1/32 or shorter are recognized as laser slams. (It is currently not possible to create 1/32 ordinary laser notes according to the current specification.)
         - `<lane-spin (optional)>`
-            - Examples: `@(192`, `@<192`, `S<192`, `S<192;500`
+            - Examples: `@(192`, `@(192;2`, `@<192`, `@<192;90`, `S<192`, `S<192;500`
             - The first two characters denote the effect type
                 - `@(`: Normal spin (left, clockwise)
                 - `@)`: Normal spin (right, counterclockwise)
@@ -90,9 +90,13 @@ A KSH file contains five types of lines: option lines, chart lines, bar lines, d
                 - `S<`: Swing effect (left)
                 - `S>`: Swing effect (right)
             - The number is the length (192 per measure).
+            - For normal spins, an optional parameter can be specified after the length, separated by "`;`" (Not supported in KSM v1.xx):
+                - Second parameter (int, 0-65535, default:`1`): Number of rotations
+            - For half spins, an optional parameter can be specified after the length, separated by "`;`" (Not supported in KSM v1.xx):
+                - Second parameter (float, -65535 - 65535, default:`60`): Maximum rotation degree (the highway rotates to this degree and then swings back)
             - For swing effects, optional parameters can be specified after the length, separated by "`;`":
                 - Second parameter (int, default:`250`): Scale value
-                - Third parameter (int, default:`3`): Number of repetitions (1 per one-way swing)
+                - Third parameter (int, 0-65535, default:`3`): Number of repetitions (1 per one-way swing)
                 - Fourth parameter (int, 0-2, default:`2`): Order of the decay (0: no decay, 1: linear decay, 2: squared decay)
 - Bar Line
     - Two measures are separated by one bar line.
@@ -104,6 +108,7 @@ A KSH file contains five types of lines: option lines, chart lines, bar lines, d
     - Example
         - "`#define_fx LoFl type=Flanger;delay=80samples;depth=60samples`"
         - "`#define_filter TSTP type=TapeStop;trigger=off>on;speed=20%`"
+        - "`#define_cam Shake zoom_side=0:0,48:100,144:-100,192:0`"
     - Format
         - "`#define_<definition-type> <name> <value>`"
         - A series of white spaces is regarded as one separator.
@@ -269,6 +274,41 @@ The list of header options is as follows:
 - "`vo`" (default:"`0`")
     - The video offset (int)
     - The value can be negative.
+- "`v_loop`" (default:"`0`") (Not supported in KSM v1.xx)
+    - Whether to play the video repeatedly (int, 0 or 1)
+    - If the value is "`1`", the video is also displayed before its beginning, as if it had been played repeatedly from the past.
+- "`v_placement`" (default:"`panel`") (Not supported in KSM v1.xx)
+    - The placement of the video (string)
+        - "`panel`": A small panel
+        - "`behind_layer`": The whole screen, in front of the background image and behind the animation layer
+        - "`in_front_of_layer`": The whole screen, in front of the background image and the animation layer
+    - If the value is "`behind_layer`" or "`in_front_of_layer`":
+        - The video is not rotated by "`rotation_deg_layer`".
+- "`v_blend_mode`" (default:"`normal`") (Not supported in KSM v1.xx)
+    - The blend mode of the video (string)
+        - "`normal`": Normal blending
+        - "`additive`": Additive blending
+    - This value is ignored if "`v_placement`" is "`panel`".
+- "`v_opacity`" (default:"`100`") (Not supported in KSM v1.xx)
+    - The opacity (%) of the video (int, 0-100)
+    - This value is ignored if "`v_placement`" is "`panel`".
+- "`v_scale`" (default:"`100`") (Not supported in KSM v1.xx)
+    - The scale (%) of the video (int, 0-10000)
+    - The video is scaled around its center.
+    - This value is ignored if "`v_placement`" is "`panel`".
+- "`vx`", "`vy`" (default:"`0`") (Not supported in KSM v1.xx)
+    - The position of the video (int, -10000 - 10000)
+    - The values are the percentage of the height of the screen (e.g. 50 for half the height of the screen).
+        - "`vx`": 0 for the center, positive values for the right
+        - "`vy`": 0 for the center, positive values for the lower side
+    - These values are ignored if "`v_placement`" is "`panel`".
+- "`v_rotation`" (default:"`0`") (Not supported in KSM v1.xx)
+    - The rotation behavior of the video (int, 0-3)
+        -  0: No rotation
+        - +1: the video follows lane tilts
+        - +2: the video follows lane spins
+    - The center of the rotation is the same as that of the animation layer and is not moved by "`v_scale`", "`vx`", and "`vy`".
+    - This value is ignored if "`v_placement`" is "`panel`".
 - "`ver`" (default:"")
     - The version of the KSH file format (string)
     - Since this value is the version of the format, the value is not always the same as the version of the editor.
@@ -349,6 +389,27 @@ The list of body options is as follows:
     - The value behaves as a linear graph (the same as lane zooms)
         - An immediate change can be created by successive two lines of the "`rotation_deg`" option.
     - The value is the rotation degree in degrees (e.g. 0 for no rotation, 90 for a quarter turn, 360 for a full rotation).
+    - Note: The animation layer is not rotated by "`rotation_deg`".
+    - Value range: [-65535, 65535]
+- "`rotation_deg_highway`" (Not supported in KSM v1.xx)
+    - A rotation degree change of the highway only (float)
+    - The value behaves as a linear graph (the same as lane zooms)
+        - An immediate change can be created by successive two lines of the "`rotation_deg_highway`" option.
+    - The value is the rotation degree in degrees, added to the "`rotation_deg`" value.
+    - Value range: [-65535, 65535]
+- "`rotation_deg_jdgline`" (Not supported in KSM v1.xx)
+    - A rotation degree change of the judgment line only (float)
+    - The value behaves as a linear graph (the same as lane zooms)
+        - An immediate change can be created by successive two lines of the "`rotation_deg_jdgline`" option.
+    - The value is the rotation degree in degrees, added to the "`rotation_deg`" value.
+    - Value range: [-65535, 65535]
+- "`rotation_deg_layer`" (Not supported in KSM v1.xx)
+    - A rotation degree change of the animation layer only (float)
+    - The value behaves as a linear graph (the same as lane zooms)
+        - An immediate change can be created by successive two lines of the "`rotation_deg_layer`" option.
+    - The value is the rotation degree in degrees.
+    - The value is applied regardless of the rotation behavior specified in "`layer`".
+    - Value range: [-65535, 65535]
 - "`stop`"
     - A pause (int)
     - The value is the length of the pause (192 per measure).
@@ -376,11 +437,18 @@ The list of body options is as follows:
     - If "`ver`" is earlier than "`167`", the value is restricted to the range [-300, 300]; otherwise, [-65535, 65535].
 - "`center_split`"
     - A value change of camera controls (float)
-    - The values behave as a linear graph (the same as manual tilts)
-        - An immediate change can be created by successive two lines of the same options.
+    - The value behaves as a linear graph (the same as lane zooms)
+        - An immediate change can be created by successive two lines of the "`center_split`" option.
     - This creates a margin in the middle of the highway. Every 100 creates a margin of one lane.
     - Value range: [-65535, 65535] (no version-based restriction)
-- "`scroll_speed_curve`", "`rotation_deg_curve`", "`zoom_top_curve`", "`zoom_bottom_curve`", "`zoom_side_curve`", "`center_split_curve`", "`tilt_curve`" (Not supported in KSM v1.xx)
+- "`highway_wipe`" (Not supported in KSM v1.xx)
+    - A value change of camera controls (float)
+    - The value behaves as a linear graph (the same as lane zooms)
+        - An immediate change can be created by successive two lines of the "`highway_wipe`" option.
+    - This hides the highway surface from the lower side (+) or the upper side (-). The value is the percentage of the hidden part (e.g. 50 for the lower half, -50 for the upper half, 100 or -100 for the whole).
+        - Notes and bar lines are not hidden.
+    - Value range: [-65535, 65535]
+- "`scroll_speed_curve`", "`rotation_deg_curve`", "`rotation_deg_highway_curve`", "`rotation_deg_jdgline_curve`", "`rotation_deg_layer_curve`", "`zoom_top_curve`", "`zoom_bottom_curve`", "`zoom_side_curve`", "`center_split_curve`", "`highway_wipe_curve`", "`tilt_curve`" (Not supported in KSM v1.xx)
     - Curve interpolation for scroll speed, rotation, camera, and tilt parameters
     - Format: "`<a>;<b>`" (both values are float in range [0.0, 1.0])
     - Applied to the parameter at the same pulse in the same measure
@@ -398,6 +466,28 @@ The list of body options is as follows:
         - Cannot make a normal laser a wide-range one midway through the note.
     - The value must be "`2x`".
         - "`1x`" is allowed but it is meaningless.
+- "`cam_slam_l`", "`cam_slam_r`" (Not supported in KSM v1.xx)
+    - A user-defined camera pattern invoked by a laser slam (string)
+    - "`cam_slam_l`" is for a laser slam to the left, and "`cam_slam_r`" is for a laser slam to the right.
+    - Should be placed just before the target laser slam.
+    - Format: "`<name>;<length>;<scale>`"
+        - `<name>`: The name of a user-defined camera pattern defined by a "`#define_cam`" line in the footer
+        - `<length>`: The length of the camera pattern (int, 192 per measure)
+        - `<scale>`: The scale of the values (float, default:"`1`")
+            - Value range: [-65535, 65535]
+    - The third parameter is optional and set to the default if not specified.
+    - Only one user-defined camera pattern can be invoked by a single laser slam.
+    - If a user-defined camera pattern is invoked while the camera pattern with the same name invoked by a previous laser slam is still in progress, the previous one is stopped, regardless of the directions of the laser slams.
+    - If user-defined camera patterns with different names overlap, the values of all the camera patterns are added.
+    - A user-defined camera pattern can be used together with a normal spin, a half spin, or a swing effect on the same laser slam.
+- "`cam_play`" (Not supported in KSM v1.xx)
+    - A user-defined camera pattern automatically invoked at the position regardless of note judgments (string)
+    - Format: "`<name>;<length>;<scale>`"
+        - The format is the same as that of "`cam_slam_l`" and "`cam_slam_r`".
+    - Normal spins, half spins, and swing effects cannot be invoked by "`cam_play`".
+    - "`slam_shake`" and "`flip_by_direction`" of the camera pattern have no effect.
+    - If multiple camera patterns invoked by "`cam_play`" overlap, the values of all the camera patterns are added, even if they have the same name. The values are also added to those of the camera patterns invoked by laser slams.
+    - The same user-defined camera pattern cannot be invoked more than once at the same position by "`cam_play`".
 - "`laser_l_curve`", "`laser_r_curve`" (Not supported in KSM v1.xx)
     - Curve interpolation for laser positions
     - Format: "`<a>;<b>`" (both values are float in range [0.0, 1.0])
@@ -461,11 +551,38 @@ The list of definition types is as follows:
 
 - "`#define_fx`"
     - User-defined audio effects for long FX notes
+    - Format: "`#define_fx <name> type=<type>;<param-name>=<param-value>;<param-name>=<param-value>;...`"
+        - `<name>`: The name of the user-defined audio effect
+            - The name can be duplicated with the preset effects (e.g. "`Flanger`").
+        - `<type>`: The type of the audio effect
+        - `<param-name>`: The parameter name
+        - `<param-value>`: The parameter value
+    - For more information about user-defined audio effects, please check out the following blog post.
+        - [K-Shoot MANIA v1.60] Tutorial on creating user-defined effects
+            - http://mtstdy.blog.fc2.com/blog-entry-27.html (only available in Japanese)
 - "`#define_filter`"
     - User-defined audio effects for laser notes
-
-Note that the name of a user-defined audio effect can be duplicated with the preset effects (e.g. "`Flanger`").
-
-For more information about user-defined audio effects, please check out the following blog post.
-- [K-Shoot MANIA v1.60] Tutorial on creating user-defined effects
-    - http://mtstdy.blog.fc2.com/blog-entry-27.html (only available in Japanese)
+    - The format is the same as that of "`#define_fx`".
+- "`#define_cam`" (Not supported in KSM v1.xx)
+    - User-defined camera patterns
+    - Format: "`#define_cam <name> <param-name>=<graph>;<param-name>=<graph>;...;slam_shake=<slam-shake>;flip_by_direction=<flip-by-direction>`"
+        - `<name>`: The name of the user-defined camera pattern
+            - "`spin`", "`half_spin`", and "`swing`" cannot be used.
+            - The name cannot contain white spaces or "`;`".
+        - `<param-name>`: "`zoom_top`", "`zoom_bottom`", "`zoom_side`", "`rotation_deg`", "`rotation_deg_highway`", "`rotation_deg_jdgline`", "`rotation_deg_layer`", "`center_split`", or "`highway_wipe`"
+        - `<graph>`: Graph points separated by "`,`"
+            - Format of a graph point: "`<position>:<value>`" or "`<position>:<value>:<a>:<b>`"
+                - `<position>`: The position from the beginning of the camera pattern (int, 192 per measure)
+                - `<value>`: The value (int for "`zoom_top`", "`zoom_bottom`", and "`zoom_side`"; otherwise, float)
+                    - Value range: [-65535, 65535]
+                - `<a>`, `<b>`: Curve interpolation to the next graph point (both values are float in range [0.0, 1.0])
+            - The position of the first graph point must be 0.
+            - An immediate change can be created by successive two graph points at the same position.
+        - `<slam-shake>`: Whether the default shake of the laser slam is applied (int, 0 or 1, default:"`1`")
+            - The default shake is the small shake of the highway applied to every laser slam without a swing effect.
+            - "`slam_shake=<slam-shake>`" is optional and set to the default if not specified.
+        - `<flip-by-direction>`: Whether the values are flipped for a laser slam to the left (int, 0 or 1, default:"`1`")
+            - "`flip_by_direction=<flip-by-direction>`" is optional and set to the default if not specified.
+    - The largest position of the graph points is the length of the definition. The positions are scaled so that the length of the definition fits the length specified in "`cam_slam_l`", "`cam_slam_r`", or "`cam_play`".
+    - The values are added to the values of the body options with the same names while the camera pattern is invoked, and are no longer added after the specified length has passed even if the last value is not zero.
+    - The values are defined for a laser slam to the right. When the values are flipped, the signs of the values of "`zoom_side`", "`rotation_deg`", "`rotation_deg_highway`", "`rotation_deg_jdgline`", and "`rotation_deg_layer`" are inverted.
