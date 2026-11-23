@@ -742,7 +742,7 @@ dictionary CamGraphs {
     zoom_side:            GraphPoint[]?  // move the highway horizontally (zoom_side in KSH format)
     rotation_deg:         GraphPoint[]?  // rotation degree (affects both highway & jdgline relatively)
     rotation_deg_highway: GraphPoint[]?  // rotation degree added to rotation_deg (affects highway only)
-    rotation_deg_jdgline: GraphPoint[]?  // rotation degree added to rotation_deg (affects jdgline only)
+    rotation_deg_jdgline: GraphPoint[]?  // (OPTIONAL SUPPORT) rotation degree added to rotation_deg (affects jdgline only)
     rotation_deg_layer:   GraphPoint[]?  // (OPTIONAL SUPPORT) rotation degree (affects layer only)
     center_split:         GraphPoint[]?  // split the highway at the center (center_split in KSH format)
     highway_wipe:         GraphPoint[]?  // hide the highway surface from the lower side (+) or the upper side (-) (highway_wipe in KSH format)
@@ -790,7 +790,7 @@ dictionary CamPatternGraphs {
     zoom_side:            GraphSectionPoint[]?
     rotation_deg:         GraphSectionPoint[]?
     rotation_deg_highway: GraphSectionPoint[]?
-    rotation_deg_jdgline: GraphSectionPoint[]?
+    rotation_deg_jdgline: GraphSectionPoint[]?  // (OPTIONAL SUPPORT)
     rotation_deg_layer:   GraphSectionPoint[]?  // (OPTIONAL SUPPORT)
     center_split:         GraphSectionPoint[]?
     highway_wipe:         GraphSectionPoint[]?
