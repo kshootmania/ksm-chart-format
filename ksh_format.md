@@ -492,11 +492,15 @@ The list of definition types is as follows:
 
 - "`#define_fx`"
     - User-defined audio effects for long FX notes
+    - Format: "`#define_fx <name> type=<type>;<param-name>=<param-value>;<param-name>=<param-value>;...`"
+        - `<name>`: The name of the user-defined audio effect
+            - The name can be duplicated with the preset effects (e.g. "`Flanger`").
+        - `<type>`: The type of the audio effect
+        - `<param-name>`: The parameter name
+        - `<param-value>`: The parameter value
+    - For more information about user-defined audio effects, please check out the following blog post.
+        - [K-Shoot MANIA v1.60] Tutorial on creating user-defined effects
+            - http://mtstdy.blog.fc2.com/blog-entry-27.html (only available in Japanese)
 - "`#define_filter`"
     - User-defined audio effects for laser notes
-
-Note that the name of a user-defined audio effect can be duplicated with the preset effects (e.g. "`Flanger`").
-
-For more information about user-defined audio effects, please check out the following blog post.
-- [K-Shoot MANIA v1.60] Tutorial on creating user-defined effects
-    - http://mtstdy.blog.fc2.com/blog-entry-27.html (only available in Japanese)
+    - The format is the same as that of "`#define_fx`".
