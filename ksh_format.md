@@ -390,6 +390,7 @@ The list of body options is as follows:
         - An immediate change can be created by successive two lines of the "`rotation_deg`" option.
     - The value is the rotation degree in degrees (e.g. 0 for no rotation, 90 for a quarter turn, 360 for a full rotation).
     - Note: The animation layer is not rotated by "`rotation_deg`".
+    - Value range: [-65535, 65535]
 - "`rotation_deg_highway`" (Not supported in KSM v1.xx)
     - A rotation degree change of the highway only (float)
     - The value behaves as a linear graph (the same as lane zooms)
