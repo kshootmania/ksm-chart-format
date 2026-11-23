@@ -437,8 +437,8 @@ The list of body options is as follows:
     - If "`ver`" is earlier than "`167`", the value is restricted to the range [-300, 300]; otherwise, [-65535, 65535].
 - "`center_split`"
     - A value change of camera controls (float)
-    - The values behave as a linear graph (the same as manual tilts)
-        - An immediate change can be created by successive two lines of the same options.
+    - The value behaves as a linear graph (the same as lane zooms)
+        - An immediate change can be created by successive two lines of the "`center_split`" option.
     - This creates a margin in the middle of the highway. Every 100 creates a margin of one lane.
     - Value range: [-65535, 65535] (no version-based restriction)
 - "`highway_wipe`" (Not supported in KSM v1.xx)
